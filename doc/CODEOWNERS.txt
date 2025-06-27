@@ -1,5 +1,5 @@
 # Arquitetura de Sistemas
-* @rafaelrisso
+* @RafaelRisso
 
 # Dev Júnior precisa de aprovação de Pleno ou Sênior 
 

@@ -3,23 +3,23 @@
 
 # Dev Júnior precisa de aprovação de Pleno ou Sênior 
 
-/teste/* @ollyvergithub @rafaelrisso
+/test/* @ollyvergithub @rafaelrisso
 
 # PRs para Homologação precisam de aprovação de Tester 
 
-/hom/* @willssan06
+/homolog/* @willssan06
 
 # PRs para Produção precisam de aprovação do Product Owner 
 
-/prod/* @product-owner 
+/master/* @product-owner 
 
 # Bug fixes seguem o mesmo fluxo de features 
 
-/bugfix/* @dev-pleno @dev-senior 
+/bugfix/* @ollyvergithub @rafaelrisso
 
  # Bug fixes seguem o mesmo fluxo de features 
 
-/hotfix/* @dev-pleno @dev-senior 
+/hotfix/* @ollyvergithub @rafaelrisso
 
 
  

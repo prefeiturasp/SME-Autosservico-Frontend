@@ -1,0 +1,27 @@
+# Arquitetura de Sistemas
+* @RafaelRisso
+
+# Dev Júnior precisa de aprovação de Pleno ou Sênior 
+
+/teste/* @dev-pleno @dev-senior 
+
+# PRs para Homologação precisam de aprovação de Tester 
+
+/hom/* @tester 
+
+# PRs para Produção precisam de aprovação do Product Owner 
+
+/prod/* @product-owner 
+
+# Bug fixes seguem o mesmo fluxo de features 
+
+/bugfix/* @dev-pleno @dev-senior 
+
+ # Bug fixes seguem o mesmo fluxo de features 
+
+/hotfix/* @dev-pleno @dev-senior 
+
+
+ 
+
+ 

@@ -3,11 +3,11 @@
 
 # Dev Júnior precisa de aprovação de Pleno ou Sênior 
 
-/teste/* @dev-pleno @dev-senior 
+/teste/* @ollyvergithub @rafaelrisso
 
 # PRs para Homologação precisam de aprovação de Tester 
 
-/hom/* @tester 
+/hom/* @willssan06
 
 # PRs para Produção precisam de aprovação do Product Owner 
 

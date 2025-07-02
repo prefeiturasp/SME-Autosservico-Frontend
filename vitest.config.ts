@@ -21,6 +21,7 @@ export default defineConfig({
         'src/const.ts',
         'src/app/api/*',
         '*/types/*',
+        '**/_material/**',
         'next.config.mjs',
         'tailwind.config.js',
         'postcss.config.mjs',
@@ -33,6 +34,8 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: [{ find: '@', replacement: path.resolve(__dirname, './src') }],
+    alias: [
+        { find: '@', replacement: path.resolve(__dirname, './src') },
+    ],
   },
 })

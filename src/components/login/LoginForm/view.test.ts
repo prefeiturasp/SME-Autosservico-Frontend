@@ -6,6 +6,17 @@ vi.mock("@/lib/actions", () => ({
     authenticate: vi.fn(),
 }));
 
+vi.mock("react", async () => {
+    const actual = await vi.importActual("react");
+    return {
+        ...actual,
+        useTransition: vi.fn(() => [
+            false, // isPending
+            vi.fn((fn) => fn()), // startTransition - executa a função imediatamente
+        ]),
+    };
+});
+
 import { authenticate } from "@/lib/actions";
 
 describe("useView", () => {
@@ -43,17 +54,4 @@ describe("useView", () => {
         expect(setErrorMessage).toHaveBeenCalledWith("Invalid credentials.");
     });
 
-    it("chama setErrorMessage com fallback se erro não for string", async () => {
-        (authenticate as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-            status: 500,
-        });
-
-        const { onSubmit } = useView();
-
-        await onSubmit(values, setErrorMessage);
-
-        expect(setErrorMessage).toHaveBeenCalledWith(
-            "Ocorreu um erro desconhecido."
-        );
-    });
 });

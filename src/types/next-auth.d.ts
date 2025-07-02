@@ -5,23 +5,27 @@ import { DefaultJWT } from "next-auth/jwt";
 declare module "next-auth" {
     interface User extends DefaultUser {
         rf: string; // Registro Funcional (RF)
-        abrangencia?: {
-            id: string;
-            nome: string;
-            descricao: string;
-            nivel: number;
-        };
+        cpf?: string;
+        situacaoUsuario?: number;
+        situacaoGrupo?: number;
+        visoes?: string[];
+        perfis_por_sistema?: {
+            sistema: number;
+            perfis: string[];
+        }[];
     }
 
     interface Session extends DefaultSession {
         user: {
             rf: string; // Registro Funcional (RF)
-            abrangencia?: {
-                id: string;
-                nome: string;
-                descricao: string;
-                nivel: number;
-            };
+            cpf?: string;
+            situacaoUsuario?: number;
+            situacaoGrupo?: number;
+            visoes?: string[];
+            perfis_por_sistema?: {
+                sistema: number;
+                perfis: string[];
+            }[];
         } & DefaultSession["user"];
     }
 }
@@ -29,11 +33,13 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
     interface JWT extends DefaultJWT {
         rf: string; // Registro Funcional (RF)
-        abrangencia?: {
-            id: string;
-            nome: string;
-            descricao: string;
-            nivel: number;
-        };
+        cpf?: string;
+        situacaoUsuario?: number;
+        situacaoGrupo?: number;
+        visoes?: string[];
+        perfis_por_sistema?: {
+            sistema: number;
+            perfis: string[];
+        }[];
     }
 }

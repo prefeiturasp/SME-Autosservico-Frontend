@@ -11,59 +11,81 @@ export default async function Dashboard() {
 
     return (
         <>
-            <div className="min-h-screen bg-gray-50">
-                <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-                    <div className="bg-white shadow rounded-lg">
-                        <div className="px-4 py-5 sm:p-6">
-                            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                                Dashboard
-                            </h1>
+            <div className="p-6 space-y-6">
+                <h1 className="text-2xl font-bold">Dashboard</h1>
+                <h2 className="text-2xl font-bold">Dados da Sessão</h2>
 
-                            <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                                <h2 className="text-lg font-medium text-blue-900 mb-2">
-                                    Informações da Sessão
-                                </h2>
-                                <div className="space-y-2 text-sm text-blue-800">
-                                    <p>
-                                        <strong>ID:</strong> {session.user?.id}
-                                    </p>
-                                    <p>
-                                        <strong>RF:</strong> {session.user?.rf}
-                                    </p>
-                                    <p>
-                                        <strong>Nome:</strong>{" "}
-                                        {session.user?.name}
-                                    </p>
-                                    <p>
-                                        <strong>Email:</strong>{" "}
-                                        {session.user?.email}
-                                    </p>
-                                    <p>
-                                        <strong>Imagem:</strong>{" "}
-                                        {session.user?.image || "N/A"}
-                                    </p>
-                                    <p>
-                                        <strong>Abrangência Nome:</strong>{" "}
-                                        {session.user?.abrangencia?.nome}
-                                    </p>
-                                    <p>
-                                        <strong>Abrangência Descrição:</strong>{" "}
-                                        {session.user?.abrangencia?.descricao}
-                                    </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white p-4 rounded-lg shadow">
+                        <h2 className="text-lg font-semibold mb-2">
+                            Informações Básicas
+                        </h2>
+                        <p>
+                            <strong>Nome:</strong> {session.user.name}
+                        </p>
+                        <p>
+                            <strong>Email:</strong> {session.user.email}
+                        </p>
+                        <p>
+                            <strong>RF:</strong> {session.user.rf}
+                        </p>
+                        <p>
+                            <strong>CPF:</strong> {session.user.cpf}
+                        </p>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-lg shadow">
+                        <h2 className="text-lg font-semibold mb-2">Status</h2>
+                        <p>
+                            <strong>Situação Usuário:</strong>{" "}
+                            {session.user.situacaoUsuario}
+                        </p>
+                        <p>
+                            <strong>Situação Grupo:</strong>{" "}
+                            {session.user.situacaoGrupo}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h2 className="text-lg font-semibold mb-2">Visões</h2>
+                    <div className="flex flex-wrap gap-2">
+                        {session.user.visoes?.map((visao) => (
+                            <span
+                                key={visao}
+                                className="px-2 py-1 bg-blue-100 text-blue-800 rounded"
+                            >
+                                {visao}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h2 className="text-lg font-semibold mb-2">
+                        Perfis por Sistema
+                    </h2>
+                    <div className="space-y-3">
+                        {session.user.perfis_por_sistema?.map((sistema) => (
+                            <div
+                                key={sistema.sistema}
+                                className="border border-gray-200 rounded p-3"
+                            >
+                                <h3 className="font-medium text-gray-900 mb-2">
+                                    Sistema {sistema.sistema}
+                                </h3>
+                                <div className="flex flex-wrap gap-1">
+                                    {sistema.perfis.map((perfil, index) => (
+                                        <span
+                                            key={index}
+                                            className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm"
+                                        >
+                                            {perfil}
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
-
-                            <div className="mt-6">
-                                <h3 className="text-lg font-medium text-gray-900 mb-3">
-                                    Área Protegida
-                                </h3>
-                                <p className="text-gray-600">
-                                    Este conteúdo só é visível para usuários
-                                    autenticados. Você está vendo isso porque
-                                    fez login com sucesso!
-                                </p>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>

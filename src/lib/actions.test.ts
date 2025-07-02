@@ -123,10 +123,10 @@ describe("authenticate", () => {
             );
             const result = await authenticate(undefined, formData);
 
-            expect(result).toBe("Invalid credentials.");
+            expect(result).toBe("Credenciais inválidas.");
         });
 
-        it("deve retornar 'Something went wrong.' para outros tipos de AuthError", async () => {
+        it("deve retornar 'Algo deu errado. Tente novamente.' para outros tipos de AuthError", async () => {
             const authError = new AuthError("Unknown error");
             //authError.type = "Configuration";
             mockSignIn.mockRejectedValue(authError);
@@ -134,10 +134,10 @@ describe("authenticate", () => {
             const formData = createFormData("user@example.com", "password123");
             const result = await authenticate(undefined, formData);
 
-            expect(result).toBe("Something went wrong.");
+            expect(result).toBe("Algo deu errado. Tente novamente.");
         });
 
-        it("deve retornar 'Something went wrong.' para AuthError sem tipo específico", async () => {
+        it("deve retornar 'Algo deu errado. Tente novamente.' para AuthError sem tipo específico", async () => {
             const authError = new AuthError("Unknown error");
             // Não define o tipo, deixa como string vazia
             mockSignIn.mockRejectedValue(authError);
@@ -145,8 +145,54 @@ describe("authenticate", () => {
             const formData = createFormData("user@example.com", "password123");
             const result = await authenticate(undefined, formData);
 
-            expect(result).toBe("Something went wrong.");
+            expect(result).toBe("Algo deu errado. Tente novamente.");
         });
+
+        it("deve retornar mensagem customizada para erro CallbackRouteError com causa", async () => {
+            const authError = new AuthError("Callback error");
+            authError.type = "CallbackRouteError";
+            authError.cause = {
+                err: {
+                    name: "Error",
+                    message: "Usuário não encontrado!",
+                },
+            };
+
+            mockSignIn.mockRejectedValue(authError);
+
+            const formData = createFormData("1234567", "password123");
+            const result = await authenticate(undefined, formData);
+
+            expect(result).toBe("Usuário não encontrado!");
+        });
+
+        it("deve retornar mensagem padrão para erro CallbackRouteError sem causa", async () => {
+            const authError = new AuthError("Callback error");
+            authError.type = "CallbackRouteError";
+            // Sem propriedade cause
+            mockSignIn.mockRejectedValue(authError);
+
+            const formData = createFormData("1234567", "password123");
+            const result = await authenticate(undefined, formData);
+
+            expect(result).toBe("Erro na autenticação.");
+        });
+
+        it("deve retornar mensagem padrão para erro CallbackRouteError com causa sem mensagem", async () => {
+            const authError = new AuthError("Callback error");
+            authError.type = "CallbackRouteError";
+            authError.cause = {
+                err: { name: "", message: "" }, // Objeto Error válido, mas vazio
+            };
+
+            mockSignIn.mockRejectedValue(authError);
+
+            const formData = createFormData("1234567", "password123");
+            const result = await authenticate(undefined, formData);
+
+            expect(result).toBe("Erro na autenticação.");
+        });
+
     });
 
     describe("Tratamento de erros não relacionados à autenticação", () => {
@@ -202,10 +248,7 @@ describe("authenticate", () => {
             const mockRetorno = { success: true };
             mockSignIn.mockResolvedValue(mockRetorno);
 
-            const formData = createFormData(
-                "  1234567  ",
-                "password123"
-            );
+            const formData = createFormData("  1234567  ", "password123");
             const result = await authenticate(undefined, formData);
 
             expect(mockSignIn).toHaveBeenCalledWith("credentials", {
@@ -222,10 +265,7 @@ describe("authenticate", () => {
             const mockRetorno = { success: true };
             mockSignIn.mockResolvedValue(mockRetorno);
 
-            const formData = createFormData(
-                "1234567",
-                "p@ssw0rd!@#$%"
-            );
+            const formData = createFormData("1234567", "p@ssw0rd!@#$%");
             const result = await authenticate(undefined, formData);
 
             expect(mockSignIn).toHaveBeenCalledWith("credentials", {
@@ -248,28 +288,6 @@ describe("authenticate", () => {
             const result = await authenticate(undefined, formData);
 
             expect(result).toBeUndefined();
-            expect(mockConsoleLog).toHaveBeenCalledWith(
-                "Retorno do signIn:",
-                mockRetorno
-            );
-        });
-    });
-
-    describe("Logs de console", () => {
-        it("deve fazer log do retorno do signIn em caso de sucesso", async () => {
-            const mockRetorno = {
-                success: true,
-                user: { id: 1, email: "user@example.com" },
-            };
-            mockSignIn.mockResolvedValue(mockRetorno);
-
-            const formData = createFormData("user@example.com", "password123");
-            await authenticate(undefined, formData);
-
-            expect(mockConsoleLog).toHaveBeenCalledWith(
-                "Retorno do signIn:",
-                mockRetorno
-            );
         });
     });
 });

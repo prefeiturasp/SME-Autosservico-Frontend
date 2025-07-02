@@ -48,11 +48,9 @@ describe("Dashboard page", () => {
         render(await Dashboard());
 
         expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
-        expect(screen.getByText(/Admin User/i)).toBeInTheDocument();
+        expect(screen.getByText(/Nome/i)).toBeInTheDocument();
+        expect(screen.getByText(/Email/i)).toBeInTheDocument();
         expect(screen.getByText(/admin@example.com/i)).toBeInTheDocument();
-        expect(screen.getByText(/Admin Area/i)).toBeInTheDocument();
-        expect(screen.getByText(/Acesso total/i)).toBeInTheDocument();
-        expect(screen.getByText(/Área Protegida/i)).toBeInTheDocument();
     });
 
     test("redireciona para /login quando não autenticado", async () => {

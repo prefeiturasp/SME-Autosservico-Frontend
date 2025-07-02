@@ -35,7 +35,7 @@ export default function LoginForm() {
         mode: "onChange",
     });
 
-    const { onSubmit } = useView();
+    const { onSubmit, isPending } = useView();
 
     return (
         <div className="min-h-screen relative overflow-hidden">
@@ -145,9 +145,12 @@ export default function LoginForm() {
 
                                 <div>
                                     <Button
+                                        type="submit"
                                         variant="default"
                                         className="w-full text-white font-medium mt-5 disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
-                                        disabled={!form.formState.isValid}
+                                        disabled={
+                                            !form.formState.isValid || isPending
+                                        }
                                     >
                                         Entrar
                                     </Button>

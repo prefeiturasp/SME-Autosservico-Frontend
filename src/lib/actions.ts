@@ -11,21 +11,26 @@ export async function authenticate(
         const rf = formData.get("rf");
         const password = formData.get("password");
 
-        const retorno = await signIn("credentials", {
+        await signIn("credentials", {
             rf,
             password,
             redirectTo: "/dashboard",
             redirect: true,
         });
-
-        console.log("Retorno do signIn:", retorno);
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
-                    return "Invalid credentials.";
+                    return "Credenciais inválidas.";
+                case "CallbackRouteError":
+                    // Captura erros customizados do authorize
+                    const message = error.cause?.err?.message;
+                    if (message) {
+                        return message;
+                    }
+                    return "Erro na autenticação.";
                 default:
-                    return "Something went wrong.";
+                    return "Algo deu errado. Tente novamente.";
             }
         }
         throw error;

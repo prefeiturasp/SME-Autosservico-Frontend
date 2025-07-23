@@ -4,8 +4,8 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { AppSidebar } from "@/components/dashboard/Sidebar/app-sidebar";
+import { PageHeader } from "@/components/dashboard/Sidebar/page-header";
 
 export default function DashboardLayout({
     children,

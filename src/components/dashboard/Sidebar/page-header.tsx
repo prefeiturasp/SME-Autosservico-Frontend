@@ -1,6 +1,5 @@
-// src/components/dashboard/page-header.tsx
 "use client";
-import useDashboardStore from "@/states/dashboard"; // default import
+import useDashboardStore from "@/states/dashboard";
 
 export function PageHeader() {
     // Usando seu padrão
@@ -9,7 +8,7 @@ export function PageHeader() {
     if (!activeItem) return null;
 
     return (
-        <div className="border-b bg-background px-6 py-4">
+        <div className="bg-background px-6 py-4">
             <h1 className="text-2xl font-bold text-foreground">
                 {activeItem.subTitle} [{activeItem.title}]
             </h1>

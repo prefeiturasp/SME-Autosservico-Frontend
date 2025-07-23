@@ -78,7 +78,7 @@ vi.mock("@/assets/icons/SidebarCotic", () => ({
 }));
 
 import useDashboardStore from "@/states/dashboard";
-import { SidebarProvider } from "../ui/sidebar";
+import { SidebarProvider } from "../../ui/sidebar";
 
 const mockSetActiveItem = vi.fn();
 

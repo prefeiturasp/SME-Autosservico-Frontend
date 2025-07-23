@@ -27,7 +27,7 @@ import SidebarMenuClose from "@/assets/icons/SidebarMenuClose";
 import SidebarMenuOpen from "@/assets/icons/SidebarMenuOpen";
 import LogoutIcon from "@/assets/icons/Logout";
 import LogoDevops from "@/assets/images/logo_devops.webp";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 
 const items = [
     {

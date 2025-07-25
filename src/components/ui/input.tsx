@@ -3,8 +3,7 @@ import * as React from 'react'
 import { Props as BaseInputMaskProps } from 'react-input-mask'
 import BaseInputMask from '@mona-health/react-input-mask'
 
-import { cn } from '@/lib/utils'
-import { numberToBRL } from '@/lib/utils'
+import {cn, numberToBRL } from '@/lib/utils'
 import { useFormField } from './form'
 
 export interface InputProps

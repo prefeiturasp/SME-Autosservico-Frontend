@@ -9,6 +9,7 @@ export default function SidebarCoceu(
             id="screenshot-b5d546b9-73df-80f5-8006-2c56a8203cd1"
             viewBox="0 0 24 24"
             className={props.className}
+            data-testid="sidebar-coped-icon"
             fill="none"
             version="1.1"
         >

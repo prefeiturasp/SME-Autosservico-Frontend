@@ -99,10 +99,10 @@ export const mockAuthorize = async (
     throw new Error("Erro interno no servidor!");
 
   return {
-    id: loginResponse.login!,
-    name: loginResponse.nome!,
+    id: loginResponse.login,
+    name: loginResponse.nome,
     email: loginResponse.email || "",
-    rf: loginResponse.login!,
+    rf: loginResponse.login,
     cpf: loginResponse.cpf || "",
     situacaoUsuario: loginResponse.situacaoUsuario!,
     situacaoGrupo: loginResponse.situacaoGrupo!,

@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import Image from "next/image";
+import React, { useEffect, useMemo } from "react";
+
 import {
     Sidebar,
     SidebarContent,
@@ -16,97 +16,13 @@ import {
 } from "@/components/ui/sidebar";
 
 import useDashboardStore from "@/states/dashboard";
+import { useAllowedSquads } from "@/hooks/useAllowedSquads";
+import { CustomTrigger } from "./custom-trigger";
+import { COORDENADORIAS } from "./coordenadorias";
 
-import SidebarAscom from "@/assets/icons/SidebarAscom";
-import SidebarCoceu from "@/assets/icons/SidebarCoceu";
-import SidebarCodae from "@/assets/icons/SidebarCodae";
-import SidebarCoped from "@/assets/icons/SidebarCoped";
-import SidebarCoplan from "@/assets/icons/SidebarCoplan";
-import SidebarCotic from "@/assets/icons/SidebarCotic";
-import SidebarMenuClose from "@/assets/icons/SidebarMenuClose";
-import SidebarMenuOpen from "@/assets/icons/SidebarMenuOpen";
 import LogoutIcon from "@/assets/icons/Logout";
-import LogoDevops from "@/assets/images/logo_devops.webp";
 import { Button } from "../../ui/button";
 
-const items = [
-    {
-        title: "ASCOM",
-        subTitle: "Assessoria de comunicação",
-        url: "#",
-        icon: SidebarAscom,
-    },
-    {
-        title: "COCEU",
-        subTitle: "Coordenadoria dos Centros Educacionais Unificados",
-        url: "#",
-        icon: SidebarCoceu,
-    },
-    {
-        title: "CODAE",
-        subTitle: "Coordenadoria de alimentação escolar",
-        url: "#",
-        icon: SidebarCodae,
-    },
-    {
-        title: "COPED",
-        subTitle: "Coordenadoria pedagógica",
-        url: "#",
-        icon: SidebarCoped,
-    },
-    {
-        title: "COPLAN",
-        subTitle: "Coordenadoria de Planejamento e Orçamento",
-        url: "#",
-        icon: SidebarCoplan,
-    },
-    {
-        title: "COTIC",
-        subTitle: "Coordenadoria de Tecnologia da Informação e Comunicação",
-        url: "#",
-        icon: SidebarCotic,
-    },
-];
-
-export function CustomTrigger() {
-    const { toggleSidebar, open } = useSidebar();
-    return (
-        <div
-            className={`${
-                open
-                    ? "flex items-center justify-between w-full px-4 py-3"
-                    : "text-center"
-            }`}
-        >
-            {open ? (
-                <>
-                    <div className="flex-shrink-0">
-                        <Image
-                            src={LogoDevops}
-                            alt="Logo AutoServiço"
-                            sizes="(min-width: 880px) 134w, 108w"
-                            className="w-[108px] md:w-[80px]"
-                            loading="lazy"
-                            fetchPriority="low"
-                            width={LogoDevops.width}
-                            height={LogoDevops.height}
-                        />
-                    </div>
-                    <button
-                        onClick={toggleSidebar}
-                        className="flex-shrink-0 p-2 rounded-md"
-                    >
-                        <SidebarMenuClose />
-                    </button>
-                </>
-            ) : (
-                <button onClick={toggleSidebar}>
-                    <SidebarMenuOpen />
-                </button>
-            )}
-        </div>
-    );
-}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { open } = useSidebar();
@@ -114,16 +30,35 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const activeItem = useDashboardStore((state) => state.activeItem);
     const setActiveItem = useDashboardStore((state) => state.setActiveItem);
 
-    const handleItemClick = (item: (typeof items)[0]) => {
+    const allowedSquads = useAllowedSquads();
+
+    const allowedItems = useMemo(
+        () => COORDENADORIAS.filter((item) => allowedSquads.includes(item.title)),
+        [allowedSquads]
+    );
+
+    useEffect(() => {
+        if (!activeItem && allowedItems.length > 0) {
+            setActiveItem(allowedItems[0]);
+        }
+    }, [activeItem, allowedItems, setActiveItem]);
+
+    const handleItemClick = (item: (typeof COORDENADORIAS)[0]) => {
         setActiveItem({
             title: item.title,
             subTitle: item.subTitle,
             url: item.url,
+            icon: item.icon
         });
     };
 
     return (
-        <Sidebar collapsible="icon" data-testid="sidebar-root" {...props}>
+        <Sidebar
+            collapsible="icon"
+            data-testid="sidebar-root"
+            {...props}
+            className="!rounded-xl m-2 ollyver"
+        >
             <SidebarHeader>
                 <CustomTrigger />
             </SidebarHeader>
@@ -131,7 +66,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
+                            {allowedItems.map((item) => (
                                 <SidebarMenuItem
                                     key={item.title}
                                     className="my-1"
@@ -142,7 +77,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             activeItem?.title === item.title
                                         }
                                         onClick={() => handleItemClick(item)}
-                                        className="px-5 rounded-sm h-auto"
+                                        //className="px-5 rounded-sm h-auto bg-[#3B82F6] text-white hover:bg-[rgba(59,130,246,0.5)] hover:text-white"
+                                        className={`px-5 rounded-sm h-auto transition-colors
+                                            ${
+                                                activeItem?.title === item.title
+                                                    ? "bg-[#3B82F6] text-white"
+                                                    : "hover:bg-[rgba(59,130,246,0.5)] hover:text-white"
+                                            }
+                                        `}
                                     >
                                         <a
                                             href={item.url}
@@ -174,8 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         open && "justify-end"
                     } [&_svg]:size-7 text-white no-underline hover:no-underline text-right`}
                 >
-                    {open && <span>Sair</span>}{" "}
-                    <LogoutIcon/>
+                    {open && <span>Sair</span>} <LogoutIcon />
                 </Button>
             </SidebarFooter>
             <SidebarRail />

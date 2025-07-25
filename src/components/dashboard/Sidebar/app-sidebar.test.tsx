@@ -1,7 +1,6 @@
 import React from "react";
 
-import { screen, fireEvent } from "@testing-library/react";
-import { render } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import {
     beforeEach,
     describe,
@@ -77,6 +76,35 @@ vi.mock("@/assets/icons/SidebarCotic", () => ({
     default: () => <div>IconCOTIC</div>,
 }));
 
+
+// ✅ Mock do NextAuth/useSession com perfis válidos
+vi.mock("next-auth/react", () => {
+    return {
+        __esModule: true,
+        useSession: vi.fn(() => ({
+            data: {
+                user: {
+                    nome: "Usuário Teste",
+                    cpf: "00000000000",
+                    email: "teste@teste.com",
+                    login: "123456",
+                    situacaoUsuario: 1,
+                    situacaoGrupo: 1,
+                    visoes: ["UE"],
+                    perfis_por_sistema: [
+                        {
+                            sistema: 1008,
+                            perfis: ["COPED", "COPLAN"],
+                        },
+                    ],
+                },
+            },
+            status: "authenticated",
+        })),
+    };
+});
+
+
 import useDashboardStore from "@/states/dashboard";
 import { SidebarProvider } from "../../ui/sidebar";
 
@@ -99,66 +127,66 @@ describe("<AppSidebar />", () => {
     const renderWithSidebarProvider = (ui: React.ReactNode) =>
         render(<SidebarProvider>{ui}</SidebarProvider>);
 
-    it("deve renderizar todos os itens do menu corretamente", () => {
+    it("deve renderizar apenas os itens permitidos (baseado nos perfis do sistema 1008)", () => {
         renderWithSidebarProvider(<AppSidebar />);
-        expect(screen.getByText("ASCOM")).toBeInTheDocument();
+        expect(screen.getByText("COPED")).toBeInTheDocument();
+        expect(screen.getByText("Coordenadoria pedagógica")).toBeInTheDocument();
+        expect(screen.getByText("COPLAN")).toBeInTheDocument();
         expect(
-            screen.getByText("Assessoria de comunicação")
+            screen.getByText("Coordenadoria de Planejamento e Orçamento")
         ).toBeInTheDocument();
         expect(screen.getByText("Sair")).toBeInTheDocument();
     });
 
-    it("deve chamar setActiveItem ao clicar em um item", () => {
-        renderWithSidebarProvider(<AppSidebar />);
-        fireEvent.click(screen.getByText("ASCOM"));
-        expect(mockSetActiveItem).toHaveBeenCalledWith({
-            title: "ASCOM",
-            subTitle: "Assessoria de comunicação",
+it("deve chamar setActiveItem ao clicar em um item permitido", () => {
+    renderWithSidebarProvider(<AppSidebar />);
+    fireEvent.click(screen.getByText("COPED"));
+    expect(mockSetActiveItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+            title: "COPED",
+            subTitle: "Coordenadoria pedagógica",
             url: "#",
-        });
-    });
+        })
+    );
+});
 
     it("deve marcar o item como ativo quando activeItem.title corresponder", () => {
         (useDashboardStore as unknown as ViMock).mockImplementation(
             (selector) => {
                 return selector({
-                    activeItem: { title: "ASCOM" },
+                    activeItem: { title: "COPED" },
                     setActiveItem: mockSetActiveItem,
                 });
             }
         );
 
         renderWithSidebarProvider(<AppSidebar />);
-        const ascomButton = screen.getByText("ASCOM").closest("a");
-        expect(ascomButton).toHaveClass("!items-start");
+        const copedButton = screen.getByText("COPED").closest("a");
+        expect(copedButton).toHaveClass("!items-start");
     });
+
 
     it("renderiza corretamente quando a sidebar está fechada e abre ao clicar no ícone de hamburguer", () => {
-        (useDashboardStore as unknown as ViMock).mockImplementation(
-            (selector) => {
-                return selector({
-                    activeItem: { title: "ASCOM" },
-                    setActiveItem: mockSetActiveItem,
-                });
-            }
-        );
+            (useDashboardStore as unknown as ViMock).mockImplementation(
+                (selector) => {
+                    return selector({
+                        activeItem: { title: "COPED" },
+                        setActiveItem: mockSetActiveItem,
+                    });
+                }
+            );
 
-        renderWithSidebarProvider(<AppSidebar />);
+            renderWithSidebarProvider(<AppSidebar />);
 
-        // ✅ Fecha a sidebar clicando no botão que contém o ícone de close (mockado ou real)
-        const closeButton = screen.getByTestId("icon-close").closest("button")!;
-        fireEvent.click(closeButton);
+            const closeButton = screen.getByTestId("icon-close").closest("button")!;
+            fireEvent.click(closeButton);
 
+            const openButton = screen.getByTestId("icon-open").closest("button")!;
+            fireEvent.click(openButton);
 
-        // ✅ Agora abre a sidebar clicando no botão com o ícone real de open (cobre o componente SidebarMenuOpen.tsx)
-        const openButton = screen.getByTestId("icon-open").closest("button")!;
-        fireEvent.click(openButton);
-
-        // 🔹 Verifica se voltou ao estado expanded e os textos reaparecem
-        //expect(sidebar).toHaveAttribute("data-state", "expanded");
-        expect(screen.getByText("ASCOM")).toBeInTheDocument();
-        expect(
-            screen.getByText("Assessoria de comunicação")
-        ).toBeInTheDocument();
-    });
+            expect(screen.getByText("COPED")).toBeInTheDocument();
+            expect(
+                screen.getByText("Coordenadoria pedagógica")
+            ).toBeInTheDocument();
+        });
 });

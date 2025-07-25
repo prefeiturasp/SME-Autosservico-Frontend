@@ -85,19 +85,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 // Caso 1: Senha inválida (status 401)
                 if (loginResponse.status === 401) {
-                    //console.log("Senha inválida:", loginResponse.detail);
                     throw new Error("Senha inválida!");
                 }
 
                 // Caso 2: Login não encontrado (sem status, mas com detail de erro)
                 if (!loginResponse.nome && loginResponse.detail) {
-                    //console.log("Login não encontrado:", loginResponse.detail);
                     throw new Error("Usuário não encontrado!");
                 }
 
                 // Caso 3: Sucesso - verifica se tem os dados essenciais
                 if (!loginResponse.nome || !loginResponse.login) {
-                    //console.log("Resposta inválida da API:", loginResponse);
                     throw new Error("Erro interno no servidor!");
                 }
 
@@ -135,7 +132,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         async session({ session, token }) {
             if (token) {
                 session.user.id = token.id as string;
-                session.user.rf = token.rf as string;
+                session.user.rf = token.rf;
                 session.user.cpf = token.cpf as string;
                 session.user.situacaoUsuario = token.situacaoUsuario as number;
                 session.user.situacaoGrupo = token.situacaoGrupo as number;

@@ -9,6 +9,7 @@ export default function SidebarCoceu(
             id="screenshot-b5d546b9-73df-80f5-8006-2c56a81fed8e"
             viewBox="1067.075 2251.042 20.925 17.45"
             className={props.className}
+            data-testid="sidebar-coceu-icon"
             fill="none"
             version="1.1"
         >

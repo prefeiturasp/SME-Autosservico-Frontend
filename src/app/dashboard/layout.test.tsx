@@ -1,6 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import DashboardLayout from "../dashboard/layout";
 
+vi.mock("next-auth/react", () => ({
+    __esModule: true,
+    useSession: vi.fn(() => ({
+        data: { user: { name: "Usuário Teste" } },
+        status: "authenticated",
+    })),
+    SessionProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 vi.mock("next/image", () => ({
     default: (props: Record<string, unknown>) => {
         // eslint-disable-next-line @next/next/no-img-element, @typescript-eslint/no-unused-vars

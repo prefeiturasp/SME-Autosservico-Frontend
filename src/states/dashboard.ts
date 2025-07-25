@@ -2,32 +2,25 @@
 import { create } from "zustand";
 
 export interface SidebarItem {
-  title: string;
-  subTitle: string;
-  url: string;
+    title: string;
+    subTitle: string;
+    url: string;
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
 type State = {
-  activeItem: SidebarItem | null;
+    activeItem: SidebarItem | null;
 };
 
 type Action = {
-  setActiveItem: (item: State["activeItem"]) => void;
-  clearActiveItem: () => void;
+    setActiveItem: (item: SidebarItem | null) => void;
+    clearActiveItem: () => void;
 };
 
-// Item inicial (ASCOM)
-const initialActiveItem: SidebarItem = {
-  title: "ASCOM",
-  subTitle: "Assessoria de comunicação",
-  url: "#"
-};
-
+// Inicialmente nulo (vamos setar depois com base no allowedSquads)
 export default create<State & Action>((set) => ({
-  // Estado inicial
-  activeItem: initialActiveItem,
+    activeItem: null,
 
-  // Ações
-  setActiveItem: (activeItem: State["activeItem"]) => set({ activeItem }),
-  clearActiveItem: () => set({ activeItem: null }),
+    setActiveItem: (activeItem) => set({ activeItem }),
+    clearActiveItem: () => set({ activeItem: null }),
 }));

@@ -1,8 +1,8 @@
+import { useCallback } from "react";
 import { SelectedSistemaSchema } from "./schema"; // Importando o schema Zod
 
 export default function useView() {
-    const useHandleSelectChange = (id: string) => {
-        console.log("Selected system ID: ", id);
+    const handleSelectChange = useCallback((id: string) => {
 
         // Validação com Zod
         const validation = SelectedSistemaSchema.safeParse(id);
@@ -14,7 +14,7 @@ export default function useView() {
             console.log("Valor válido:", validation.data);
             // Aqui você pode adicionar lógica adicional para valor válido
         }
-    };
+    }, []); // ✅ Memoriza a função, evitando recriação a cada render
 
-    return { useHandleSelectChange };
+    return { handleSelectChange };
 }

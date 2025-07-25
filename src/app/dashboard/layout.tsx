@@ -1,3 +1,5 @@
+"use client";
+import { SessionProvider } from "next-auth/react";
 import "@/styles/globals.scss";
 import {
     SidebarInset,
@@ -5,7 +7,8 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/Sidebar/app-sidebar";
-import { PageHeader } from "@/components/dashboard/Sidebar/page-header";
+import { PageHeader } from "@/components/dashboard/page-header";
+import { SelectSistemas } from "@/components/dashboard/SelectSistemas";
 
 export default function DashboardLayout({
     children,
@@ -13,13 +16,16 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-                <SidebarTrigger className="md:hidden" />
-                <PageHeader />
-                {children}
-            </SidebarInset>
-        </SidebarProvider>
+        <SessionProvider>
+            <SidebarProvider>
+                <AppSidebar />
+                <SidebarInset>
+                    <SidebarTrigger className="md:hidden" />
+                    <PageHeader />
+                    <SelectSistemas />
+                    {children}
+                </SidebarInset>
+            </SidebarProvider>
+        </SessionProvider>
     );
 }

@@ -9,6 +9,7 @@ export default function SidebarAscom(
             id="screenshot-5bcc641d-caae-80e6-8006-16c1cafc76a9"
             viewBox="-594.133 2186.767 20 18"
             className={props.className}
+            data-testid="sidebar-ascom-icon"
             fill="none"
             version="1.1"
         >

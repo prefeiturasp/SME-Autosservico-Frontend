@@ -9,6 +9,7 @@ export default function SidebarCodae(
             id="screenshot-5bcc641d-caae-80e6-8006-16c1cafc76af"
             viewBox="0 0 24 24"
             className={props.className}
+            data-testid="sidebar-codae-icon"
             fill="none"
             version="1.1"
         >

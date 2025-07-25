@@ -2,7 +2,7 @@
 import useDashboardStore from "@/states/dashboard";
 
 export function PageHeader() {
-    // Usando seu padrão
+
     const activeItem = useDashboardStore((state) => state.activeItem);
 
     if (!activeItem) return null;

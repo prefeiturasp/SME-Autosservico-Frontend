@@ -128,7 +128,6 @@ describe("authenticate", () => {
 
         it("deve retornar 'Algo deu errado. Tente novamente.' para outros tipos de AuthError", async () => {
             const authError = new AuthError("Unknown error");
-            //authError.type = "Configuration";
             mockSignIn.mockRejectedValue(authError);
 
             const formData = createFormData("user@example.com", "password123");

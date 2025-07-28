@@ -76,6 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         isActive={
                                             activeItem?.title === item.title
                                         }
+                                        data-testid={`sidebar-button-${item.title.toLowerCase()}`}
                                         onClick={() => handleItemClick(item)}
                                         //className="px-5 rounded-sm h-auto bg-[#3B82F6] text-white hover:bg-[rgba(59,130,246,0.5)] hover:text-white"
                                         className={`px-5 rounded-sm h-auto transition-colors
@@ -86,11 +87,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             }
                                         `}
                                     >
-                                        <a
-                                            href={item.url}
-                                            className={`${
-                                                open ? "!items-start" : ""
-                                            } flex gap-3`}
+                                        <span
+                                            className={`${open ? "!items-start" : ""} flex gap-3 cursor-pointer`}
                                         >
                                             <item.icon className="mt-1 flex-shrink-0" />
                                             <div className="flex flex-col gap-0.5 min-w-0 items-start">
@@ -101,7 +99,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                                     {item.subTitle}
                                                 </span>
                                             </div>
-                                        </a>
+                                        </span>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}

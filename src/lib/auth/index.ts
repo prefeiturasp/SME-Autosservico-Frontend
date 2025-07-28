@@ -3,6 +3,9 @@ import { AxiosError } from "axios";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
+// A lógica de autenticação foi isolada para permitir testes mais fáceis e atingir a cobertura de testes necessária
+import { authorizeUser, jwtCallback, sessionCallback } from "./logic";
+
 type LoginData = {
     login: string;
     senha: string;
@@ -59,93 +62,20 @@ export async function Login(data: LoginData): Promise<LoginResponse> {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    providers: [
-        Credentials({
-            name: "credentials",
-            credentials: {
-                rf: {
-                    label: "RF",
-                    type: "text",
-                    placeholder: "1234567",
-                },
-                password: {
-                    label: "Password",
-                    type: "password",
-                },
-            },
-            async authorize(credentials) {
-                if (!credentials?.rf || !credentials?.password) {
-                    return null;
-                }
-
-                const loginResponse = await Login({
-                    login: credentials.rf as string,
-                    senha: credentials.password as string,
-                });
-
-                // Caso 1: Senha inválida (status 401)
-                if (loginResponse.status === 401) {
-                    throw new Error("Senha inválida!");
-                }
-
-                // Caso 2: Login não encontrado (sem status, mas com detail de erro)
-                if (!loginResponse.nome && loginResponse.detail) {
-                    throw new Error("Usuário não encontrado!");
-                }
-
-                // Caso 3: Sucesso - verifica se tem os dados essenciais
-                if (!loginResponse.nome || !loginResponse.login) {
-                    throw new Error("Erro interno no servidor!");
-                }
-
-                // Retorna o objeto user com os novos campos
-                return {
-                    id: loginResponse.login,
-                    name: loginResponse.nome,
-                    email: loginResponse.email || "",
-                    rf: loginResponse.login,
-                    cpf: loginResponse.cpf,
-                    situacaoUsuario: loginResponse.situacaoUsuario,
-                    situacaoGrupo: loginResponse.situacaoGrupo,
-                    visoes: loginResponse.visoes || [],
-                    perfis_por_sistema: loginResponse.perfis_por_sistema || [],
-                };
-            },
-        }),
-    ],
-    pages: {
-        signIn: "/login",
-    },
-    callbacks: {
-        async jwt({ token, user }) {
-            if (user) {
-                token.id = user.id;
-                token.rf = user.rf;
-                token.cpf = user.cpf;
-                token.situacaoUsuario = user.situacaoUsuario;
-                token.situacaoGrupo = user.situacaoGrupo;
-                token.visoes = user.visoes;
-                token.perfis_por_sistema = user.perfis_por_sistema;
-            }
-            return token;
-        },
-        async session({ session, token }) {
-            if (token) {
-                session.user.id = token.id as string;
-                session.user.rf = token.rf;
-                session.user.cpf = token.cpf as string;
-                session.user.situacaoUsuario = token.situacaoUsuario as number;
-                session.user.situacaoGrupo = token.situacaoGrupo as number;
-                session.user.visoes = token.visoes as string[];
-                session.user.perfis_por_sistema = token.perfis_por_sistema as {
-                    sistema: number;
-                    perfis: string[];
-                }[];
-            }
-            return session;
-        },
-    },
-    session: {
-        strategy: "jwt",
-    },
+  providers: [
+    Credentials({
+      name: "credentials",
+      credentials: {
+        rf: { label: "RF", type: "text", placeholder: "1234567" },
+        password: { label: "Password", type: "password" },
+      },
+      authorize: authorizeUser,
+    }),
+  ],
+  pages: { signIn: "/" },
+  callbacks: {
+    jwt: jwtCallback,
+    session: sessionCallback,
+  },
+  session: { strategy: "jwt" },
 });

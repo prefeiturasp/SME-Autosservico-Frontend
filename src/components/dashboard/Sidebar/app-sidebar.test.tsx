@@ -123,14 +123,15 @@ describe("<AppSidebar />", () => {
         );
     });
 
-
     const renderWithSidebarProvider = (ui: React.ReactNode) =>
         render(<SidebarProvider>{ui}</SidebarProvider>);
 
     it("deve renderizar apenas os itens permitidos (baseado nos perfis do sistema 1008)", () => {
         renderWithSidebarProvider(<AppSidebar />);
         expect(screen.getByText("COPED")).toBeInTheDocument();
-        expect(screen.getByText("Coordenadoria pedagógica")).toBeInTheDocument();
+        expect(
+            screen.getByText("Coordenadoria pedagógica")
+        ).toBeInTheDocument();
         expect(screen.getByText("COPLAN")).toBeInTheDocument();
         expect(
             screen.getByText("Coordenadoria de Planejamento e Orçamento")
@@ -138,17 +139,17 @@ describe("<AppSidebar />", () => {
         expect(screen.getByText("Sair")).toBeInTheDocument();
     });
 
-it("deve chamar setActiveItem ao clicar em um item permitido", () => {
-    renderWithSidebarProvider(<AppSidebar />);
-    fireEvent.click(screen.getByText("COPED"));
-    expect(mockSetActiveItem).toHaveBeenCalledWith(
-        expect.objectContaining({
-            title: "COPED",
-            subTitle: "Coordenadoria pedagógica",
-            url: "#",
-        })
-    );
-});
+    it("deve chamar setActiveItem ao clicar em um item permitido", () => {
+        renderWithSidebarProvider(<AppSidebar />);
+        fireEvent.click(screen.getByText("COPED"));
+        expect(mockSetActiveItem).toHaveBeenCalledWith(
+            expect.objectContaining({
+                title: "COPED",
+                subTitle: "Coordenadoria pedagógica",
+                url: "#",
+            })
+        );
+    });
 
     it("deve marcar o item como ativo quando activeItem.title corresponder", () => {
         (useDashboardStore as unknown as ViMock).mockImplementation(
@@ -161,32 +162,31 @@ it("deve chamar setActiveItem ao clicar em um item permitido", () => {
         );
 
         renderWithSidebarProvider(<AppSidebar />);
-        const copedButton = screen.getByText("COPED").closest("a");
-        expect(copedButton).toHaveClass("!items-start");
+        const button = screen.getByTestId("sidebar-button-coped");
+        expect(button).toHaveClass("bg-[#3B82F6]", "text-white");
     });
 
-
     it("renderiza corretamente quando a sidebar está fechada e abre ao clicar no ícone de hamburguer", () => {
-            (useDashboardStore as unknown as ViMock).mockImplementation(
-                (selector) => {
-                    return selector({
-                        activeItem: { title: "COPED" },
-                        setActiveItem: mockSetActiveItem,
-                    });
-                }
-            );
+        (useDashboardStore as unknown as ViMock).mockImplementation(
+            (selector) => {
+                return selector({
+                    activeItem: { title: "COPED" },
+                    setActiveItem: mockSetActiveItem,
+                });
+            }
+        );
 
-            renderWithSidebarProvider(<AppSidebar />);
+        renderWithSidebarProvider(<AppSidebar />);
 
-            const closeButton = screen.getByTestId("icon-close").closest("button")!;
-            fireEvent.click(closeButton);
+        const closeButton = screen.getByTestId("icon-close").closest("button")!;
+        fireEvent.click(closeButton);
 
-            const openButton = screen.getByTestId("icon-open").closest("button")!;
-            fireEvent.click(openButton);
+        const openButton = screen.getByTestId("icon-open").closest("button")!;
+        fireEvent.click(openButton);
 
-            expect(screen.getByText("COPED")).toBeInTheDocument();
-            expect(
-                screen.getByText("Coordenadoria pedagógica")
-            ).toBeInTheDocument();
-        });
+        expect(screen.getByText("COPED")).toBeInTheDocument();
+        expect(
+            screen.getByText("Coordenadoria pedagógica")
+        ).toBeInTheDocument();
+    });
 });

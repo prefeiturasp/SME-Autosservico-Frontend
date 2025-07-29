@@ -20,7 +20,7 @@ vi.mock("react", async () => {
 import { authenticate } from "@/lib/actions";
 
 describe("useView", () => {
-    const setErrorMessage = vi.fn();
+    const onError = vi.fn(); // Mudou de setErrorMessage para onError
     const values = {
         rf: "12345678",
         password: "admin123",
@@ -30,28 +30,44 @@ describe("useView", () => {
         vi.clearAllMocks();
     });
 
-    it("chama setErrorMessage(null) quando autenticação é bem-sucedida", async () => {
+    it("NÃO chama onError quando autenticação é bem-sucedida", async () => {
         (authenticate as ReturnType<typeof vi.fn>).mockResolvedValueOnce(null);
 
         const { onSubmit } = useView();
 
-        await onSubmit(values, setErrorMessage);
+        await onSubmit(values, onError);
 
         expect(authenticate).toHaveBeenCalled();
-        expect(setErrorMessage).toHaveBeenCalledWith(null);
+        expect(onError).not.toHaveBeenCalled(); // Mudou: não deve chamar quando sucesso
     });
 
-    it("chama setErrorMessage com string de erro se for retornado", async () => {
+    it("chama onError com string de erro quando autenticação falha", async () => {
         (authenticate as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
             "Invalid credentials."
         );
 
         const { onSubmit } = useView();
 
-        await onSubmit(values, setErrorMessage);
+        await onSubmit(values, onError);
 
         expect(authenticate).toHaveBeenCalled();
-        expect(setErrorMessage).toHaveBeenCalledWith("Invalid credentials.");
+        expect(onError).toHaveBeenCalledWith("Invalid credentials."); // Mantém o mesmo teste
     });
 
+    it("chama authenticate com FormData correto", async () => {
+        (authenticate as ReturnType<typeof vi.fn>).mockResolvedValueOnce(null);
+
+        const { onSubmit } = useView();
+
+        await onSubmit(values, onError);
+
+        // Verifica se authenticate foi chamado com FormData
+        expect(authenticate).toHaveBeenCalledWith(undefined, expect.any(FormData));
+
+        // Verifica o conteúdo do FormData
+        const callArgs = (authenticate as ReturnType<typeof vi.fn>).mock.calls[0];
+        const formData = callArgs[1] as FormData;
+        expect(formData.get("rf")).toBe("12345678");
+        expect(formData.get("password")).toBe("admin123");
+    });
 });

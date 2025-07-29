@@ -3,8 +3,9 @@ import { temPermissaoDeAcesso } from "./validacoes";
 import type { User, Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 
-// Necessário isolar a lógica de autenticação para atingir a cobertura de testes
+import {PERFIL_NOT_FOUND_ERROR_MESSAGE, PERFIL_NOT_PERMISSION_ERROR_MESSAGE} from "@/const";
 
+// Necessário isolar a lógica de autenticação para atingir a cobertura de testes
 export async function authorizeUser(
     credentials: Partial<Record<"rf" | "password", unknown>> | undefined
 ): Promise<User | null> {
@@ -17,12 +18,8 @@ export async function authorizeUser(
         senha: credentials.password as string,
     });
 
-    if (loginResponse.status === 401) {
-        throw new Error("Senha inválida!");
-    }
-
-    if (!loginResponse.nome && loginResponse.detail) {
-        throw new Error("Usuário não encontrado!");
+    if (loginResponse.status === 401 || (!loginResponse.nome && loginResponse.detail)) {
+        throw new Error(PERFIL_NOT_FOUND_ERROR_MESSAGE);
     }
 
     const acessoPermitido = temPermissaoDeAcesso(
@@ -30,7 +27,7 @@ export async function authorizeUser(
     );
 
     if (!acessoPermitido) {
-        throw new Error("Você não tem permissão para acessar este sistema.");
+        throw new Error(PERFIL_NOT_PERMISSION_ERROR_MESSAGE);
     }
 
     if (!loginResponse.nome || !loginResponse.login) {

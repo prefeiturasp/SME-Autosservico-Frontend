@@ -53,14 +53,14 @@ describe("authorizeUser", () => {
     mockedLogin.mockResolvedValue({ status: 401 });
     await expect(
       authorizeUser({ rf: "123", password: "errada" })
-    ).rejects.toThrow("Senha inválida!");
+    ).rejects.toThrow("Não encontramos um perfil com essas informações. Por favor, tente novamente.");
   });
 
   it("lança erro se não tiver nome e tiver detail", async () => {
-    mockedLogin.mockResolvedValue({ detail: "Usuário não encontrado" });
+    mockedLogin.mockResolvedValue({ detail: "Não encontramos um perfil com essas informações. Por favor, tente novamente." });
     await expect(
       authorizeUser({ rf: "123", password: "qualquer" })
-    ).rejects.toThrow("Usuário não encontrado!");
+    ).rejects.toThrow("Não encontramos um perfil com essas informações. Por favor, tente novamente.");
   });
 
   it("lança erro se acesso não for permitido", async () => {
@@ -68,7 +68,7 @@ describe("authorizeUser", () => {
     mockedPermissao.mockReturnValue(false);
     await expect(
       authorizeUser({ rf: "123", password: "qualquer" })
-    ).rejects.toThrow("Você não tem permissão para acessar este sistema.");
+    ).rejects.toThrow("Desculpe! mas o acesso ao Autosserviço é restrito a perfis específicos.");
   });
 
   it("lança erro se nome ou login estiverem ausentes", async () => {

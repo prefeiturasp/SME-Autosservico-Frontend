@@ -7,10 +7,8 @@ export default function useLoginView() {
 
     async function onSubmit(
         values: FormDataLogin,
-        setErrorMessage: (msg: string | null) => void
+        onError: (errorMsg: string) => void
     ) {
-        setErrorMessage(null); // Limpa mensagens de erro anteriores
-
         startTransition(async () => {
             const formData = new FormData();
             formData.append("rf", values.rf);
@@ -19,7 +17,7 @@ export default function useLoginView() {
             const error = await authenticate(undefined, formData);
 
             if (error) {
-                setErrorMessage(error);
+               onError(error); // Chama callback quando há erro
             }
         });
     }

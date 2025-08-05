@@ -6,7 +6,6 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarRail,
     SidebarGroup,
     SidebarGroupContent,
     SidebarMenu,
@@ -57,7 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             collapsible="icon"
             data-testid="sidebar-root"
             {...props}
-            className="!rounded-xl m-2 ollyver"
+            className="m-2"
         >
             <SidebarHeader>
                 <CustomTrigger />
@@ -78,7 +77,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         }
                                         data-testid={`sidebar-button-${item.title.toLowerCase()}`}
                                         onClick={() => handleItemClick(item)}
-                                        //className="px-5 rounded-sm h-auto bg-[#3B82F6] text-white hover:bg-[rgba(59,130,246,0.5)] hover:text-white"
                                         className={`px-5 rounded-sm h-auto transition-colors
                                             ${
                                                 activeItem?.title === item.title
@@ -117,7 +115,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     {open && <span>Sair</span>} <LogoutIcon />
                 </Button>
             </SidebarFooter>
-            <SidebarRail />
         </Sidebar>
     );
 }

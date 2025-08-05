@@ -20,8 +20,6 @@ export function temPermissaoDeAcesso(
     const sistema = Number(sistemaEnv);
     const squadsValidas = squadsEnv.split(",").map((s) => s.trim().toUpperCase());
 
-    console.log("Sistema esperado:", sistema, "Squads válidas:", squadsValidas);
-
     return perfisPorSistema?.some(
         (item) =>
             item.sistema === sistema &&

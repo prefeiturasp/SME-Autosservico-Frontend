@@ -61,6 +61,7 @@ export function SelectSistemas() {
                                     <SelectItem
                                         key={sistema.id}
                                         value={sistema.id}
+                                        className="focus:bg-[#3b82f6] focus:text-white !focus:ring-0 !focus-visible:ring-0 focus:outline-none"
                                     >
                                         {sistema.nome}
                                     </SelectItem>

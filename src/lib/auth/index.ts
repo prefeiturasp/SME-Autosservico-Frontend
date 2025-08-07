@@ -77,5 +77,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt: jwtCallback,
     session: sessionCallback,
   },
-  session: { strategy: "jwt" },
-});
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 dias - tempo de vida total
+    updateAge: 24 * 60 * 60,   // 24 horas - intervalo entre renovações
+  },
+  cookies: {
+    sessionToken: {
+      options: {
+        httpOnly: true,     // Impede acesso via JavaScript (XSS protection)
+        sameSite: "lax",    // Proteção CSRF
+        path: "/",
+        secure: process.env.NODE_ENV === "production", // HTTPS em produção
+        maxAge: 30 * 24 * 60 * 60, // 30 dias
+      },
+    },
+  },
+  });

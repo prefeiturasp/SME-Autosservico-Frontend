@@ -83,7 +83,7 @@ export default function LoginForm() {
                     <div className="bg-white rounded-sm shadow-2xl p-8 backdrop-blur-sm bg-opacity-95">
                         <div className="mb-8 text-left">
                             <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                                Boas vindas ao Autoserviço!
+                                Boas vindas ao Autosserviço!
                             </h1>
                             <p className="text-gray-600 text-sm">
                                 Confira as informações da saúde do seu sistema e

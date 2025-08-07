@@ -22,6 +22,7 @@ export default defineConfig({
         'src/components/ui/**', // 👈 Exclui apenas a pasta 'ui' dentro de components
         'src/const.ts',
         'src/app/api/*',
+        'src/lib/auth/__tests__/*',
         '*/types/*',
         '**/_material/**',
         'next.config.mjs',

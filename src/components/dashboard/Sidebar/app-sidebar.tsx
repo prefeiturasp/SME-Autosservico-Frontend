@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 
 import {
     Sidebar,
@@ -20,7 +20,7 @@ import { CustomTrigger } from "./custom-trigger";
 import { COORDENADORIAS } from "./coordenadorias";
 
 import LogoutIcon from "@/assets/icons/Logout";
-import { Button } from "../../ui/button";
+import SignOutButton from "@/components/login/SignOutButton";
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -42,14 +42,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         }
     }, [activeItem, allowedItems, setActiveItem]);
 
-    const handleItemClick = (item: (typeof COORDENADORIAS)[0]) => {
+    const handleItemClick = useCallback((item: (typeof COORDENADORIAS)[0]) => {
         setActiveItem({
             title: item.title,
             subTitle: item.subTitle,
             url: item.url,
             icon: item.icon
         });
-    };
+    }, [setActiveItem]);
+
+    // Mostrar loading enquanto não tem dados
+    if (allowedItems.length === 0) {
+        return (
+            <Sidebar collapsible="icon" data-testid="sidebar-root" {...props} className="m-2">
+                <SidebarContent>
+                    <div className="p-4">Carregando...</div>
+                </SidebarContent>
+            </Sidebar>
+        );
+    }
+
 
     return (
         <Sidebar
@@ -61,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader>
                 <CustomTrigger />
             </SidebarHeader>
-            <SidebarContent>
+            <SidebarContent className="custom-scrollbar overflow-y-auto">
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu>
@@ -77,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         }
                                         data-testid={`sidebar-button-${item.title.toLowerCase()}`}
                                         onClick={() => handleItemClick(item)}
-                                        className={`px-5 rounded-sm h-auto transition-colors
+                                        className={`px-4 rounded-sm h-auto transition-colors
                                             ${
                                                 activeItem?.title === item.title
                                                     ? "bg-[#3B82F6] text-white"
@@ -86,7 +98,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         `}
                                     >
                                         <span
-                                            className={`${open ? "!items-start" : ""} flex gap-3 cursor-pointer`}
+                                            className={`${open ? "!items-start" : ""} flex gap-3 cursor-pointer [&_svg]:!size-6`}
                                         >
                                             <item.icon className="mt-1 flex-shrink-0" />
                                             <div className="flex flex-col gap-0.5 min-w-0 items-start">
@@ -106,14 +118,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <Button
+                <SignOutButton
                     variant="link"
                     className={`${
                         open && "justify-end"
                     } [&_svg]:size-7 text-white no-underline hover:no-underline text-right`}
                 >
                     {open && <span>Sair</span>} <LogoutIcon />
-                </Button>
+                </SignOutButton>
             </SidebarFooter>
         </Sidebar>
     );

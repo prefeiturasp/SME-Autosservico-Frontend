@@ -16,7 +16,11 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <SessionProvider>
+        <SessionProvider
+            refetchInterval={5 * 60} // 5 minutos
+            refetchOnWindowFocus={false}
+            refetchWhenOffline={false}
+        >
             <SidebarProvider>
                 <AppSidebar />
                 <SidebarInset>

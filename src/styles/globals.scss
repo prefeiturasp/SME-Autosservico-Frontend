@@ -86,6 +86,66 @@
         --sidebar-border: 240 3.7% 15.9%;
         --sidebar-ring: 217.2 91.2% 59.8%;
     }
+
+    /* Estilo para scrollbar personalizada */
+    .custom-scrollbar {
+        /* Para navegadores webkit (Chrome, Safari, Edge) */
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        /* Para Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    }
+
+    /* Variação mais sutil */
+    .custom-scrollbar-subtle {
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    /* Esconder scrollbar mas manter funcionalidade */
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
 }
 
 @layer base {

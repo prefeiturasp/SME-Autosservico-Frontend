@@ -26,7 +26,7 @@ pipeline {
             }
         }
 
-        stage('Executar Testes Cypress') {
+        stage('Executar') {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'jenkins_registry', url: 'https://registry.sme.prefeitura.sp.gov.br/repository/sme-registry/') {
@@ -49,12 +49,12 @@ pipeline {
                                             --key somekey \
                                             --reporter mocha-allure-reporter \
                                             --reporter-options reportDir=allure-results \
-                                            --ci-build-id SME-GIPE_JENKINS-BUILD-${BUILD_NUMBER} && \
+                                            --ci-build-id SME-AUTOSSERVICO_JENKINS-BUILD-${BUILD_NUMBER} && \
                                        chown 1001:1001 * -R && \
                                        chmod 777 * -R"
                         '''
                     }
-                    echo "✅ Testes Cypress finalizados."
+                    echo "Testes Cypress finalizados."
                 }
             }
         }

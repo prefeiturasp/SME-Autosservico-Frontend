@@ -101,7 +101,7 @@ pipeline {
             }
         }
 
-        /*
+        
         success {
             sendTelegram("☑️ Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nStatus: Success \nLog: \n${env.BUILD_URL}allure")
         }
@@ -117,11 +117,11 @@ pipeline {
         aborted {
             sendTelegram("😥 Job Name: ${JOB_NAME} \nBuild: ${BUILD_DISPLAY_NAME} \nStatus: Aborted \nLog: \n${env.BUILD_URL}console")
         }
-        */
+        
     }
 }
 
-/*
+
 def sendTelegram(message) {
     def encodedMessage = URLEncoder.encode(message, "UTF-8")
     withCredentials([
@@ -138,4 +138,4 @@ def sendTelegram(message) {
         return response
     }
 }
-*/
+

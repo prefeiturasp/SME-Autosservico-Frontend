@@ -1,19 +1,19 @@
 class Login_Auto_Servico_Localizadores {
 
     campo_usuario() {
-        return 'input[placeholder="Digite um RF ou CPF"]';
+        return 'input[placeholder="Digite o seu RF..."]';
     }
 
     campo_senha() {
-        return 'input[placeholder="Digite sua senha"]';
+        return 'input[placeholder="Digite a sua senha..."]';
     }
 
     botao_acessar() {
-        return 'button:contains("Acessar")';
+        return 'button:contains("Entrar")';
     }
 
     mensagem_erro() {
-        return 'div:contains("Usuário e/ou senha inválida")';
+        return 'div:contains("Vamos tentar de novo?")';
     }
 }
 

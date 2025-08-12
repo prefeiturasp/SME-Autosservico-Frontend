@@ -5,7 +5,7 @@ Funcionalidade: Login
     Dado que eu acesso o sistema
 
   Esquema do Cenário: Acesso ao sistema "<cenario>"
-    Quando eu insiro o RF "<rf>" e senha "<senha>" válidos
+    Quando eu insiro o RF "<rf>" e senha "<senha>"
     E clico no botão de acessar
     Então o resultado esperado para "<cenario>" deve ser exibido
 
@@ -13,3 +13,6 @@ Funcionalidade: Login
       | cenario             | rf       | senha      |
       | Login válido padrão | 6605656  | Sgp5656    |
       | Login inválido      | 7210418  | Sgp@123    |
+      | Senha em branco     | 7210418  |            |
+      | RF em branco        |          | Sgp@123    |
+

@@ -15,6 +15,14 @@ class Login_Auto_Servico_Localizadores {
     mensagem_erro() {
         return 'div:contains("Vamos tentar de novo?")';
     }
+
+    mensagem_erro_senha_vazia(){
+        return 'div:contains("Senha é obrigatória")';
+    }
+
+    mensagem_erro_rf_vazio() {
+        return 'div:contains("RF é obrigatório")';
+    }
 }
 
 export default Login_Auto_Servico_Localizadores;

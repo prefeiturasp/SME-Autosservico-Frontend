@@ -1,11 +1,12 @@
 import { SidebarItem } from "@/states/dashboard";
 
 import SidebarAscom from "@/assets/icons/SidebarAscom";
-import SidebarCoceu from "@/assets/icons/SidebarCoceu";
 import SidebarCodae from "@/assets/icons/SidebarCodae";
 import SidebarCoped from "@/assets/icons/SidebarCoped";
 import SidebarCoplan from "@/assets/icons/SidebarCoplan";
 import SidebarCotic from "@/assets/icons/SidebarCotic";
+import SidebarCogep from "@/assets/icons/SidebarCogep";
+import SidebarGipe from "@/assets/icons/SidebarGipe";
 
 
 export const COORDENADORIAS: SidebarItem[] = [
@@ -41,14 +42,14 @@ export const COORDENADORIAS: SidebarItem[] = [
     },
     {
         title: "COGEP",
-        subTitle: "NNN Coordenadoria dos Centros Educacionais Unificados",
+        subTitle: "Coordenadoria de Gestão de Pessoas",
         url: "#",
-        icon: SidebarCoceu,
+        icon: SidebarCogep,
     },
     {
         title: "GIPE",
         subTitle: "Gabinete Integrado de Proteção Escolar",
         url: "#",
-        icon: SidebarCotic,
+        icon: SidebarGipe,
     },
 ];

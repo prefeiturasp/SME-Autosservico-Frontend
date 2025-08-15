@@ -16,17 +16,18 @@ describe("SignOutButton", () => {
 
     it('renderiza o botão "Sair"', () => {
         render(<SignOutButton />);
-        expect(
-            screen.getByRole("button", { name: /sair/i })
-        ).toBeInTheDocument();
+
+        const btnLogout = screen.getByTestId("btn-logout");
+        expect(btnLogout).toBeInTheDocument();
+
     });
 
     it('chama signOut com callbackUrl "/" ao clicar no botão', () => {
         render(<SignOutButton />);
 
-        const button = screen.getByRole("button", { name: /sair/i });
+        const btnLogout = screen.getByTestId("btn-logout");
 
-        fireEvent.click(button);
+        fireEvent.click(btnLogout);
 
         expect(signOut).toHaveBeenCalledWith({ callbackUrl: "/" });
     });

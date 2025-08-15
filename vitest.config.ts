@@ -22,9 +22,12 @@ export default defineConfig({
         'src/components/ui/**', // 👈 Exclui apenas a pasta 'ui' dentro de components
         'src/const.ts',
         'src/app/api/*',
+        'src/lib/auth/__tests__/*',
         '*/types/*',
         '**/_material/**',
+        '**/testes/**',
         'next.config.mjs',
+        'cypress.config.js',
         'tailwind.config.js',
         'postcss.config.mjs',
         'src/lib/zod-i18n.ts',

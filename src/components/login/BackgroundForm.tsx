@@ -1,5 +1,5 @@
 import Image from "next/image";
-import BackgroundFormImage from "@/assets/images/background_forms.webp";
+import BackgroundFormImage from "@/assets/images/background_forms.jpeg";
 import LogoDevops from "@/assets/images/logo_devops.webp";
 
 export default function BackgroundForm() {
@@ -10,7 +10,7 @@ export default function BackgroundForm() {
                 className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                 // Necessário pois, o Tailwind não permite misturar linear-gradient com uma imagem externa diretamente via classes
                 style={{
-                    backgroundImage: `linear-gradient(to bottom, rgba(59, 130, 246, 0.85), rgba(0, 50, 130, 0.74)), url(${BackgroundFormImage.src})`,
+                    backgroundImage: `url(${BackgroundFormImage.src})`,
                 }}
             ></div>
             {/* Logo */}

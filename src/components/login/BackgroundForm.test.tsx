@@ -4,7 +4,7 @@ import BackgroundForm from "./BackgroundForm";
 import { vi } from "vitest";
 
 // Mock das imagens
-vi.mock("@/assets/images/background_forms.webp", () => ({
+vi.mock("@/assets/images/background_forms.jpeg", () => ({
   default: {
     src: "/fake-background.webp",
   },
@@ -40,7 +40,7 @@ describe("BackgroundForm", () => {
 
     expect(backgroundDiv).toHaveStyle({
       backgroundImage:
-        "linear-gradient(to bottom, rgba(59, 130, 246, 0.85), rgba(0, 50, 130, 0.74)), url(/fake-background.webp)",
+        "url(/fake-background.webp)",
     });
   });
 

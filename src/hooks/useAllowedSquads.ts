@@ -20,9 +20,13 @@ interface SessionUser {
 }
 
 export function useAllowedSquads() {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
 
     return useMemo(() => {
+
+         // Evita executar se ainda está carregando
+        if (status === "loading") return [];
+
         if (!session || !session.user) return [];
 
         const user = session.user as SessionUser;
@@ -38,5 +42,5 @@ export function useAllowedSquads() {
         });
 
         return Array.from(new Set(allowedSquads));
-    }, [session]);
+    }, [session, status]);
 }

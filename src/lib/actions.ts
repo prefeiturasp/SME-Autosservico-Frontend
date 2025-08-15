@@ -22,13 +22,14 @@ export async function authenticate(
             switch (error.type) {
                 case "CredentialsSignin":
                     return "Credenciais inválidas.";
-                case "CallbackRouteError":
+                case "CallbackRouteError": {
                     // Captura erros customizados do authorize
                     const message = error.cause?.err?.message;
                     if (message) {
                         return message;
                     }
                     return "Erro na autenticação.";
+                }
                 default:
                     return "Algo deu errado. Tente novamente.";
             }

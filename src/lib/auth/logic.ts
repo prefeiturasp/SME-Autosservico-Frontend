@@ -23,7 +23,7 @@ export async function authorizeUser(
     }
 
     const acessoPermitido = temPermissaoDeAcesso(
-        loginResponse.perfis_por_sistema || []
+        loginResponse.perfis_por_sistema ?? []
     );
 
     if (!acessoPermitido) {
@@ -37,13 +37,13 @@ export async function authorizeUser(
     return {
         id: loginResponse.login,
         name: loginResponse.nome,
-        email: loginResponse.email || "",
+        email: loginResponse.email ?? "",
         rf: loginResponse.login,
         cpf: loginResponse.cpf,
         situacaoUsuario: loginResponse.situacaoUsuario,
         situacaoGrupo: loginResponse.situacaoGrupo,
-        visoes: loginResponse.visoes || [],
-        perfis_por_sistema: loginResponse.perfis_por_sistema || [],
+        visoes: loginResponse.visoes ?? [],
+        perfis_por_sistema: loginResponse.perfis_por_sistema ?? [],
     };
 }
 

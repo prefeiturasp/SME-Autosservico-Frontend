@@ -33,7 +33,7 @@ export default async function Dashboard() {
                             </p>
                             <p>
                                 <strong>Imagem:</strong>{" "}
-                                {session.user?.image || "N/A"}
+                                {session.user?.image ?? "N/A"}
                             </p>
                         </div>
                     </div>

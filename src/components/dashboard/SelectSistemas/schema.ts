@@ -3,7 +3,9 @@ import { z } from "zod";
 
 export const SistemaSchema = z.object({
   id: z.string(),
-  nome: z.string()
+  nome: z.string(),
+  zabbixQueryFrontend: z.string(),
+  zabbixQueryBackend: z.string(),
 });
 
 export type Sistema = z.infer<typeof SistemaSchema>;

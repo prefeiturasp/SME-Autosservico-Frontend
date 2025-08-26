@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat} from "next/font/google"
+import ReactQueryProvider from "@/lib/ReactQueryProvider";
 
 import "@/styles/globals.scss";
 
@@ -22,7 +23,7 @@ export default function RootLayout({
     return (
         <html lang="pt-br">
             <body className={`${montserrat.className} mx-auto`}>
-                {children}
+                <ReactQueryProvider>{children}</ReactQueryProvider>
             </body>
         </html>
     );

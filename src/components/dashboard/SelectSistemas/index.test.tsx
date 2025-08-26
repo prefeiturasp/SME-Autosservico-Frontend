@@ -1,6 +1,13 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, it, expect, beforeEach, vi, type Mock as ViMock } from "vitest";
+import {
+    describe,
+    it,
+    expect,
+    beforeEach,
+    vi,
+    type Mock as ViMock,
+} from "vitest";
 
 import { SelectSistemas } from "./index";
 import useDashboardStore from "@/states/dashboard";
@@ -40,8 +47,13 @@ describe("<SelectSistemas />", () => {
     });
 
     it("não deve renderizar nada quando activeItem é null", () => {
-        (useDashboardStore as unknown as ViMock).mockImplementation((selector) =>
-            selector({ activeItem: null })
+        const setActiveProjectMock = vi.fn();
+        (useDashboardStore as unknown as ViMock).mockImplementation(
+            (selector) =>
+                selector({
+                    activeItem: null,
+                    setActiveProject: setActiveProjectMock,
+                })
         );
 
         const { container } = render(<SelectSistemas />);
@@ -49,19 +61,32 @@ describe("<SelectSistemas />", () => {
     });
 
     it("deve renderizar corretamente os sistemas e chamar handleSelectChange com o primeiro sistema ao montar", () => {
-        (useDashboardStore as unknown as ViMock).mockImplementation((selector) =>
-            selector({
-                activeItem: {
-                    title: "COPED",
-                    subTitle: "Coordenadoria pedagógica",
-                    url: "#",
-                },
-            })
+        const setActiveProjectMock = vi.fn();
+        (useDashboardStore as unknown as ViMock).mockImplementation(
+            (selector) =>
+                selector({
+                    activeItem: {
+                        title: "COPED",
+                        subTitle: "Coordenadoria pedagógica",
+                        url: "#",
+                    },
+                    setActiveProject: setActiveProjectMock,
+                })
         );
 
         (getSistemasPorSquad as unknown as ViMock).mockReturnValue([
-            { id: "10", nome: "Novo SGP" },
-            { id: "11", nome: "Serap" },
+            {
+                id: "10",
+                nome: "Novo SGP",
+                zabbixQueryFrontend: "PRD - Novo SGP",
+                zabbixQueryBackend: "PRD - Novo SGP - API",
+            },
+            {
+                id: "11",
+                nome: "Serap",
+                zabbixQueryFrontend: "PRD - Serap",
+                zabbixQueryBackend: "PRD - Serap - API",
+            },
         ]);
 
         render(<SelectSistemas />);
@@ -69,30 +94,50 @@ describe("<SelectSistemas />", () => {
         // ✅ Renderização do título e instruções
         expect(screen.getByText("Sistema")).toBeInTheDocument();
         expect(
-            screen.getByText("Selecione um sistema para visualizar as informações")
+            screen.getByText(
+                "Selecione um sistema para visualizar as informações"
+            )
         ).toBeInTheDocument();
 
         // ✅ Renderiza os sistemas
         expect(screen.getByText("Novo SGP")).toBeInTheDocument();
 
         // ✅ handleSelectChange deve ser chamado automaticamente com o primeiro sistema
-        expect(mockHandleSelectChange).toHaveBeenCalledWith("10");
+        expect(setActiveProjectMock).toHaveBeenCalledWith({
+            id: "10",
+            nome: "Novo SGP",
+            zabbixQueryFrontend: "PRD - Novo SGP",
+            zabbixQueryBackend: "PRD - Novo SGP - API",
+        });
     });
 
     it("deve atualizar o sistema selecionado ao escolher outro item", async () => {
-        (useDashboardStore as unknown as ViMock).mockImplementation((selector) =>
-            selector({
-                activeItem: {
-                    title: "COPED",
-                    subTitle: "Coordenadoria pedagógica",
-                    url: "#",
-                },
-            })
+        const setActiveProjectMock = vi.fn();
+        (useDashboardStore as unknown as ViMock).mockImplementation(
+            (selector) =>
+                selector({
+                    activeItem: {
+                        title: "COPED",
+                        subTitle: "Coordenadoria pedagógica",
+                        url: "#",
+                    },
+                    setActiveProject: setActiveProjectMock,
+                })
         );
 
         (getSistemasPorSquad as unknown as ViMock).mockReturnValue([
-            { id: "10", nome: "Novo SGP" },
-            { id: "11", nome: "Serap" },
+            {
+                id: "10",
+                nome: "Novo SGP",
+                zabbixQueryFrontend: "PRD - Novo SGP",
+                zabbixQueryBackend: "PRD - Novo SGP - API",
+            },
+            {
+                id: "11",
+                nome: "Serap",
+                zabbixQueryFrontend: "PRD - Serap",
+                zabbixQueryBackend: "PRD - Serap - API",
+            },
         ]);
 
         render(<SelectSistemas />);
@@ -105,25 +150,33 @@ describe("<SelectSistemas />", () => {
         fireEvent.click(screen.getByText("Serap"));
 
         // ✅ handleSelectChange deve ser chamado com o segundo sistema
-        expect(mockHandleSelectChange).toHaveBeenCalledWith("11");
+        expect(setActiveProjectMock).toHaveBeenCalledWith({
+            id: "10",
+            nome: "Novo SGP",
+            zabbixQueryFrontend: "PRD - Novo SGP",
+            zabbixQueryBackend: "PRD - Novo SGP - API",
+        });
     });
 
     it("deve resetar o valor quando não houver sistemas disponíveis", () => {
-        (useDashboardStore as unknown as ViMock).mockImplementation((selector) =>
-            selector({
-                activeItem: {
-                    title: "COTIC",
-                    subTitle: "Coordenadoria de Tecnologia",
-                    url: "#",
-                },
-            })
+        const setActiveProjectMock = vi.fn();
+        (useDashboardStore as unknown as ViMock).mockImplementation(
+            (selector) =>
+                selector({
+                    activeItem: {
+                        title: "COTIC",
+                        subTitle: "Coordenadoria de Tecnologia",
+                        url: "#",
+                    },
+                    setActiveProject: setActiveProjectMock,
+                })
         );
 
         (getSistemasPorSquad as unknown as ViMock).mockReturnValue([]);
 
         render(<SelectSistemas />);
 
-        expect(mockHandleSelectChange).not.toHaveBeenCalled();
+        expect(setActiveProjectMock).not.toHaveBeenCalled();
         expect(screen.queryByRole("combobox")).toBeInTheDocument();
         expect(screen.queryByText("Nenhum sistema")).not.toBeInTheDocument();
     });

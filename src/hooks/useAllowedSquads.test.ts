@@ -1,87 +1,133 @@
+/* @vitest-environment jsdom */
+// src/hooks/useAllowedSquads.test.ts
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { useAllowedSquads } from "./useAllowedSquads";
 
 // ✅ Mock do useSession do NextAuth
 vi.mock("next-auth/react", () => ({
-    __esModule: true,
-    useSession: vi.fn(),
+  __esModule: true,
+  useSession: vi.fn(),
 }));
 
 import { useSession } from "next-auth/react";
 
 describe("useAllowedSquads", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('deve retornar [] quando status="loading"', () => {
+    (useSession as unknown as Mock).mockReturnValue({
+      data: null,
+      status: "loading",
     });
 
-    it("deve retornar um array vazio quando não houver sessão", () => {
-        (useSession as unknown as Mock).mockReturnValue({ data: null });
+    const { result } = renderHook(() => useAllowedSquads());
+    expect(result.current).toEqual([]);
+  });
 
-        const { result } = renderHook(() => useAllowedSquads());
-        expect(result.current).toEqual([]);
+  it("deve retornar um array vazio quando não houver sessão", () => {
+    (useSession as unknown as Mock).mockReturnValue({
+      data: null,
+      status: "unauthenticated",
     });
 
-    it("deve retornar um array vazio quando não houver perfis_por_sistema", () => {
-        (useSession as unknown as Mock).mockReturnValue({
-            data: {
-                user: {
-                    name: "Teste",
-                    perfis_por_sistema: undefined,
-                },
-            },
-        });
+    const { result } = renderHook(() => useAllowedSquads());
+    expect(result.current).toEqual([]);
+  });
 
-        const { result } = renderHook(() => useAllowedSquads());
-        expect(result.current).toEqual([]);
+  it("deve retornar [] quando existir sessão mas user estiver ausente", () => {
+    (useSession as unknown as Mock).mockReturnValue({
+      data: { user: undefined },
+      status: "authenticated",
     });
 
-    it("deve retornar apenas os perfis do sistema 1008", () => {
-        (useSession as unknown as Mock).mockReturnValue({
-            data: {
-                user: {
-                    name: "Teste",
-                    perfis_por_sistema: [
-                        { sistema: 1008, perfis: ["COPED", "COPLAN"] },
-                        { sistema: 903, perfis: ["UE", "SME"] },
-                    ],
-                },
-            },
-        });
+    const { result } = renderHook(() => useAllowedSquads());
+    expect(result.current).toEqual([]);
+  });
 
-        const { result } = renderHook(() => useAllowedSquads());
-        expect(result.current).toEqual(["COPED", "COPLAN"]);
+  it("deve retornar um array vazio quando não houver perfis_por_sistema", () => {
+    (useSession as unknown as Mock).mockReturnValue({
+      data: {
+        user: {
+          name: "Teste",
+          perfis_por_sistema: undefined,
+        },
+      },
+      status: "authenticated",
     });
 
-    it("deve remover perfis duplicados", () => {
-        (useSession as unknown as Mock).mockReturnValue({
-            data: {
-                user: {
-                    name: "Teste",
-                    perfis_por_sistema: [
-                        { sistema: 1008, perfis: ["COPED", "COPED", "COTIC"] },
-                    ],
-                },
-            },
-        });
+    const { result } = renderHook(() => useAllowedSquads());
+    expect(result.current).toEqual([]);
+  });
 
-        const { result } = renderHook(() => useAllowedSquads());
-        expect(result.current).toEqual(["COPED", "COTIC"]);
+  it("deve retornar apenas os perfis do sistema 1008", () => {
+    (useSession as unknown as Mock).mockReturnValue({
+      data: {
+        user: {
+          name: "Teste",
+          perfis_por_sistema: [
+            { sistema: 1008, perfis: ["COPED", "COPLAN"] },
+            { sistema: 903, perfis: ["UE", "SME"] },
+          ],
+        },
+      },
+      status: "authenticated",
     });
 
-    it("deve retornar um array vazio quando perfis_por_sistema não contiver sistema 1008", () => {
-        (useSession as unknown as Mock).mockReturnValue({
-            data: {
-                user: {
-                    name: "Teste",
-                    perfis_por_sistema: [
-                        { sistema: 903, perfis: ["UE", "SME"] },
-                    ],
-                },
-            },
-        });
+    const { result } = renderHook(() => useAllowedSquads());
+    expect(result.current).toEqual(["COPED", "COPLAN"]);
+  });
 
-        const { result } = renderHook(() => useAllowedSquads());
-        expect(result.current).toEqual([]);
+  it("deve remover perfis duplicados (no mesmo item)", () => {
+    (useSession as unknown as Mock).mockReturnValue({
+      data: {
+        user: {
+          name: "Teste",
+          perfis_por_sistema: [
+            { sistema: 1008, perfis: ["COPED", "COPED", "COTIC"] },
+          ],
+        },
+      },
+      status: "authenticated",
     });
+
+    const { result } = renderHook(() => useAllowedSquads());
+    expect(result.current).toEqual(["COPED", "COTIC"]);
+  });
+
+  it("deve mesclar e deduplicar perfis vindos de múltiplos itens do sistema 1008", () => {
+    (useSession as unknown as Mock).mockReturnValue({
+      data: {
+        user: {
+          name: "Teste",
+          perfis_por_sistema: [
+            { sistema: 1008, perfis: ["COPED", "COPLAN"] },
+            { sistema: 1008, perfis: ["COPLAN", "COTIC"] }, // duplicado "COPLAN"
+            { sistema: 903, perfis: ["UE"] },
+          ],
+        },
+      },
+      status: "authenticated",
+    });
+
+    const { result } = renderHook(() => useAllowedSquads());
+    expect(result.current).toEqual(["COPED", "COPLAN", "COTIC"]);
+  });
+
+  it("deve retornar um array vazio quando perfis_por_sistema não contiver sistema 1008", () => {
+    (useSession as unknown as Mock).mockReturnValue({
+      data: {
+        user: {
+          name: "Teste",
+          perfis_por_sistema: [{ sistema: 903, perfis: ["UE", "SME"] }],
+        },
+      },
+      status: "authenticated",
+    });
+
+    const { result } = renderHook(() => useAllowedSquads());
+    expect(result.current).toEqual([]);
+  });
 });

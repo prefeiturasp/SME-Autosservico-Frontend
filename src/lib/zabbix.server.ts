@@ -3,22 +3,12 @@
 import "server-only";
 import axios from "axios";
 
-const baseURL = process.env.ZABBIX_API_URL;
-const token = process.env.ZABBIX_API_TOKEN;
-
-if (!baseURL) {
-  throw new Error("[Zabbix] ZABBIX_API_URL ausente no .env");
-}
-if (!token) {
-  throw new Error("[Zabbix] ZABBIX_API_TOKEN ausente no .env");
-}
-
 export const zabbixApi = axios.create({
-  baseURL,
+  baseURL: process.env.ZABBIX_API_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json-rpc",
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${process.env.ZABBIX_API_TOKEN}`,
   },
 });
 

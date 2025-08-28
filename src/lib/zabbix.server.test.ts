@@ -26,15 +26,6 @@ describe("zabbix.server zabbixRpc", () => {
         if (postMock) postMock.mockReset();
     });
 
-    it("env ausentes → lança erro no import", async () => {
-        delete process.env.ZABBIX_API_URL;
-        delete process.env.ZABBIX_API_TOKEN;
-
-        await expect(import("@/lib/zabbix.server")).rejects.toThrow(
-            /ZABBIX_API_URL|ZABBIX_API_TOKEN/i
-        );
-    });
-
     it("retorna result (happy path)", async () => {
         const mod = await import("@/lib/zabbix.server");
         if (!postMock) throw new Error("postMock não inicializado");
@@ -81,22 +72,6 @@ describe("zabbix.server zabbixRpc", () => {
 
         await expect(mod.zabbixRpc("trigger.get", {})).rejects.toThrow(
             /não-JSON/i
-        );
-    });
-
-    it("env ausente apenas URL → lança erro claro", async () => {
-        delete process.env.ZABBIX_API_URL;
-        process.env.ZABBIX_API_TOKEN = "token";
-        await expect(import("@/lib/zabbix.server")).rejects.toThrow(
-            /ZABBIX_API_URL/i
-        );
-    });
-
-    it("env ausente apenas TOKEN → lança erro claro", async () => {
-        process.env.ZABBIX_API_URL = "http://example/api_jsonrpc.php";
-        delete process.env.ZABBIX_API_TOKEN;
-        await expect(import("@/lib/zabbix.server")).rejects.toThrow(
-            /ZABBIX_API_TOKEN/i
         );
     });
 

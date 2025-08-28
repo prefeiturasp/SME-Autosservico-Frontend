@@ -1,4 +1,5 @@
-import { DisponibilidadeDosAmbientes } from "@/components/dashboard/DisponibilidadeDosAmbientes";
+import DisponibilidadeDoAmbiente from "@/components/dashboard/DisponibilidadeDosAmbientes";
+import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -12,6 +13,11 @@ export default async function Dashboard() {
 
     return (
         <div className="border-b bg-background px-6 py-4">
+            <DisponibilidadeDoAmbiente className="max-w-sm mb-5">
+                <Producao />
+            </DisponibilidadeDoAmbiente>
+
+
             <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">
@@ -19,9 +25,6 @@ export default async function Dashboard() {
                     </h1>
 
                     <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-
-                        <DisponibilidadeDosAmbientes />
-
                         <h2 className="text-lg font-medium text-blue-900 mb-2">
                             Informações da Sessão
                         </h2>

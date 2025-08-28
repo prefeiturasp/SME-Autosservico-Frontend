@@ -362,4 +362,22 @@ describe("getDisponibilidadeDosAmbientesProducao", () => {
         // ...mas o formatter recebe seconds=0 → !seconds ⇒ undefined
         expect(res.lastIncidentAt).toBeUndefined();
     });
+
+    it("usa fallback 'Zabbix server' quando ZABBIX_DEFAULT_HOST está undefined (ramo do ??)", async () => {
+        // isola o módulo com a env ausente para recalcular DEFAULT_HOST
+        vi.resetModules();
+        delete process.env.ZABBIX_DEFAULT_HOST; // <- undefined
+        process.env.ZABBIX_RECENT_WINDOW_MS = String(24 * 60 * 60 * 1000); // mantém janela
+        zabbixRpcMock.mockResolvedValueOnce([]); // não importa o resultado, só validaremos os params
+
+        const { getDisponibilidadeDosAmbientesProducao } = await import(
+            "@/actions/disponibilidade-dos-ambientes"
+        );
+        await getDisponibilidadeDosAmbientesProducao("Portal Educação"); // sem 'host' para usar o default
+
+        const calledParams = zabbixRpcMock.mock.calls[0][1];
+        expect(calledParams.filter.description).toEqual(["Portal Educação"]);
+        // ✅ com ??, undefined cai no fallback "Zabbix server"
+        expect(calledParams.filter.host).toEqual(["Zabbix server"]);
+    });
 });

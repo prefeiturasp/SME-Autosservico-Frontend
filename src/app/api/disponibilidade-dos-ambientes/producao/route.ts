@@ -26,6 +26,6 @@ export async function GET(req: NextRequest) {
       typeof e === "object" && e !== null && "message" in e
         ? (e as { message?: string }).message
         : "Erro ao consultar Zabbix";
-    return NextResponse.json({ error: errorMessage || "Erro ao consultar Zabbix" }, { status: 500 });
+    return NextResponse.json({ error: errorMessage ?? "Erro ao consultar Zabbix" }, { status: 500 });
   }
 }

@@ -23,6 +23,7 @@ export default defineConfig({
         'src/const.ts',
         'src/app/api/*',
         'src/lib/auth/__tests__/*',
+         "src/__mocks__/**",
         '*/types/*',
         '**/_material/**',
         '**/testes/**',
@@ -41,6 +42,7 @@ export default defineConfig({
   resolve: {
     alias: [
         { find: '@', replacement: path.resolve(__dirname, './src') },
+        { find: 'server-only', replacement: path.resolve(__dirname, './src/__mocks__/server-only.ts') },
     ],
   },
 })

@@ -1,0 +1,1 @@
+export {}; // módulo vazio

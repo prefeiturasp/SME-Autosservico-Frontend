@@ -9,7 +9,7 @@ export type ProducaoStatus = {
   lastIncidentAt?: string;
 };
 
-const DEFAULT_HOST = process.env.ZABBIX_DEFAULT_HOST || "Zabbix server";
+const DEFAULT_HOST = process.env.ZABBIX_DEFAULT_HOST ?? "Zabbix server";
 const RECENT_WINDOW_MS = Number(
   process.env.ZABBIX_RECENT_WINDOW_MS ?? 24 * 60 * 60 * 1000
 );

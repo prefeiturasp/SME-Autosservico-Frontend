@@ -18,7 +18,7 @@ export default function Producao({ title = "Produção", className }: ProducaoPr
   const projectName = activeProject?.zabbixQueryFrontend?.trim();
 
   const { data, isLoading, isError, refetch, isFetching } =
-    useFetchDisponibilidadeDosAmbientesProducao(projectName || "");
+    useFetchDisponibilidadeDosAmbientesProducao(projectName ?? "");
 
   if (!projectName) {
     return (

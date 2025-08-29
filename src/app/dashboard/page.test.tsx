@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import Dashboard from "./page";
 import { vi } from "vitest";
+import { withClient } from "@/__mocks__/renderWithClient";
 
 // Mock de Navbar
 vi.mock("@/components/ui/Navbar", () => ({
@@ -45,7 +46,7 @@ describe("Dashboard page", () => {
             },
         });
 
-        render(await Dashboard());
+        render(withClient(await Dashboard()));
 
         expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
         expect(screen.getByText(/Nome/i)).toBeInTheDocument();

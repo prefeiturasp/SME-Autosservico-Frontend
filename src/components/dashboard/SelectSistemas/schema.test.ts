@@ -3,7 +3,7 @@ import { SistemaSchema, SelectedSistemaSchema } from "./schema";
 
 describe("SistemaSchema", () => {
     it("deve validar um objeto Sistema válido", () => {
-        const validSistema = { id: "10", nome: "Novo SGP" };
+        const validSistema = { id: "10", nome: "Novo SGP", zabbixQueryFrontend: "PRD - Novo SGP", zabbixQueryBackend: "PRD - Novo SGP - API" };
         const result = SistemaSchema.safeParse(validSistema);
 
         expect(result.success).toBe(true);

@@ -1,0 +1,22 @@
+"use client";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+
+type Props = {
+  readonly className?: string;
+  readonly children: React.ReactNode; // aqui dentro você passa o <Producao />
+};
+
+export default function DisponibilidadeDoAmbiente({ className, children }: Props) {
+  return (
+    <Card className={cn("rounded-md shadow-sm gap-3 py-3 px-1", className)}>
+      <CardHeader className="pb-1 px-4">
+        <CardTitle className="text-lg">Disponibilidade do ambiente</CardTitle>
+      </CardHeader>
+      <CardContent className="px-4 pb-3">
+        <div className="rounded-md bg-[#F5F5F5] p-3">{children}</div>
+      </CardContent>
+    </Card>
+  );
+}

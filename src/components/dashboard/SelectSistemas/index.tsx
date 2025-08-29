@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useDashboardStore from "@/states/dashboard";
 
 import {
@@ -10,13 +10,14 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import useView from "./view";
 import { Sistema } from "./schema";
 import { getSistemasPorSquad } from "./getSistemasPorSquad";
 
 export function SelectSistemas() {
-    const { handleSelectChange } = useView();
     const activeItem = useDashboardStore((state) => state.activeItem);
+    const setActiveProject = useDashboardStore(
+        (state) => state.setActiveProject
+    );
 
     const sistemas: Sistema[] = useMemo(
         () => (activeItem ? getSistemasPorSquad(activeItem.title) : []),
@@ -24,6 +25,22 @@ export function SelectSistemas() {
     );
 
     const [selectedValue, setSelectedValue] = useState("");
+
+    const handleSelectChange = useCallback(
+        (value: string) => {
+            const selectedSistema = sistemas.find(
+                (sistema) => sistema.id === value
+            );
+            if (selectedSistema) {
+                setActiveProject({
+                    ...selectedSistema,
+                    zabbixQueryFrontend: selectedSistema.zabbixQueryFrontend,
+                    zabbixQueryBackend: selectedSistema.zabbixQueryBackend,
+                });
+            }
+        },
+        [setActiveProject, sistemas]
+    );
 
     // ✅ Atualiza apenas quando a Squad (activeItem) muda
     useEffect(() => {
@@ -33,7 +50,7 @@ export function SelectSistemas() {
         } else {
             setSelectedValue(""); // Reseta quando não houver sistemas
         }
-    }, [activeItem, handleSelectChange, sistemas]);
+    }, [activeItem, handleSelectChange, sistemas, setActiveProject]);
 
     if (!activeItem) return null;
 

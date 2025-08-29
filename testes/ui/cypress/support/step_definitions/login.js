@@ -4,7 +4,7 @@ import Login_Auto_Servico_Localizadores from '../locators/login_locators'
 const locators = new Login_Auto_Servico_Localizadores()
 
 Given('que eu acesso o sistema', () => {
-    cy.login_gipe()
+    cy.login_autoservico()
 })
 
 When('eu insiro o RF {string} e senha {string}', (rf, senha) => {

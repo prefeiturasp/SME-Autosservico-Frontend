@@ -1,3 +1,5 @@
+import DisponibilidadeDoAmbiente from "@/components/dashboard/DisponibilidadeDosAmbientes";
+import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -11,6 +13,11 @@ export default async function Dashboard() {
 
     return (
         <div className="border-b bg-background px-6 py-4">
+            <DisponibilidadeDoAmbiente className="max-w-sm mb-5">
+                <Producao />
+            </DisponibilidadeDoAmbiente>
+
+
             <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">
@@ -33,7 +40,7 @@ export default async function Dashboard() {
                             </p>
                             <p>
                                 <strong>Imagem:</strong>{" "}
-                                {session.user?.image || "N/A"}
+                                {session.user?.image ?? "N/A"}
                             </p>
                         </div>
                     </div>

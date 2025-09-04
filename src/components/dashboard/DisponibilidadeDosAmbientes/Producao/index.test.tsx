@@ -1,173 +1,259 @@
-/* @vitest-environment jsdom */
-// tests/components/Producao.test.tsx
-import React from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+// src/components/dashboard/DisponibilidadeDosAmbientes/Producao/index.test.tsx
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import Producao from "./index";
 
-// mocks configuráveis
-type MockStoreState = {
-    activeProject: {
-        zabbixQueryFrontend: string;
-    };
-};
-
-let mockStoreState: MockStoreState = {
-    activeProject: { zabbixQueryFrontend: "Portal Educação" },
-};
-type HookReturnType = {
-    data: {
-        available: boolean;
-        incidents_recent: boolean;
-        message?: string;
-        lastIncidentAt?: string;
-    };
-    isLoading: boolean;
-    isFetching: boolean;
-    isError: boolean;
-    refetch: () => void;
-};
-
-let hookReturn: HookReturnType = {
-    data: {
-        available: true,
-        incidents_recent: false,
-        message: "Sem incidentes recentes",
-    },
-    isLoading: false,
-    isFetching: false,
-    isError: false,
-    refetch: vi.fn(),
-};
-
-vi.mock("@/states/dashboard", () => ({
+vi.mock("@/components/ui/skeleton", () => ({
     __esModule: true,
-    default: (selector: (state: MockStoreState) => unknown) =>
-        selector(mockStoreState),
+    Skeleton: ({ className }: { className?: string }) => (
+        <div data-testid="skeleton" className={className} />
+    ),
+}));
+vi.mock("@/components/ui/button", () => ({
+    __esModule: true,
+    Button: ({
+        children,
+        onClick,
+        className,
+    }: React.PropsWithChildren<{
+        onClick?: () => void;
+        className?: string;
+    }>) => (
+        <button data-testid="button" className={className} onClick={onClick}>
+            {children}
+        </button>
+    ),
 }));
 
+const mockHook = vi.fn();
 vi.mock("@/hooks/useDisponibilidadeDosAmbientes", () => ({
     __esModule: true,
-    useFetchDisponibilidadeDosAmbientesProducao: () => hookReturn,
+    useFetchDisponibilidadeDosAmbientesProducao: (...args: unknown[]) =>
+        mockHook(...args),
 }));
-
-import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
 
 describe("<Producao />", () => {
     beforeEach(() => {
-        hookReturn = {
-            data: {
-                available: true,
-                incidents_recent: false,
-                message: "Sem incidentes recentes",
-            },
+        vi.clearAllMocks();
+
+        // ✅ Retorno padrão para evitar erro de destructuring quando projectName = ""
+        mockHook.mockReturnValue({
+            data: undefined,
             isLoading: false,
-            isFetching: false,
             isError: false,
+            isFetching: false,
             refetch: vi.fn(),
-        };
-        mockStoreState = {
-            activeProject: { zabbixQueryFrontend: "Portal Educação" },
-        };
+        });
     });
 
-    it("pede seleção quando não há projeto ativo", () => {
-        mockStoreState = { activeProject: { zabbixQueryFrontend: "" } };
-        render(<Producao />);
+    it("exibe mensagem para selecionar projeto quando projectName está vazio", () => {
+        // usa o retorno padrão acima
+        render(<Producao projectName="" />);
+        expect(screen.getByText("Produção")).toBeInTheDocument();
         expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
     });
 
-    it("renderiza loading (skeleton) quando isLoading", () => {
-        hookReturn.isLoading = true;
-        render(<Producao />);
-        expect(screen.getByText("Produção")).toBeInTheDocument();
-        // não deve mostrar 'Disponível' ainda
-        expect(screen.queryByText("Disponível")).not.toBeInTheDocument();
+    it("exibe skeleton quando isLoading=true", () => {
+        mockHook.mockReturnValue({
+            data: undefined,
+            isLoading: true,
+            isError: false,
+            isFetching: false,
+            refetch: vi.fn(),
+        });
+        render(<Producao projectName="Portal SME" />);
+        expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(
+            2
+        );
     });
 
-    it("renderiza erro e botão 'Tentar novamente'", () => {
-        hookReturn.isError = true;
-        render(<Producao />);
+    it("exibe skeleton quando isFetching=true", () => {
+        mockHook.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            isError: false,
+            isFetching: true,
+            refetch: vi.fn(),
+        });
+        render(<Producao projectName="Portal SME" />);
+        expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(
+            2
+        );
+    });
+
+    it("exibe erro quando isError=true e permite refetch", () => {
+        const refetch = vi.fn();
+        mockHook.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            isError: true,
+            isFetching: false,
+            refetch,
+        });
+        render(<Producao projectName="Portal SME" />);
+        fireEvent.click(screen.getByTestId("button"));
+        expect(refetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("exibe erro quando !data (mesmo sem isError)", () => {
+        mockHook.mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            isError: false,
+            isFetching: false,
+            refetch: vi.fn(),
+        });
+        render(<Producao projectName="Portal SME" />);
         expect(
-            screen.getByText(/Não foi possível carregar o status/i)
+            screen.getByText("Não foi possível carregar o status.")
         ).toBeInTheDocument();
-        const btn = screen.getByRole("button", { name: /Tentar novamente/i });
-        expect(btn).toBeInTheDocument();
-        fireEvent.click(btn);
-        expect(hookReturn.refetch).toHaveBeenCalled();
     });
 
-    it("renderiza sucesso: disponível", () => {
-        render(<Producao />);
+    it("sucesso: incidents_recent=false → 'Sem incidentes recentes' + Disponível", () => {
+        mockHook.mockReturnValue({
+            data: {
+                available: true,
+                message: undefined,
+                incidents_recent: false,
+                lastIncidentAt: null,
+            },
+            isLoading: false,
+            isError: false,
+            isFetching: false,
+            refetch: vi.fn(),
+        });
+        render(<Producao projectName="Portal SME" />);
         expect(screen.getByText("Sem incidentes recentes")).toBeInTheDocument();
-        expect(screen.getByText("Disponível")).toBeInTheDocument();
+        expect(screen.getByLabelText("Status: Disponível")).toHaveTextContent(
+            "Disponível"
+        );
     });
 
-    it("renderiza sucesso: indisponível", () => {
-        hookReturn.data = {
-            available: false,
-            incidents_recent: true,
-            message: "Há incidentes ativos",
-        };
-        render(<Producao />);
-        expect(screen.getByText("Há incidentes ativos")).toBeInTheDocument();
-        expect(screen.getByText("Indisponível")).toBeInTheDocument();
-    });
-
-    it("mostra 'Houve incidentes recentes' quando message é undefined e incidents_recent=true", () => {
-        hookReturn.data = {
-            available: true,
-            incidents_recent: true,
-            message: undefined,
-        };
-        render(<Producao />);
+    it("sucesso: incidents_recent=true → 'Houve incidentes recentes' + Indisponível", () => {
+        mockHook.mockReturnValue({
+            data: {
+                available: false,
+                message: undefined,
+                incidents_recent: true,
+                lastIncidentAt: null,
+            },
+            isLoading: false,
+            isError: false,
+            isFetching: false,
+            refetch: vi.fn(),
+        });
+        render(<Producao projectName="Portal SME" />);
         expect(
             screen.getByText("Houve incidentes recentes")
         ).toBeInTheDocument();
-        expect(screen.getByText("Disponível")).toBeInTheDocument();
+        expect(screen.getByLabelText("Status: Indisponível")).toHaveTextContent(
+            "Indisponível"
+        );
     });
 
-    it("mostra 'Sem incidentes recentes' quando message é undefined e incidents_recent=false", () => {
-        hookReturn.data = {
-            available: true,
-            incidents_recent: false,
-            message: undefined,
-        };
-
-        render(<Producao />);
-        expect(screen.getByText("Sem incidentes recentes")).toBeInTheDocument();
-        expect(screen.getByText("Disponível")).toBeInTheDocument();
-    });
-
-    it("quando houve incidentes recentes e lastIncidentAt existe → mostra 'Houve incidentes recentes — dd/mm/aaaa HH:mm'", () => {
-        hookReturn.data = {
-            available: true,
-            incidents_recent: true,
-            message: "Houve incidentes recentes",
-            lastIncidentAt: "01/02/2025 13:45",
-        };
-
-        render(<Producao />);
-
+    it('sucesso: message === "Houve incidentes recentes" + lastIncidentAt', () => {
+        mockHook.mockReturnValue({
+            data: {
+                available: false,
+                message: "Houve incidentes recentes",
+                incidents_recent: true,
+                lastIncidentAt: "2025-09-03 10:00",
+            },
+            isLoading: false,
+            isError: false,
+            isFetching: false,
+            refetch: vi.fn(),
+        });
+        render(<Producao title="API Service" projectName="API SME" />);
         expect(
-            screen.getByText("Houve incidentes recentes - 01/02/2025 13:45")
+            screen.getByText("Houve incidentes recentes - 2025-09-03 10:00")
         ).toBeInTheDocument();
-        expect(screen.getByText("Disponível")).toBeInTheDocument();
+        expect(
+            screen.getByLabelText("Status: Indisponível")
+        ).toBeInTheDocument();
     });
 
-    it("quando há incidentes ATIVOS não deve anexar data/hora ao subtítulo", () => {
-        hookReturn.data = {
-            available: false,
-            incidents_recent: true,
-            message: "Há incidentes ativos",
-            lastIncidentAt: "01/02/2025 13:45", // mesmo presente, regra do componente não anexa
-        };
+    it('sucesso: message customizada (≠ "Houve incidentes recentes") → usa exatamente a mensagem', () => {
+        mockHook.mockReturnValue({
+            data: {
+                available: true,
+                message: "Sistema em manutenção programada",
+                incidents_recent: true, // irrelevante porque message está definido
+                lastIncidentAt: "2025-09-03 10:00", // não deve ser concatenado
+            },
+            isLoading: false,
+            isError: false,
+            isFetching: false,
+            refetch: vi.fn(),
+        });
 
-        render(<Producao />);
-
-        expect(screen.getByText("Há incidentes ativos")).toBeInTheDocument();
+        render(<Producao projectName="Portal SME" />);
+        // deve exibir exatamente a message, sem sufixo de data
         expect(
-            screen.queryByText(/— 01\/02\/2025 13:45/)
+            screen.getByText("Sistema em manutenção programada")
+        ).toBeInTheDocument();
+
+        // pílula continua funcionando normalmente
+        expect(screen.getByLabelText("Status: Disponível")).toBeInTheDocument();
+    });
+
+    it('sucesso: message === "Houve incidentes recentes" mas sem lastIncidentAt → NÃO concatena', () => {
+        mockHook.mockReturnValue({
+            data: {
+                available: true,
+                message: "Houve incidentes recentes",
+                incidents_recent: true, // irrelevante pq message está definido
+                lastIncidentAt: null, // 👈 força o branch true && false
+            },
+            isLoading: false,
+            isError: false,
+            isFetching: false,
+            refetch: vi.fn(),
+        });
+
+        render(<Producao projectName="Portal SME" />);
+
+        // Deve exibir exatamente "Houve incidentes recentes" (sem " - data")
+        expect(
+            screen.getByText("Houve incidentes recentes")
+        ).toBeInTheDocument();
+        // E não deve existir a versão concatenada
+        expect(
+            screen.queryByText(/Houve incidentes recentes\s*-\s*/i)
         ).not.toBeInTheDocument();
-        expect(screen.getByText("Indisponível")).toBeInTheDocument();
+
+        // Pílula segue normal
+        expect(screen.getByLabelText("Status: Disponível")).toBeInTheDocument();
+    });
+
+    it("usa fallback do ?? e chama o hook com string vazia quando projectName é undefined", () => {
+        // retorno padrão já vem do beforeEach
+        render(<Producao projectName={undefined as unknown as string} />);
+
+        // Continua mostrando o estado 'selecione um projeto'
+        expect(screen.getByText("Produção")).toBeInTheDocument();
+        expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
+
+        // ✅ garante que o branch do ?? foi exercitado (arg = "")
+        expect(mockHook).toHaveBeenCalledWith("");
+    });
+
+    it("sucesso: message === null cai no else do && e usa incidents_recent (false → 'Sem incidentes recentes')", () => {
+        mockHook.mockReturnValue({
+            data: {
+                available: true,
+                message: null, // 👈 cobre o ramo (message !== undefined) true e (message !== null) false
+                incidents_recent: false, // cai no fallback "Sem incidentes recentes"
+                lastIncidentAt: "2025-09-03 10:00", // ignorado nesse ramo
+            },
+            isLoading: false,
+            isError: false,
+            isFetching: false,
+            refetch: vi.fn(),
+        });
+
+        render(<Producao projectName="Portal SME" />);
+        expect(screen.getByText("Sem incidentes recentes")).toBeInTheDocument();
+        expect(screen.getByLabelText("Status: Disponível")).toBeInTheDocument();
     });
 });

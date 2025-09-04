@@ -13,7 +13,7 @@ export default function CardWrapperInfoAmbientes({
     title = "Disponibilidade do ambiente",
     className,
     children,
-}: Props) {
+}: Readonly<Props>) {
     return (
         <Card className={cn("rounded-md shadow-sm gap-3 py-3 px-1", className)}>
             <CardHeader className="pb-1 px-4">

@@ -44,7 +44,7 @@ When(/^seleciono o sistema Autosserviço$/, () => {
   .click({ force: true });
 })
 
-Then(/^devo ver o status de falha do sistema$/, () => {
-  cy.xpath(locators_monitoramento.mensagem_incidente()).should('be.visible')
+Then(/^devo ver se há algum incidente no sistema$/, () => {
+  cy.xpath(locators_monitoramento.status_sistema()).should('be.visible')
 })
 

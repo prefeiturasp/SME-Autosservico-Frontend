@@ -13,8 +13,8 @@ class Monitoramento_Auto_Servico_Localizadores {
         return '/html/body/div/main/div[2]/div/div/div/button/span';
     }
 
-    mensagem_incidente() {
-        return '/html/body/div/main/div[3]/div[1]/div[2]/div/div/div[2]';
+    status_sistema() {
+        return '/html/body/div/main/div[3]/div/div[1]/div[2]/div/div/div[3]';
     }
 }
 

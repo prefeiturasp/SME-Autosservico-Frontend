@@ -1,61 +1,24 @@
-import DisponibilidadeDoAmbiente from "@/components/dashboard/DisponibilidadeDosAmbientes";
+"use client";
+import  CardWrapperInfoAmbientes from "@/components/dashboard/CardWrapperInfoAmbientes";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import useDashboardStore from "@/states/dashboard";
 
-export default async function Dashboard() {
-    const session = await auth();
+export default function Dashboard() {
 
-    if (!session) {
-        redirect("/login");
-        return null;
-    }
+    const activeProject = useDashboardStore((state) => state.activeProject);
+    const projectNameFrontEnd = activeProject?.zabbixQueryFrontend?.trim();
+    const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim();
 
     return (
         <div className="border-b bg-background px-6 py-4">
-            <DisponibilidadeDoAmbiente className="max-w-sm mb-5">
-                <Producao />
-            </DisponibilidadeDoAmbiente>
+            <div className="flex space-x-4 mb-6">
+                <CardWrapperInfoAmbientes title = "Disponibilidade do ambiente" className="max-w-sm mb-5">
+                    <Producao projectName={projectNameFrontEnd ?? ""} />
+                </CardWrapperInfoAmbientes>
 
-
-            <div className="bg-white shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                        Dashboard
-                    </h1>
-
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                        <h2 className="text-lg font-medium text-blue-900 mb-2">
-                            Informações da Sessão
-                        </h2>
-                        <div className="space-y-2 text-sm text-blue-800">
-                            <p>
-                                <strong>ID:</strong> {session.user?.id}
-                            </p>
-                            <p>
-                                <strong>Nome:</strong> {session.user?.name}
-                            </p>
-                            <p>
-                                <strong>Email:</strong> {session.user?.email}
-                            </p>
-                            <p>
-                                <strong>Imagem:</strong>{" "}
-                                {session.user?.image ?? "N/A"}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="mt-6">
-                        <h3 className="text-lg font-medium text-gray-900 mb-3">
-                            Área Protegida
-                        </h3>
-                        <p className="text-gray-600">
-                            Este conteúdo só é visível para usuários
-                            autenticados. Você está vendo isso porque fez login
-                            com sucesso!
-                        </p>
-                    </div>
-                </div>
+                <CardWrapperInfoAmbientes title = "Saúde do servidor (Workloads)" className="max-w-sm mb-5">
+                    <Producao title="API Service" projectName={projectNameBackEnd ?? ""} />
+                </CardWrapperInfoAmbientes>
             </div>
         </div>
     );

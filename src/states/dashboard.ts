@@ -13,6 +13,7 @@ export interface ProjectItem {
     nome: string;
     zabbixQueryFrontend: string;
     zabbixQueryBackend: string;
+    zabbixQueryFilasRabbitMQ: string;
 }
 
 type State = {

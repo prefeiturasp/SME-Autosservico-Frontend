@@ -36,6 +36,7 @@ export function SelectSistemas() {
                     ...selectedSistema,
                     zabbixQueryFrontend: selectedSistema.zabbixQueryFrontend,
                     zabbixQueryBackend: selectedSistema.zabbixQueryBackend,
+                    zabbixQueryFilasRabbitMQ: selectedSistema.zabbixQueryFilasRabbitMQ,
                 });
             }
         },

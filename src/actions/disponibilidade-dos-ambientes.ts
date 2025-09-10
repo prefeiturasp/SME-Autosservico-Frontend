@@ -1,5 +1,6 @@
 import "server-only";
 import { zabbixRpc } from "@/lib/zabbix.server";
+import { formatDDMMYYYY_HHMM_FromSeconds } from "@/lib/utils";
 
 export type ProducaoStatus = {
   available: boolean;
@@ -15,18 +16,6 @@ const RECENT_WINDOW_MS = Number(
 );
 
 type Trigger = { lastchange: string; value: string };
-
-function formatDDMMYYYY_HHMM_FromSeconds(seconds?: number): string | undefined {
-  if (!seconds || !isFinite(seconds)) return undefined;
-  const d = new Date(seconds * 1000);
-  if (isNaN(d.getTime())) return undefined;
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const yyyy = d.getFullYear();
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mi = String(d.getMinutes()).padStart(2, "0");
-  return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
-}
 
 export async function getDisponibilidadeDosAmbientesProducao(
   projectName: string,

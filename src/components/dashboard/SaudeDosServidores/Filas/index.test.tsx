@@ -1,258 +1,158 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+
+// SUT
 import Filas from "./index";
 
-vi.mock("@/components/ui/skeleton", () => ({
-    __esModule: true,
-    Skeleton: ({ className }: { className?: string }) => (
-        <div data-testid="skeleton" className={className} />
-    ),
-}));
-vi.mock("@/components/ui/button", () => ({
-    __esModule: true,
-    Button: ({
-        children,
-        onClick,
-        className,
-    }: React.PropsWithChildren<{
-        onClick?: () => void;
-        className?: string;
-    }>) => (
-        <button data-testid="button" className={className} onClick={onClick}>
-            {children}
-        </button>
-    ),
+// --- Mocks ---
+const mockUseZabbixStatus = vi.fn();
+
+// 1) mock do hook
+vi.mock("@/hooks/useZabbixStatus", () => ({
+  useZabbixStatus: (...args: unknown[]) => mockUseZabbixStatus(...args),
 }));
 
-const mockHook = vi.fn();
-vi.mock("@/hooks/useSaudeDosServidores", () => ({
-    __esModule: true,
-    useFetchSaudeDosServidoresFilas: (...args: unknown[]) =>
-        mockHook(...args),
-}));
+// 2) mock do ZabbixStatusCard para inspecionar props recebidas
+vi.mock("@/components/dashboard/ZabbixStatusCard", () => {
+  return {
+    default: ({
+      title,
+      className,
+      projectName,
+      query,
+    }: {
+      title: string;
+      className?: string;
+      projectName?: string;
+      query?: { isLoading?: boolean };
+    }) => (
+      <div data-testid="zabbix-card">
+        <span data-testid="title">{title}</span>
+        <span data-testid="className">{className ?? ""}</span>
+        <span data-testid="projectName">{projectName ?? ""}</span>
+        <span data-testid="query-is-loading">
+          {String(query?.isLoading ?? false)}
+        </span>
+      </div>
+    ),
+  };
+});
+
+// --- Helper para estado do hook ---
+interface QueryState {
+  data?: unknown;
+  isLoading: boolean;
+  isFetching: boolean;
+  isError: boolean;
+  refetch: () => void;
+}
+
+const makeQueryState = (overrides: Partial<QueryState> = {}) => ({
+  data: undefined,
+  isLoading: false,
+  isFetching: false,
+  isError: false,
+  refetch: vi.fn(),
+  ...overrides,
+});
 
 describe("<Filas />", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-        // ✅ Retorno padrão para evitar erro de destructuring quando projectName = ""
-        mockHook.mockReturnValue({
-            data: undefined,
-            isLoading: false,
-            isError: false,
-            isFetching: false,
-            refetch: vi.fn(),
-        });
+  it("usa o título padrão 'Fila' e repassa o projectName", () => {
+    mockUseZabbixStatus.mockReturnValue(makeQueryState());
+
+    render(
+      <Filas
+        // sem title -> usa default
+        className="mb-5 bg-[#F5F5F5] p-3"
+        projectName="SIG Escola - Filas RabbitMQ"
+      />
+    );
+
+    // Hook chamado com endpoint e keyPrefix corretos
+    expect(mockUseZabbixStatus).toHaveBeenCalledTimes(1);
+    expect(mockUseZabbixStatus).toHaveBeenCalledWith({
+      endpoint: "/api/zabbix/status/filas",
+      keyPrefix: "zabbix-status-filas",
+      projectName: "SIG Escola - Filas RabbitMQ",
     });
 
-    it("exibe mensagem para selecionar projeto quando projectName está vazio", () => {
-        // usa o retorno padrão acima
-        render(<Filas projectName="" />);
-        expect(screen.getByText("Produção")).toBeInTheDocument();
-        expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
+    // Props repassadas ao Card
+    expect(screen.getByTestId("zabbix-card")).toBeInTheDocument();
+    expect(screen.getByTestId("title").textContent).toBe("Fila"); // default
+    expect(screen.getByTestId("className").textContent).toBe(
+      "mb-5 bg-[#F5F5F5] p-3"
+    );
+    expect(screen.getByTestId("projectName").textContent).toBe(
+      "SIG Escola - Filas RabbitMQ"
+    );
+  });
+
+  it("aceita title e className customizados", () => {
+    mockUseZabbixStatus.mockReturnValue(makeQueryState());
+
+    render(
+      <Filas
+        title="Workload Fila"
+        className="rounded-md shadow"
+        projectName="Projeto Y - Fila"
+      />
+    );
+
+    expect(mockUseZabbixStatus).toHaveBeenCalledWith({
+      endpoint: "/api/zabbix/status/filas",
+      keyPrefix: "zabbix-status-filas",
+      projectName: "Projeto Y - Fila",
     });
 
-    it("exibe skeleton quando isLoading=true", () => {
-        mockHook.mockReturnValue({
-            data: undefined,
-            isLoading: true,
-            isError: false,
-            isFetching: false,
-            refetch: vi.fn(),
-        });
-        render(<Filas projectName="PRD - RabbitMQ" />);
-        expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(
-            2
-        );
+    expect(screen.getByTestId("title").textContent).toBe("Workload Fila");
+    expect(screen.getByTestId("className").textContent).toBe(
+      "rounded-md shadow"
+    );
+    expect(screen.getByTestId("projectName").textContent).toBe(
+      "Projeto Y - Fila"
+    );
+  });
+
+  it("repassa o resultado do hook (ex.: isLoading) para o Card", () => {
+    mockUseZabbixStatus.mockReturnValue(makeQueryState({ isLoading: true }));
+
+    render(<Filas projectName="Projeto Z" />);
+
+    // Nosso mock do Card imprime isLoading
+    expect(screen.getByTestId("query-is-loading").textContent).toBe("true");
+  });
+
+  it("quando projectName é string vazia, o hook recebe string vazia", () => {
+    mockUseZabbixStatus.mockReturnValue(makeQueryState());
+
+    render(<Filas projectName="" />);
+
+    expect(mockUseZabbixStatus).toHaveBeenCalledWith({
+      endpoint: "/api/zabbix/status/filas",
+      keyPrefix: "zabbix-status-filas",
+      projectName: "",
     });
 
-    it("exibe skeleton quando isFetching=true", () => {
-        mockHook.mockReturnValue({
-            data: undefined,
-            isLoading: false,
-            isError: false,
-            isFetching: true,
-            refetch: vi.fn(),
-        });
-        render(<Filas projectName="PRD - RabbitMQ" />);
-        expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(
-            2
-        );
+    expect(screen.getByTestId("projectName").textContent).toBe("");
+  });
+
+  it("quando projectName é undefined, o hook recebe string vazia (ramo do ??)", () => {
+    mockUseZabbixStatus.mockReturnValue(makeQueryState());
+
+    // forçando undefined apesar do tipo exigir string
+    render(<Filas projectName={undefined as unknown as string} />);
+
+    expect(mockUseZabbixStatus).toHaveBeenCalledWith({
+      endpoint: "/api/zabbix/status/filas",
+      keyPrefix: "zabbix-status-filas",
+      projectName: "", // cai no lado direito do ??
     });
 
-    it("exibe erro quando isError=true e permite refetch", () => {
-        const refetch = vi.fn();
-        mockHook.mockReturnValue({
-            data: undefined,
-            isLoading: false,
-            isError: true,
-            isFetching: false,
-            refetch,
-        });
-        render(<Filas projectName="PRD - RabbitMQ" />);
-        fireEvent.click(screen.getByTestId("button"));
-        expect(refetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("exibe erro quando !data (mesmo sem isError)", () => {
-        mockHook.mockReturnValue({
-            data: undefined,
-            isLoading: false,
-            isError: false,
-            isFetching: false,
-            refetch: vi.fn(),
-        });
-        render(<Filas projectName="PRD - RabbitMQ" />);
-        expect(
-            screen.getByText("Não foi possível carregar o status.")
-        ).toBeInTheDocument();
-    });
-
-    it("sucesso: incidents_recent=false → 'Sem incidentes recentes' + Disponível", () => {
-        mockHook.mockReturnValue({
-            data: {
-                available: true,
-                message: undefined,
-                incidents_recent: false,
-                lastIncidentAt: null,
-            },
-            isLoading: false,
-            isError: false,
-            isFetching: false,
-            refetch: vi.fn(),
-        });
-        render(<Filas projectName="PRD - RabbitMQ" />);
-        expect(screen.getByText("Sem incidentes recentes")).toBeInTheDocument();
-        expect(screen.getByLabelText("Status: Disponível")).toHaveTextContent(
-            "Disponível"
-        );
-    });
-
-    it("sucesso: incidents_recent=true → 'Houve incidentes recentes' + Indisponível", () => {
-        mockHook.mockReturnValue({
-            data: {
-                available: false,
-                message: undefined,
-                incidents_recent: true,
-                lastIncidentAt: null,
-            },
-            isLoading: false,
-            isError: false,
-            isFetching: false,
-            refetch: vi.fn(),
-        });
-        render(<Filas projectName="PRD - RabbitMQ" />);
-        expect(
-            screen.getByText("Houve incidentes recentes")
-        ).toBeInTheDocument();
-        expect(screen.getByLabelText("Status: Indisponível")).toHaveTextContent(
-            "Indisponível"
-        );
-    });
-
-    it('sucesso: message === "Houve incidentes recentes" + lastIncidentAt', () => {
-        mockHook.mockReturnValue({
-            data: {
-                available: false,
-                message: "Houve incidentes recentes",
-                incidents_recent: true,
-                lastIncidentAt: "2025-09-03 10:00",
-            },
-            isLoading: false,
-            isError: false,
-            isFetching: false,
-            refetch: vi.fn(),
-        });
-        render(<Filas title="API Service" projectName="PRD - RabbitMQ" />);
-        expect(
-            screen.getByText("Houve incidentes recentes - 2025-09-03 10:00")
-        ).toBeInTheDocument();
-        expect(
-            screen.getByLabelText("Status: Indisponível")
-        ).toBeInTheDocument();
-    });
-
-    it('sucesso: message customizada (≠ "Houve incidentes recentes") → usa exatamente a mensagem', () => {
-        mockHook.mockReturnValue({
-            data: {
-                available: true,
-                message: "Sistema em manutenção programada",
-                incidents_recent: true, // irrelevante porque message está definido
-                lastIncidentAt: "2025-09-03 10:00", // não deve ser concatenado
-            },
-            isLoading: false,
-            isError: false,
-            isFetching: false,
-            refetch: vi.fn(),
-        });
-
-        render(<Filas projectName="PRD - RabbitMQ" />);
-        // deve exibir exatamente a message, sem sufixo de data
-        expect(
-            screen.getByText("Sistema em manutenção programada")
-        ).toBeInTheDocument();
-
-        // pílula continua funcionando normalmente
-        expect(screen.getByLabelText("Status: Disponível")).toBeInTheDocument();
-    });
-
-    it('sucesso: message === "Houve incidentes recentes" mas sem lastIncidentAt → NÃO concatena', () => {
-        mockHook.mockReturnValue({
-            data: {
-                available: true,
-                message: "Houve incidentes recentes",
-                incidents_recent: true, // irrelevante pq message está definido
-                lastIncidentAt: null, // 👈 força o branch true && false
-            },
-            isLoading: false,
-            isError: false,
-            isFetching: false,
-            refetch: vi.fn(),
-        });
-
-        render(<Filas projectName="PRD - RabbitMQ" />);
-
-        // Deve exibir exatamente "Houve incidentes recentes" (sem " - data")
-        expect(
-            screen.getByText("Houve incidentes recentes")
-        ).toBeInTheDocument();
-        // E não deve existir a versão concatenada
-        expect(
-            screen.queryByText(/Houve incidentes recentes\s*-\s*/i)
-        ).not.toBeInTheDocument();
-
-        // Pílula segue normal
-        expect(screen.getByLabelText("Status: Disponível")).toBeInTheDocument();
-    });
-
-    it("usa fallback do ?? e chama o hook com string vazia quando projectName é undefined", () => {
-        // retorno padrão já vem do beforeEach
-        render(<Filas projectName={undefined as unknown as string} />);
-
-        // Continua mostrando o estado 'selecione um projeto'
-        expect(screen.getByText("Produção")).toBeInTheDocument();
-        expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
-
-        // ✅ garante que o branch do ?? foi exercitado (arg = "")
-        expect(mockHook).toHaveBeenCalledWith("");
-    });
-
-    it("sucesso: message === null cai no else do && e usa incidents_recent (false → 'Sem incidentes recentes')", () => {
-        mockHook.mockReturnValue({
-            data: {
-                available: true,
-                message: null, // 👈 cobre o ramo (message !== undefined) true e (message !== null) false
-                incidents_recent: false, // cai no fallback "Sem incidentes recentes"
-                lastIncidentAt: "2025-09-03 10:00", // ignorado nesse ramo
-            },
-            isLoading: false,
-            isError: false,
-            isFetching: false,
-            refetch: vi.fn(),
-        });
-
-        render(<Filas projectName="PRD - RabbitMQ" />);
-        expect(screen.getByText("Sem incidentes recentes")).toBeInTheDocument();
-        expect(screen.getByLabelText("Status: Disponível")).toBeInTheDocument();
-    });
+    expect(screen.getByTestId("projectName").textContent).toBe("");
+  });
 });

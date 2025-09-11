@@ -13,3 +13,15 @@ export function numberToBRL(n: number): string {
 
   return n < 0 ? `R$ -${absValue.replace("R$", "").trim()}` : absValue;
 }
+
+export function formatDDMMYYYY_HHMM_FromSeconds(seconds?: number): string | undefined {
+    if (!seconds || !isFinite(seconds)) return undefined;
+    const d = new Date(seconds * 1000);
+    if (isNaN(d.getTime())) return undefined;
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+}

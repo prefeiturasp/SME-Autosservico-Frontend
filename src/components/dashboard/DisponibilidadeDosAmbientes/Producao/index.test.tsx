@@ -1,173 +1,161 @@
-/* @vitest-environment jsdom */
-// tests/components/Producao.test.tsx
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
-// mocks configuráveis
-type MockStoreState = {
-    activeProject: {
-        zabbixQueryFrontend: string;
+// SUT
+import Producao from "./index";
+
+// --- Mocks ---
+const mockUseZabbixStatus = vi.fn();
+
+// 1) mock do hook
+vi.mock("@/hooks/useZabbixStatus", () => ({
+    useZabbixStatus: (...args: unknown[]) => mockUseZabbixStatus(...args),
+}));
+
+// 2) mock do ZabbixStatusCard para inspecionar props recebidas
+//    Renderiza algo simples com data-testid e exibe props importantes
+vi.mock("@/components/dashboard/ZabbixStatusCard", () => {
+    return {
+        default: ({
+            title,
+            className,
+            projectName,
+            query,
+        }: {
+            title: string;
+            className?: string;
+            projectName?: string;
+            query?: { isLoading?: boolean };
+        }) => (
+            <div data-testid="zabbix-card">
+                <span data-testid="title">{title}</span>
+                <span data-testid="className">{className ?? ""}</span>
+                <span data-testid="projectName">{projectName ?? ""}</span>
+                <span data-testid="query-is-loading">
+                    {String(query?.isLoading ?? false)}
+                </span>
+            </div>
+        ),
     };
+});
+
+// --- Helpers de estado do hook ---
+type QueryState = {
+    data?: unknown;
+    isLoading?: boolean;
+    isFetching?: boolean;
+    isError?: boolean;
+    refetch?: () => void;
 };
 
-let mockStoreState: MockStoreState = {
-    activeProject: { zabbixQueryFrontend: "Portal Educação" },
-};
-type HookReturnType = {
-    data: {
-        available: boolean;
-        incidents_recent: boolean;
-        message?: string;
-        lastIncidentAt?: string;
-    };
-    isLoading: boolean;
-    isFetching: boolean;
-    isError: boolean;
-    refetch: () => void;
-};
-
-let hookReturn: HookReturnType = {
-    data: {
-        available: true,
-        incidents_recent: false,
-        message: "Sem incidentes recentes",
-    },
+const makeQueryState = (overrides: Partial<QueryState> = {}) => ({
+    data: undefined,
     isLoading: false,
     isFetching: false,
     isError: false,
     refetch: vi.fn(),
-};
-
-vi.mock("@/states/dashboard", () => ({
-    __esModule: true,
-    default: (selector: (state: MockStoreState) => unknown) =>
-        selector(mockStoreState),
-}));
-
-vi.mock("@/hooks/useDisponibilidadeDosAmbientes", () => ({
-    __esModule: true,
-    useFetchDisponibilidadeDosAmbientesProducao: () => hookReturn,
-}));
-
-import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
+    ...overrides,
+});
 
 describe("<Producao />", () => {
     beforeEach(() => {
-        hookReturn = {
-            data: {
-                available: true,
-                incidents_recent: false,
-                message: "Sem incidentes recentes",
-            },
-            isLoading: false,
-            isFetching: false,
-            isError: false,
-            refetch: vi.fn(),
-        };
-        mockStoreState = {
-            activeProject: { zabbixQueryFrontend: "Portal Educação" },
-        };
+        vi.clearAllMocks();
     });
 
-    it("pede seleção quando não há projeto ativo", () => {
-        mockStoreState = { activeProject: { zabbixQueryFrontend: "" } };
-        render(<Producao />);
-        expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
+    it("usa o título padrão 'Produção' e repassa o projectName", () => {
+        mockUseZabbixStatus.mockReturnValue(makeQueryState());
+
+        render(
+            <Producao
+                // sem title -> usa default
+                className="bg-[#F5F5F5] p-3"
+                projectName="SIG Escola - Frontend"
+            />
+        );
+
+        // Verifica chamada do hook com endpoint e keyPrefix corretos
+        expect(mockUseZabbixStatus).toHaveBeenCalledTimes(1);
+        expect(mockUseZabbixStatus).toHaveBeenCalledWith({
+            endpoint: "/api/zabbix/status/producao",
+            keyPrefix: "zabbix-status-producao",
+            projectName: "SIG Escola - Frontend",
+        });
+
+        // Verifica props repassadas ao Card
+        expect(screen.getByTestId("zabbix-card")).toBeInTheDocument();
+        expect(screen.getByTestId("title").textContent).toBe("Produção"); // default title
+        expect(screen.getByTestId("className").textContent).toBe(
+            "bg-[#F5F5F5] p-3"
+        );
+        expect(screen.getByTestId("projectName").textContent).toBe(
+            "SIG Escola - Frontend"
+        );
     });
 
-    it("renderiza loading (skeleton) quando isLoading", () => {
-        hookReturn.isLoading = true;
-        render(<Producao />);
-        expect(screen.getByText("Produção")).toBeInTheDocument();
-        // não deve mostrar 'Disponível' ainda
-        expect(screen.queryByText("Disponível")).not.toBeInTheDocument();
+    it("aceita title customizado e className customizada", () => {
+        mockUseZabbixStatus.mockReturnValue(makeQueryState());
+
+        render(
+            <Producao
+                title="API Service"
+                className="rounded-md shadow"
+                projectName="SIG Escola - Backend"
+            />
+        );
+
+        expect(mockUseZabbixStatus).toHaveBeenCalledWith({
+            endpoint: "/api/zabbix/status/producao",
+            keyPrefix: "zabbix-status-producao",
+            projectName: "SIG Escola - Backend",
+        });
+
+        expect(screen.getByTestId("title").textContent).toBe("API Service");
+        expect(screen.getByTestId("className").textContent).toBe(
+            "rounded-md shadow"
+        );
+        expect(screen.getByTestId("projectName").textContent).toBe(
+            "SIG Escola - Backend"
+        );
     });
 
-    it("renderiza erro e botão 'Tentar novamente'", () => {
-        hookReturn.isError = true;
-        render(<Producao />);
-        expect(
-            screen.getByText(/Não foi possível carregar o status/i)
-        ).toBeInTheDocument();
-        const btn = screen.getByRole("button", { name: /Tentar novamente/i });
-        expect(btn).toBeInTheDocument();
-        fireEvent.click(btn);
-        expect(hookReturn.refetch).toHaveBeenCalled();
+    it("repassa o resultado do hook (ex.: isLoading) para o Card", () => {
+        mockUseZabbixStatus.mockReturnValue(
+            makeQueryState({ isLoading: true })
+        );
+
+        render(<Producao projectName="Projeto X" />);
+
+        // Nosso mock do Card imprime isLoading
+        expect(screen.getByTestId("query-is-loading").textContent).toBe("true");
     });
 
-    it("renderiza sucesso: disponível", () => {
-        render(<Producao />);
-        expect(screen.getByText("Sem incidentes recentes")).toBeInTheDocument();
-        expect(screen.getByText("Disponível")).toBeInTheDocument();
+    it("funciona com projectName vazio (continua chamando o hook com string vazia)", () => {
+        mockUseZabbixStatus.mockReturnValue(makeQueryState());
+
+        render(<Producao projectName={""} />);
+
+        expect(mockUseZabbixStatus).toHaveBeenCalledWith({
+            endpoint: "/api/zabbix/status/producao",
+            keyPrefix: "zabbix-status-producao",
+            projectName: "",
+        });
+
+        expect(screen.getByTestId("projectName").textContent).toBe("");
     });
+    it("quando projectName é undefined, o hook recebe string vazia (ramo do ??)", () => {
+        mockUseZabbixStatus.mockReturnValue(makeQueryState());
 
-    it("renderiza sucesso: indisponível", () => {
-        hookReturn.data = {
-            available: false,
-            incidents_recent: true,
-            message: "Há incidentes ativos",
-        };
-        render(<Producao />);
-        expect(screen.getByText("Há incidentes ativos")).toBeInTheDocument();
-        expect(screen.getByText("Indisponível")).toBeInTheDocument();
-    });
+        // forçando undefined apesar do tipo exigir string
+        render(<Producao projectName={undefined as unknown as string} />);
 
-    it("mostra 'Houve incidentes recentes' quando message é undefined e incidents_recent=true", () => {
-        hookReturn.data = {
-            available: true,
-            incidents_recent: true,
-            message: undefined,
-        };
-        render(<Producao />);
-        expect(
-            screen.getByText("Houve incidentes recentes")
-        ).toBeInTheDocument();
-        expect(screen.getByText("Disponível")).toBeInTheDocument();
-    });
+        expect(mockUseZabbixStatus).toHaveBeenCalledWith({
+            endpoint: "/api/zabbix/status/producao",
+            keyPrefix: "zabbix-status-producao",
+            projectName: "", // <- cai no lado direito do ??
+        });
 
-    it("mostra 'Sem incidentes recentes' quando message é undefined e incidents_recent=false", () => {
-        hookReturn.data = {
-            available: true,
-            incidents_recent: false,
-            message: undefined,
-        };
-
-        render(<Producao />);
-        expect(screen.getByText("Sem incidentes recentes")).toBeInTheDocument();
-        expect(screen.getByText("Disponível")).toBeInTheDocument();
-    });
-
-    it("quando houve incidentes recentes e lastIncidentAt existe → mostra 'Houve incidentes recentes — dd/mm/aaaa HH:mm'", () => {
-        hookReturn.data = {
-            available: true,
-            incidents_recent: true,
-            message: "Houve incidentes recentes",
-            lastIncidentAt: "01/02/2025 13:45",
-        };
-
-        render(<Producao />);
-
-        expect(
-            screen.getByText("Houve incidentes recentes - 01/02/2025 13:45")
-        ).toBeInTheDocument();
-        expect(screen.getByText("Disponível")).toBeInTheDocument();
-    });
-
-    it("quando há incidentes ATIVOS não deve anexar data/hora ao subtítulo", () => {
-        hookReturn.data = {
-            available: false,
-            incidents_recent: true,
-            message: "Há incidentes ativos",
-            lastIncidentAt: "01/02/2025 13:45", // mesmo presente, regra do componente não anexa
-        };
-
-        render(<Producao />);
-
-        expect(screen.getByText("Há incidentes ativos")).toBeInTheDocument();
-        expect(
-            screen.queryByText(/— 01\/02\/2025 13:45/)
-        ).not.toBeInTheDocument();
-        expect(screen.getByText("Indisponível")).toBeInTheDocument();
+        // nosso mock do Card trata projectName ?? ""
+        expect(screen.getByTestId("projectName").textContent).toBe("");
     });
 });

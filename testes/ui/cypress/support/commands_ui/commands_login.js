@@ -3,7 +3,7 @@ import Login_Auto_Servico_Localizadores from '../locators/login_locators'
 
 const loginLocalizadores = new Login_Auto_Servico_Localizadores()
 
-Cypress.Commands.add('login_gipe', () => {
+Cypress.Commands.add('login_autoservico', () => {
     cy.visit('/')
 })
 

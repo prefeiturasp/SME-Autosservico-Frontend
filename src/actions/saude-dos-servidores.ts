@@ -5,15 +5,17 @@ import type { ZabbixStatus } from "@/types/zabbix";
 
 const DEFAULT_HOST = process.env.ZABBIX_DEFAULT_HOST ?? "Zabbix server";
 
-export async function getDisponibilidadeDosAmbientesProducao(
+export async function getSaudeDosServidoresFilas(
   projectName: string,
   host = DEFAULT_HOST
 ): Promise<ZabbixStatus> {
   const params = {
-    filter: { host: [host], description: [projectName] },
+    host,
     output: "extend" as const,
+    selectFunctions: "extend",
+    filter: { description: projectName },
   };
 
-  const triggers = await zabbixRpc<Trigger[]>("trigger.get", params, 2);
+  const triggers = await zabbixRpc<Trigger[]>("trigger.get", params, 1);
   return zabbixStatusFromTriggers(triggers);
 }

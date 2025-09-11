@@ -3,20 +3,20 @@
 import ZabbixStatusCard from "@/components/dashboard/ZabbixStatusCard";
 import { useZabbixStatus } from "@/hooks/useZabbixStatus";
 
-type ProducaoProps = {
+type FilasProps = {
     readonly projectName: string;
     readonly title?: string;
     readonly className?: string;
 };
 
-export default function Producao({
-    title = "Produção",
+export default function Filas({
+    title = "Fila",
     className,
     projectName,
-}: ProducaoProps) {
+}: FilasProps) {
     const query = useZabbixStatus({
-        endpoint: "/api/zabbix/status/producao",
-        keyPrefix: "zabbix-status-producao",
+        endpoint: "/api/zabbix/status/filas",
+        keyPrefix: "zabbix-status-filas",
         projectName: projectName ?? "",
     });
 

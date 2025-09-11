@@ -6,6 +6,7 @@ export const SistemaSchema = z.object({
   nome: z.string(),
   zabbixQueryFrontend: z.string(),
   zabbixQueryBackend: z.string(),
+  zabbixQueryFilasRabbitMQ: z.string(),
 });
 
 export type Sistema = z.infer<typeof SistemaSchema>;

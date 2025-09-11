@@ -1,66 +1,119 @@
+// src/app/dashboard/page.test.tsx
+/* @vitest-environment jsdom */
 import { render, screen } from "@testing-library/react";
+import { vi, describe, test, beforeEach } from "vitest";
 import Dashboard from "./page";
-import { vi } from "vitest";
 import { withClient } from "@/__mocks__/renderWithClient";
 
-// Mock de Navbar
-vi.mock("@/components/ui/Navbar", () => ({
-    __esModule: true,
-    default: () => <nav data-testid="navbar">Mocked Navbar</nav>,
+// 🔧 Mock do store com estado configurável por teste
+type StoreState = {
+  activeProject: null | {
+    zabbixQueryFrontend?: string;
+    zabbixQueryBackend?: string;
+    zabbixQueryFilasRabbitMQ?: string;
+  };
+};
+let mockStoreState: StoreState = {
+  activeProject: {
+    zabbixQueryFrontend: "Portal SME",
+    zabbixQueryBackend: "API SME",
+    zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
+  },
+};
+
+vi.mock("@/states/dashboard", () => ({
+  __esModule: true,
+  default: (selector: (s: StoreState) => unknown) => selector(mockStoreState),
 }));
 
-// Mock da função `auth()` para simular login
-vi.mock("@/lib/auth", async () => {
-    return {
-        auth: vi.fn(),
-    };
-});
-
-// Mock da função `redirect` do next/navigation
-vi.mock("next/navigation", () => ({
-    redirect: vi.fn(),
+// 🔧 Mocks simples dos filhos
+vi.mock("@/components/dashboard/CardWrapperInfoAmbientes", () => ({
+  __esModule: true,
+  default: ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <section data-testid={`card-${title}`}>{children}</section>
+  ),
 }));
 
-import { auth } from "@/lib/auth";
-const mockedAuth = auth as unknown as ReturnType<typeof vi.fn>;
+vi.mock("@/components/dashboard/DisponibilidadeDosAmbientes/Producao", () => ({
+  __esModule: true,
+  default: ({ title, projectName }: { title?: string; projectName: string }) => (
+    <div data-testid={`producao-${title ?? "Frontend"}`}>{projectName}</div>
+  ),
+}));
 
-import { redirect } from "next/navigation";
+vi.mock("@/components/dashboard/SaudeDosServidores/Filas", () => ({
+  __esModule: true,
+  default: ({ title, projectName }: { title: string; projectName: string }) => (
+    <div data-testid={`filas-${title ?? "Filas"}`}>{projectName}</div>
+  ),
+}));
 
 describe("Dashboard page", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockStoreState = {
+      activeProject: {
+        zabbixQueryFrontend: "Portal SME",
+        zabbixQueryBackend: "API SME",
+        zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
+      },
+    };
+  });
 
-    test("renderiza informações da sessão quando logado", async () => {
-        // Simula usuário autenticado
-        mockedAuth.mockResolvedValueOnce({
-            user: {
-                id: "1",
-                name: "Admin User",
-                email: "admin@example.com",
-                image: null,
-                abrangencia: {
-                    nome: "Admin Area",
-                    descricao: "Acesso total",
-                },
-            },
-        });
+  test("renderiza os cards e passa os nomes de projeto corretos", () => {
+    render(withClient(<Dashboard />));
 
-        render(withClient(await Dashboard()));
+    // Primeiro card (Frontend)
+    expect(screen.getByTestId("card-Disponibilidade do ambiente")).toBeInTheDocument();
+    expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("Portal SME");
 
-        expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
-        expect(screen.getByText(/Nome/i)).toBeInTheDocument();
-        expect(screen.getByText(/Email/i)).toBeInTheDocument();
-        expect(screen.getByText(/admin@example.com/i)).toBeInTheDocument();
-    });
+    // Segundo card (Saúde do servidor)
+    expect(screen.getByTestId("card-Saúde do servidor (Workloads)")).toBeInTheDocument();
+    expect(screen.getByTestId("producao-API Service")).toHaveTextContent("API SME");
 
-    test("redireciona para /login quando não autenticado", async () => {
-        (auth as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-            null
-        );
+    // Filas
+    expect(screen.getByTestId("filas-Fila")).toHaveTextContent("Filas RabbitMQ");
+  });
 
-        await Dashboard();
+  test("quando não há projeto ativo, passa strings vazias para os filhos (ramo do ??)", () => {
+    mockStoreState = { activeProject: null };
 
-        expect(redirect).toHaveBeenCalledWith("/login");
-    });
+    render(withClient(<Dashboard />));
+
+    expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("");
+    expect(screen.getByTestId("producao-API Service")).toHaveTextContent("");
+    expect(screen.getByTestId("filas-Fila")).toHaveTextContent("");
+  });
+
+  test("trima os nomes antes de passar (ramo do ?.trim())", () => {
+    mockStoreState = {
+      activeProject: {
+        zabbixQueryFrontend: "   Portal SME   ",
+        zabbixQueryBackend: "   API SME   ",
+        zabbixQueryFilasRabbitMQ: "   Filas RabbitMQ   ",
+      },
+    };
+
+    render(withClient(<Dashboard />));
+
+    expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("Portal SME");
+    expect(screen.getByTestId("producao-API Service")).toHaveTextContent("API SME");
+    expect(screen.getByTestId("filas-Fila")).toHaveTextContent("Filas RabbitMQ");
+  });
+
+  test("quando um campo específico está undefined, cai no fallback vazio para aquele filho", () => {
+    mockStoreState = {
+      activeProject: {
+        zabbixQueryFrontend: "Portal SME",
+        zabbixQueryBackend: "API SME",
+        // RabbitMQ ausente → deve virar ""
+      },
+    };
+
+    render(withClient(<Dashboard />));
+
+    expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("Portal SME");
+    expect(screen.getByTestId("producao-API Service")).toHaveTextContent("API SME");
+    expect(screen.getByTestId("filas-Fila")).toHaveTextContent(""); // fallback
+  });
 });

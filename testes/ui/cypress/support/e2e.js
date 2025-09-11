@@ -1,6 +1,7 @@
 import '@shelex/cypress-allure-plugin'
 import "cypress-cloud/support";
 import './commands_ui/commands_login'
+import 'cypress-xpath'
 
 // PostgreSQL
 const postgreSQL = require('cypress-postgresql');

@@ -22,7 +22,7 @@ export default function CardWrapperInfoAmbientes({
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-3">
-                <div className="rounded-md bg-[#F5F5F5] p-3">{children}</div>
+                <div className="rounded-md ">{children}</div>
             </CardContent>
         </Card>
     );

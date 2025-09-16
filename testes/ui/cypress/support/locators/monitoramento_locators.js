@@ -1,8 +1,8 @@
 class Monitoramento_Auto_Servico_Localizadores {
 
 
-    botao_cotic() {
-        return 'span[data-testid="sidebar-button-cotic"]';
+    botao_ascom() {
+        return 'span[data-testid="sidebar-button-ascom"]';
     }
 
     botao_sistema() {
@@ -10,7 +10,7 @@ class Monitoramento_Auto_Servico_Localizadores {
     }
 
     opcao_sistema() {
-        return '/html/body/div/main/div[2]/div/div/div/button/span';
+        return 'span[data-slot="select-value"]';
     }
 
     status_sistema() {

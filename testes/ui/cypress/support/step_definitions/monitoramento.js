@@ -34,13 +34,12 @@ Then(/^devo ter acesso ao dashboard$/, () => {
   cy.url().should('include', '/dashboard')
 })
 
-When(/^clico no menu COTIC$/, () => {
-  cy.get(locators_monitoramento.botao_cotic()).click()
+When(/^clico no menu Acom$/, () => {
+  cy.get(locators_monitoramento.botao_ascom()).click()
 })
 
-When(/^seleciono o sistema Autosserviço$/, () => {
+When(/^seleciono o sistema Portal Educação$/, () => {
   cy.xpath(locators_monitoramento.botao_sistema()).click()
-  cy.xpath(locators_monitoramento.opcao_sistema()).should('be.visible')
   .click({ force: true });
 })
 

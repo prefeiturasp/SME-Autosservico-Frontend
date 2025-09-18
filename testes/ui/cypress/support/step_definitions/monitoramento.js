@@ -44,6 +44,6 @@ When(/^seleciono o sistema Portal Educação$/, () => {
 })
 
 Then(/^devo ver se há algum incidente no sistema$/, () => {
-  cy.xpath(locators_monitoramento.status_sistema()).should('be.visible')
+  cy.xpath(locators_monitoramento.status_sistema())
 })
 

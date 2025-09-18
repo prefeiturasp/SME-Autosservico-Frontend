@@ -14,7 +14,7 @@ class Monitoramento_Auto_Servico_Localizadores {
     }
 
     status_sistema() {
-        return '/html/body/div/main/div[3]/div/div[1]/div[2]/div/div/div[3]';
+        return '/html/body/div[1]/main/div[3]/div/div[1]/div[2]/div/div/div[3]';
     }
 }
 

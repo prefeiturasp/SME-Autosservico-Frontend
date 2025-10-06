@@ -36,6 +36,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         [allowedSquads]
     );
 
+    console.log("YYYYYYYYYYYYY Allowed Items:", allowedItems);
+
     useEffect(() => {
         if (!activeItem && allowedItems.length > 0) {
             setActiveItem(allowedItems[0]);

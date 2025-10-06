@@ -2,6 +2,12 @@
 import { useMemo } from "react";
 import { useSession } from "next-auth/react";
 
+
+// Função utilitária para ler a env dinamicamente (testável)
+function getAuthVersion() {
+    return process.env.NEXT_PUBLIC_AUTH_VERSION ?? "v1";
+}
+
 interface PerfilPorSistema {
     sistema: number;
     perfis: string[];
@@ -23,11 +29,7 @@ interface SessionUser {
 export function useAllowedSquads() {
     const { data: session, status } = useSession();
 
-    // Retorna os grupos do usuário autenticado via Keycloak (v2)
-    const authVersion = process.env.NEXT_PUBLIC_AUTH_VERSION ?? "v1";
-
     return useMemo(() => {
-
         // Evita executar se ainda está carregando
         if (status === "loading") return [];
 
@@ -36,7 +38,7 @@ export function useAllowedSquads() {
         const user = session.user as SessionUser;
 
         // Retorna os grupos do usuário autenticado via Keycloak (v2)
-        if (authVersion === "v2") {
+        if (getAuthVersion() === "v2") {
             if (!user.groups) return [];
             return Array.isArray(user.groups) ? user.groups : [];
         }
@@ -52,5 +54,5 @@ export function useAllowedSquads() {
         });
 
         return Array.from(new Set(allowedSquads));
-    }, [session, status, authVersion]);
+    }, [session, status]);
 }

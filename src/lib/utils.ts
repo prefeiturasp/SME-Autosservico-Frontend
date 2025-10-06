@@ -25,3 +25,9 @@ export function formatDDMMYYYY_HHMM_FromSeconds(seconds?: number): string | unde
     const mi = String(d.getMinutes()).padStart(2, "0");
     return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
 }
+
+
+export function decodeJwt(token: string) {
+    const payload = token.split('.')[1];
+    return JSON.parse(Buffer.from(payload, 'base64').toString('utf-8'));
+}

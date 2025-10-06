@@ -34,10 +34,16 @@ export function useAllowedSquads() {
 
         const user = session.user as SessionUser;
 
+        // Debug: logar AUTH_VERSION e user
+        console.log("[DEBUG] useAllowedSquads.ts AUTH_VERSION:", AUTH_VERSION);
+        console.log("[DEBUG] useAllowedSquads.ts session.user:", user);
+
         // Retorna os grupos do usuário autenticado via Keycloak (v2)
         if (AUTH_VERSION === "v2") {
             if (!user.groups) return [];
-            return Array.isArray(user.groups) ? user.groups : [];
+            const result = Array.isArray(user.groups) ? user.groups : [];
+            console.log("[DEBUG] allowedSquads (v2):", result);
+            return result;
         }
 
         if (!user.perfis_por_sistema) return [];
@@ -50,6 +56,8 @@ export function useAllowedSquads() {
             }
         });
 
-        return Array.from(new Set(allowedSquads));
+        const result = Array.from(new Set(allowedSquads));
+        console.log("[DEBUG] useAllowedSquads (v1):", result);
+        return result;
     }, [session, status]);
 }

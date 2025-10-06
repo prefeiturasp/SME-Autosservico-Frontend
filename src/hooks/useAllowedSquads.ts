@@ -17,19 +17,29 @@ interface SessionUser {
     situacaoGrupo?: number;
     visoes?: string[];
     perfis_por_sistema?: PerfilPorSistema[];
+    groups?: string[]; // V2 Keycloak
 }
 
 export function useAllowedSquads() {
     const { data: session, status } = useSession();
 
+    // Retorna os grupos do usuário autenticado via Keycloak (v2)
+    const authVersion = process.env.NEXT_PUBLIC_AUTH_VERSION ?? "v1";
+
     return useMemo(() => {
 
-         // Evita executar se ainda está carregando
+        // Evita executar se ainda está carregando
         if (status === "loading") return [];
 
-        if (!session || !session.user) return [];
+        if (!session?.user) return [];
 
         const user = session.user as SessionUser;
+
+        // Retorna os grupos do usuário autenticado via Keycloak (v2)
+        if (authVersion === "v2") {
+            if (!user.groups) return [];
+            return Array.isArray(user.groups) ? user.groups : [];
+        }
 
         if (!user.perfis_por_sistema) return [];
 
@@ -42,5 +52,5 @@ export function useAllowedSquads() {
         });
 
         return Array.from(new Set(allowedSquads));
-    }, [session, status]);
+    }, [session, status, authVersion]);
 }

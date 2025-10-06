@@ -22,6 +22,7 @@ describe("Login Function", () => {
   beforeEach(() => {
     cleanupMocks();
     resetEnv();
+    process.env.NEXT_PUBLIC_AUTH_VERSION = "v1";
   });
 
   describe("Casos de sucesso", () => {
@@ -396,4 +397,17 @@ describe("Callback Logic", () => {
       expect(result).toEqual(initialSession);
     });
   });
+
+  describe("Login (branch coverage)", () => {
+  it("chama loginKeycloak quando version='v2'", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    await import("../strategies");
+    const spy = vi.spyOn(await import("@/lib/auth/strategies"), "loginKeycloak").mockResolvedValue({ name: "Angela" });
+    const { Login } = await import("../index");
+    const result = await Login({ login: "angela", senha: "123" }, "v2");
+    expect(spy).toHaveBeenCalledWith({ login: "angela", senha: "123" });
+    expect(result).toEqual({ name: "Angela" });
+    spy.mockRestore();
+  });
+});
 });

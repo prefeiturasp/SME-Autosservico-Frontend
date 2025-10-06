@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cn, numberToBRL } from "./utils";
+import { cn, numberToBRL, decodeJwt } from "./utils";
 
 describe("Função cn (clsx + tailwind-merge)", () => {
   it("retorna uma string combinada de classes", () => {
@@ -39,5 +39,29 @@ describe("Função numberToBRL", () => {
   it("formata número negativo corretamente", () => {
     expect(numberToBRL(-2500.75)).toBe("R$ -2.500,75");
 
+  });
+});
+
+describe("decodeJwt", () => {
+  it("decodifica um JWT válido", () => {
+    // header: {"alg":"HS256","typ":"JWT"}
+    // payload: {"name":"Angela","groups":["G1","G2"]}
+    const payload = { name: "Angela", groups: ["G1", "G2"] };
+    const base64Payload = Buffer.from(JSON.stringify(payload)).toString("base64url");
+    const token = `aaa.${base64Payload}.zzz`;
+    expect(decodeJwt(token)).toEqual(payload);
+  });
+
+  it("lança erro se o token não tem dois pontos", () => {
+    expect(() => decodeJwt("invalidtoken")).toThrow();
+  });
+
+  it("lança erro se o payload não é base64 válido", () => {
+    expect(() => decodeJwt("aaa.notbase64.zzz")).toThrow();
+  });
+
+  it("lança erro se o payload não é JSON válido", () => {
+    const badBase64 = Buffer.from("notjson").toString("base64url");
+    expect(() => decodeJwt(`aaa.${badBase64}.zzz`)).toThrow();
   });
 });

@@ -355,4 +355,23 @@ describe("auth/logic", () => {
             rf: "999",
         });
     });
+
+    it("cobre fallback '' em rf quando preferred_username e login ausentes (lança erro interno)", async () => {
+        const { Login } = await import("./index");
+        const { temPermissaoDeAcesso } = await import("./validacoes");
+
+        (Login as unknown as Mock).mockResolvedValueOnce({
+            status: 200,
+            nome: "Fulano",
+            // preferred_username: undefined,
+            // login: undefined,
+            email: "fulano@example.com",
+            perfis_por_sistema: [{ sistema: 1008, perfis: ["COPED"] }],
+        });
+        (temPermissaoDeAcesso as unknown as Mock).mockReturnValueOnce(true);
+
+        await expect(
+            authorizeUser({ rf: "qualquer", password: "ok" })
+        ).rejects.toThrow(/Erro interno no servidor/i);
+    });
 });

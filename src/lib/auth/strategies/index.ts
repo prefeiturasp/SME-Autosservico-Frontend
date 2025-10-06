@@ -66,7 +66,7 @@ export async function loginKeycloak(data: LoginData): Promise<LoginResponse> {
         if (e instanceof AxiosError && e.response) {
             return {
                 status: e.response.status,
-                detail: e.response.data.error_description || e.response.data.detail,
+                detail: e.response.data.error_description ?? e.response.data.detail,
                 operation_id: e.response.data.operation_id,
             };
         }

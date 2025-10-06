@@ -152,7 +152,11 @@ describe("useAllowedSquads (v2)", () => {
         expect(result.current).toEqual([]);
     });
 
-    it("deve retornar groups quando presentes (v2)", () => {
+    it("deve retornar groups quando presentes (v2)", async () => {
+        vi.resetModules();
+        process.env.NEXT_PUBLIC_AUTH_VERSION = "v2";
+        // Precisa importar o hook depois de setar a env!
+        const { useAllowedSquads } = await import("./useAllowedSquads");
         (useSession as unknown as Mock).mockReturnValue({
             data: { user: { name: "Teste", groups: ["G1", "G2"] } },
             status: "authenticated",
@@ -164,6 +168,30 @@ describe("useAllowedSquads (v2)", () => {
     it("deve retornar [] quando groups existe mas não é array (v2)", () => {
         (useSession as unknown as Mock).mockReturnValue({
             data: { user: { name: "Teste", groups: "G1" } },
+            status: "authenticated",
+        });
+        const { result } = renderHook(() => useAllowedSquads());
+        expect(result.current).toEqual([]);
+    });
+
+    it("deve retornar [] quando groups existe mas não é array (v2)", async () => {
+        vi.resetModules();
+        process.env.NEXT_PUBLIC_AUTH_VERSION = "v2";
+        const { useAllowedSquads } = await import("./useAllowedSquads");
+        (useSession as unknown as Mock).mockReturnValue({
+            data: { user: { name: "Teste", groups: "G1" } },
+            status: "authenticated",
+        });
+        const { result } = renderHook(() => useAllowedSquads());
+        expect(result.current).toEqual([]);
+    });
+
+    it("deve retornar [] quando groups é null (v2)", async () => {
+        vi.resetModules();
+        process.env.NEXT_PUBLIC_AUTH_VERSION = "v2";
+        const { useAllowedSquads } = await import("./useAllowedSquads");
+        (useSession as unknown as Mock).mockReturnValue({
+            data: { user: { name: "Teste", groups: null } },
             status: "authenticated",
         });
         const { result } = renderHook(() => useAllowedSquads());

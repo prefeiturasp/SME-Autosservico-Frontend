@@ -2,11 +2,8 @@
 import { useMemo } from "react";
 import { useSession } from "next-auth/react";
 
-
-// Função utilitária para ler a env dinamicamente (testável)
-function getAuthVersion() {
-    return process.env.NEXT_PUBLIC_AUTH_VERSION ?? "v1";
-}
+// Lê a variável de ambiente no build (Next.js substitui corretamente)
+const AUTH_VERSION = process.env.NEXT_PUBLIC_AUTH_VERSION ?? "v1";
 
 interface PerfilPorSistema {
     sistema: number;
@@ -38,7 +35,7 @@ export function useAllowedSquads() {
         const user = session.user as SessionUser;
 
         // Retorna os grupos do usuário autenticado via Keycloak (v2)
-        if (getAuthVersion() === "v2") {
+        if (AUTH_VERSION === "v2") {
             if (!user.groups) return [];
             return Array.isArray(user.groups) ? user.groups : [];
         }

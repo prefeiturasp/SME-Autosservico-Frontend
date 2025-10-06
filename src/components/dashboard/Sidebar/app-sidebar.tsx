@@ -16,6 +16,7 @@ import {
 
 import useDashboardStore from "@/states/dashboard";
 import { useAllowedSquads } from "@/hooks/useAllowedSquads";
+import { useSession } from "next-auth/react";
 import { CustomTrigger } from "./custom-trigger";
 import { COORDENADORIAS } from "./coordenadorias";
 
@@ -30,13 +31,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const setActiveItem = useDashboardStore((state) => state.setActiveItem);
 
     const allowedSquads = useAllowedSquads();
+    const { data: session } = useSession();
+    // Debug: logar AUTH_VERSION, session.user, allowedSquads e allowedItems
+    // eslint-disable-next-line no-undef
+    const AUTH_VERSION = process.env.NEXT_PUBLIC_AUTH_VERSION ?? "v1";
+    console.log("[DEBUG] app-sidebar AUTH_VERSION (sidebar):", AUTH_VERSION);
+    console.log("[DEBUG] app-sidebar session.user (sidebar):", session?.user);
+    console.log("[DEBUG] app-sidebar allowedSquads (sidebar):", allowedSquads);
 
     const allowedItems = useMemo(
         () => COORDENADORIAS.filter((item) => allowedSquads.includes(item.title)),
         [allowedSquads]
     );
 
-    console.log("YYYYYYYYYYYYY Allowed Items:", allowedItems);
+    console.log("[DEBUG] allowedItems (sidebar):", allowedItems);
 
     useEffect(() => {
         if (!activeItem && allowedItems.length > 0) {

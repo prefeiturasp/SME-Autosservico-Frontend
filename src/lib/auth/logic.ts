@@ -40,10 +40,10 @@ export async function authorizeUser(
 
     // Mapeamento flexível para v1 (CORESSO) e v2 (Keycloak)
     // Para v2, prioriza os campos do Keycloak se existirem
-    const id = loginResponse.preferred_username || loginResponse.login;
-    const name = loginResponse.name || loginResponse.nome;
+    const id = loginResponse.preferred_username ?? loginResponse.login;
+    const name = loginResponse.name ?? loginResponse.nome;
     const email = loginResponse.email ?? "";
-    const rf = loginResponse.preferred_username || loginResponse.login || "";
+    const rf = loginResponse.preferred_username ?? loginResponse.login ?? "";
     const cpf = loginResponse.cpf;
     const situacaoUsuario = loginResponse.situacaoUsuario;
     const situacaoGrupo = loginResponse.situacaoGrupo;

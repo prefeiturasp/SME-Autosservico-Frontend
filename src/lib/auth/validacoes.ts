@@ -11,8 +11,7 @@ export function temPermissaoDeAcessoV2(
         return false;
     }
     const gruposValidos = gruposValidosEnv.split(",").map((g) => g.trim().toUpperCase());
-    console.log("Grupos do usuário:", groups);
-    console.log("Grupos válidos:", gruposValidos);
+
     return groups.some((group) => gruposValidos.includes(group.toUpperCase()));
 }
 type PerfilPorSistema = {

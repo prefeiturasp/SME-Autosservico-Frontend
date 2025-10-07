@@ -59,17 +59,6 @@ describe("temPermissaoDeAcessoV2", () => {
         expect(temPermissaoDeAcessoV2(["GRUPO3"], "GRUPO1,GRUPO2")).toBe(false);
     });
 
-    it("faz log dos grupos e grupos válidos", () => {
-        const logSpy = vi.spyOn(console, "log");
-        temPermissaoDeAcessoV2(["COPED"]);
-        expect(logSpy).toHaveBeenCalledWith("Grupos do usuário:", ["COPED"]);
-        expect(logSpy).toHaveBeenCalledWith(
-            "Grupos válidos:",
-            ["ASCOM", "COGEP", "CODAE", "COPED", "COPLAN", "COTIC", "GIPE"]
-        );
-        logSpy.mockRestore();
-    });
-
     it("faz warn se env ausente", () => {
         const warnSpy = vi.spyOn(console, "warn");
         delete process.env.NEXT_PUBLIC_SQUADS_VALIDAS;

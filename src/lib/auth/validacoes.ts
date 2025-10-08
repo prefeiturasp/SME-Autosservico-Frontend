@@ -1,3 +1,19 @@
+/**
+ * Valida se o usuário possui acesso ao sistema baseado nos grupos do Keycloak.
+ * O usuário deve pertencer a pelo menos um grupo válido.
+ */
+export function temPermissaoDeAcessoV2(
+    groups: string[] = [],
+    gruposValidosEnv = process.env.NEXT_PUBLIC_SQUADS_VALIDAS
+): boolean {
+    if (!gruposValidosEnv) {
+        console.warn("Variável de ambiente NEXT_PUBLIC_SQUADS_VALIDAS não configurada.");
+        return false;
+    }
+    const gruposValidos = gruposValidosEnv.split(",").map((g) => g.trim().toUpperCase());
+
+    return groups.some((group) => gruposValidos.includes(group.toUpperCase()));
+}
 type PerfilPorSistema = {
     sistema: number;
     perfis: string[];

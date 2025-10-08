@@ -13,15 +13,34 @@ vi.mock("./index", () => ({ __esModule: true, Login: vi.fn() }));
 vi.mock("./validacoes", () => ({
     __esModule: true,
     temPermissaoDeAcesso: vi.fn(),
+    temPermissaoDeAcessoV2: vi.fn(),
 }));
 
 import { authorizeUser, jwtCallback, sessionCallback } from "./logic";
 import { Login } from "./index";
-import { temPermissaoDeAcesso } from "./validacoes";
+import { temPermissaoDeAcesso, temPermissaoDeAcessoV2 } from "./validacoes";
+
 
 describe("auth/logic", () => {
+    it("v2: groups undefined chama temPermissaoDeAcessoV2([]) e lança erro se sem permissão", async () => {
+        process.env.NEXT_PUBLIC_AUTH_VERSION = "v2";
+        (Login as unknown as Mock).mockResolvedValueOnce({
+            status: 200,
+            name: "Key User",
+            preferred_username: "keyuser",
+            // groups: undefined
+        });
+        (temPermissaoDeAcessoV2 as unknown as Mock).mockReturnValueOnce(false);
+
+        await expect(
+            authorizeUser({ rf: "keyuser", password: "x" })
+        ).rejects.toThrow(PERFIL_NOT_PERMISSION_ERROR_MESSAGE);
+        expect(temPermissaoDeAcessoV2).toHaveBeenCalledWith([]);
+    });
+    const OLD_ENV = { ...process.env };
     beforeEach(() => {
         vi.resetAllMocks();
+        process.env = { ...OLD_ENV };
     });
 
     // ---------- authorizeUser ----------
@@ -37,7 +56,7 @@ describe("auth/logic", () => {
         await expect(
             authorizeUser({ rf: "123", password: "x" })
         ).rejects.toThrow(PERFIL_NOT_FOUND_ERROR_MESSAGE);
-        expect(Login).toHaveBeenCalledWith({ login: "123", senha: "x" });
+        expect(Login).toHaveBeenCalledWith({ login: "123", senha: "x" }, "v1");
     });
 
     it("!nome && detail → lança PERFIL_NOT_FOUND_ERROR_MESSAGE", async () => {
@@ -52,7 +71,9 @@ describe("auth/logic", () => {
         ).rejects.toThrow(PERFIL_NOT_FOUND_ERROR_MESSAGE);
     });
 
-    it("sem permissão → lança PERFIL_NOT_PERMISSION_ERROR_MESSAGE", async () => {
+
+    it("sem permissão v1 → lança PERFIL_NOT_PERMISSION_ERROR_MESSAGE", async () => {
+        process.env.NEXT_PUBLIC_AUTH_VERSION = "v1";
         (Login as unknown as Mock).mockResolvedValueOnce({
             status: 200,
             nome: "João",
@@ -64,6 +85,22 @@ describe("auth/logic", () => {
         await expect(
             authorizeUser({ rf: "123", password: "x" })
         ).rejects.toThrow(PERFIL_NOT_PERMISSION_ERROR_MESSAGE);
+    });
+
+    it("sem permissão v2 (Keycloak) → lança PERFIL_NOT_PERMISSION_ERROR_MESSAGE", async () => {
+        process.env.NEXT_PUBLIC_AUTH_VERSION = "v2";
+        (Login as unknown as Mock).mockResolvedValueOnce({
+            status: 200,
+            name: "Joana",
+            preferred_username: "999",
+            groups: ["G_X"],
+        });
+        (temPermissaoDeAcessoV2 as unknown as Mock).mockReturnValueOnce(false);
+
+        await expect(
+            authorizeUser({ rf: "999", password: "x" })
+        ).rejects.toThrow(PERFIL_NOT_PERMISSION_ERROR_MESSAGE);
+        expect(temPermissaoDeAcessoV2).toHaveBeenCalledWith(["G_X"]);
     });
 
     it('falta "nome" ou "login" → lança "Erro interno no servidor!"', async () => {
@@ -93,7 +130,9 @@ describe("auth/logic", () => {
         ).rejects.toThrow(/Erro interno no servidor/i);
     });
 
-    it("happy path → retorna User normalizado", async () => {
+
+    it("happy path v1 → retorna User normalizado", async () => {
+        process.env.NEXT_PUBLIC_AUTH_VERSION = "v1";
         (Login as unknown as Mock).mockResolvedValueOnce({
             status: 200,
             nome: "João Silva",
@@ -121,6 +160,42 @@ describe("auth/logic", () => {
             situacaoGrupo: 2,
             visoes: ["A", "B"],
             perfis_por_sistema: [{ sistema: 1008, perfis: ["COPED"] }],
+            groups: [],
+            given_name: undefined,
+            family_name: undefined,
+        });
+    });
+
+    it("happy path v2 (Keycloak) → retorna User normalizado com groups", async () => {
+        process.env.NEXT_PUBLIC_AUTH_VERSION = "v2";
+        (Login as unknown as Mock).mockResolvedValueOnce({
+            status: 200,
+            name: "Angela",
+            preferred_username: "6913261",
+            email: "angela@sme.gov.br",
+            groups: ["G_ASCOM", "G_GIPE"],
+            given_name: "Angela",
+            family_name: "Regina Sampaio Nunes",
+        });
+        (temPermissaoDeAcessoV2 as unknown as Mock).mockReturnValueOnce(true);
+
+        const user = await authorizeUser({
+            rf: "6913261",
+            password: "secret",
+        });
+        expect(user).toEqual<User>({
+            id: "6913261",
+            name: "Angela",
+            email: "angela@sme.gov.br",
+            rf: "6913261",
+            cpf: undefined,
+            situacaoUsuario: undefined,
+            situacaoGrupo: undefined,
+            visoes: [],
+            perfis_por_sistema: [],
+            groups: ["G_ASCOM", "G_GIPE"],
+            given_name: "Angela",
+            family_name: "Regina Sampaio Nunes",
         });
     });
 
@@ -279,5 +354,24 @@ describe("auth/logic", () => {
             situacaoGrupo: 1,
             rf: "999",
         });
+    });
+
+    it("cobre fallback '' em rf quando preferred_username e login ausentes (lança erro interno)", async () => {
+        const { Login } = await import("./index");
+        const { temPermissaoDeAcesso } = await import("./validacoes");
+
+        (Login as unknown as Mock).mockResolvedValueOnce({
+            status: 200,
+            nome: "Fulano",
+            // preferred_username: undefined,
+            // login: undefined,
+            email: "fulano@example.com",
+            perfis_por_sistema: [{ sistema: 1008, perfis: ["COPED"] }],
+        });
+        (temPermissaoDeAcesso as unknown as Mock).mockReturnValueOnce(true);
+
+        await expect(
+            authorizeUser({ rf: "qualquer", password: "ok" })
+        ).rejects.toThrow(/Erro interno no servidor/i);
     });
 });

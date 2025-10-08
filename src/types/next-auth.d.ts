@@ -13,6 +13,10 @@ declare module "next-auth" {
             sistema: number;
             perfis: string[];
         }[];
+        // Keycloak fields
+        groups?: string[];
+        given_name?: string;
+        family_name?: string;
     }
 
     interface Session extends DefaultSession {
@@ -26,6 +30,10 @@ declare module "next-auth" {
                 sistema: number;
                 perfis: string[];
             }[];
+            // Keycloak fields
+            groups?: string[];
+            given_name?: string;
+            family_name?: string;
         } & DefaultSession["user"];
     }
 }
@@ -41,5 +49,9 @@ declare module "next-auth/jwt" {
             sistema: number;
             perfis: string[];
         }[];
+        // Keycloak fields
+        groups?: string[];
+        given_name?: string;
+        family_name?: string;
     }
 }

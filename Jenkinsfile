@@ -139,7 +139,7 @@ def sendTelegram(message) {
     def encodedMessage = URLEncoder.encode(messageTemplate, "UTF-8")
 
     withCredentials([string(credentialsId: 'telegramTokensigpae', variable: 'TOKEN'),
-    string(credentialsId: 'ttelegramChatIdsigpae', variable: 'CHAT_ID')]) {
+    string(credentialsId: 'telegramChatIdsigpae', variable: 'CHAT_ID')]) {
         response = httpRequest (consoleLogResponseBody: true,
             contentType: 'APPLICATION_JSON',
             httpMode: 'GET',

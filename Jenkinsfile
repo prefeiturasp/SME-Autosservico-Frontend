@@ -122,7 +122,7 @@ pipeline {
         
         success { sendTelegram("<b>SUCESSO! ✅</b>") }
         unstable { sendTelegram("<b>INSTÁVEL! ⚠️</b>") }
-        failure { sendTelegram("<b>FALHA! ❌</b>\n<b>Stage com falha:</b> ${failedStage}") }
+        failure { sendTelegram("<b>FALHA! ❌</b>\n") }
         aborted { sendTelegram("<b>CANCELADO! ✖️</b>\n") }
         
     }

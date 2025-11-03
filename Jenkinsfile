@@ -55,8 +55,8 @@ pipeline {
                         '''
                     }
                     echo "Testes Cypress finalizados."
-                    def logText = currentBuild.rawBuild.getLog(1000).join('\n')
-                    def match = logText =~ /Run URL:\s*(https?:\/\/\S+)/
+                    def logText = currentBuild.rawBuild.getLog(20).join('\n')
+                    def match = logText =~ /Recorded Run:\s*(https?:\/\/\S+)/
                     if (match) {
                         env.CYPRESS_RUN_URL = match[0][1]
                     }

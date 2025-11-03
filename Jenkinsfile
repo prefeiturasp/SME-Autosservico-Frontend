@@ -59,8 +59,6 @@ pipeline {
                     def match = logText =~ /Run URL:\s*(https?:\/\/\S+)/
                     if (match) {
                         env.CYPRESS_RUN_URL = match[0][1]
-                    } else {
-                        echo "Nenhum Run URL encontrado"
                     }
                 }
             }

@@ -67,14 +67,14 @@ export default function JenkinsJob({
 
     return (
         <div className={cn("space-y-3", className)}>
-            {hasMultipleSubprojects ? (
-                <div className="bg-white shadow rounded-lg">
-                    <div className="px-4 py-4">
-                        <div className="text-sm font-semibold pb-2">Projeto</div>
-                        <Select
-                            value={selectedKey}
-                            onValueChange={(value) => setSelectedKey(value)}
-                        >
+	            {hasMultipleSubprojects ? (
+	                <div className="bg-white shadow rounded-lg">
+	                    <div className="px-4 py-4">
+	                        <div className="text-sm font-semibold pb-2">Subprojeto</div>
+	                        <Select
+	                            value={selectedKey}
+	                            onValueChange={(value) => setSelectedKey(value)}
+	                        >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Selecione" />
                             </SelectTrigger>

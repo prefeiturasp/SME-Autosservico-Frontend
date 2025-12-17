@@ -7,14 +7,20 @@ import { withClient } from "@/__mocks__/renderWithClient";
 
 // 🔧 Mock do store com estado configurável por teste
 type StoreState = {
+  activeItem?: null | {
+    title?: string;
+  };
   activeProject: null | {
+    nome?: string;
     zabbixQueryFrontend?: string;
     zabbixQueryBackend?: string;
     zabbixQueryFilasRabbitMQ?: string;
   };
 };
 let mockStoreState: StoreState = {
+  activeItem: { title: "COPED" },
   activeProject: {
+    nome: "Novo SGP",
     zabbixQueryFrontend: "Portal SME",
     zabbixQueryBackend: "API SME",
     zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
@@ -48,11 +54,22 @@ vi.mock("@/components/dashboard/SaudeDosServidores/Filas", () => ({
   ),
 }));
 
+vi.mock("@/components/dashboard/JenkinsJob", () => ({
+  __esModule: true,
+  default: ({ title, project, subprojects }: { title?: string; project: string; subprojects?: unknown[] }) => (
+    <div data-testid={`jenkins-${title ?? "Lançamento de Versões"}`}>
+      {project}::{Array.isArray(subprojects) ? subprojects.length : 0}
+    </div>
+  ),
+}));
+
 describe("Dashboard page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockStoreState = {
+      activeItem: { title: "COPED" },
       activeProject: {
+        nome: "Novo SGP",
         zabbixQueryFrontend: "Portal SME",
         zabbixQueryBackend: "API SME",
         zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
@@ -73,6 +90,10 @@ describe("Dashboard page", () => {
 
     // Filas
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent("Filas RabbitMQ");
+
+    // Jenkins
+    expect(screen.getByTestId("card-Lançamento de Versões")).toBeInTheDocument();
+    expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("Novo SGP::0");
   });
 
   test("quando não há projeto ativo, passa strings vazias para os filhos (ramo do ??)", () => {
@@ -83,11 +104,14 @@ describe("Dashboard page", () => {
     expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("");
     expect(screen.getByTestId("producao-API Service")).toHaveTextContent("");
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent("");
+    expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("::0");
   });
 
   test("trima os nomes antes de passar (ramo do ?.trim())", () => {
     mockStoreState = {
+      activeItem: { title: "COPED" },
       activeProject: {
+        nome: "   Novo SGP   ",
         zabbixQueryFrontend: "   Portal SME   ",
         zabbixQueryBackend: "   API SME   ",
         zabbixQueryFilasRabbitMQ: "   Filas RabbitMQ   ",
@@ -99,11 +123,14 @@ describe("Dashboard page", () => {
     expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("Portal SME");
     expect(screen.getByTestId("producao-API Service")).toHaveTextContent("API SME");
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent("Filas RabbitMQ");
+    expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("Novo SGP::0");
   });
 
   test("quando um campo específico está undefined, cai no fallback vazio para aquele filho", () => {
     mockStoreState = {
+      activeItem: { title: "COPED" },
       activeProject: {
+        nome: "Novo SGP",
         zabbixQueryFrontend: "Portal SME",
         zabbixQueryBackend: "API SME",
         // RabbitMQ ausente → deve virar ""
@@ -115,5 +142,6 @@ describe("Dashboard page", () => {
     expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("Portal SME");
     expect(screen.getByTestId("producao-API Service")).toHaveTextContent("API SME");
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent(""); // fallback
+    expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("Novo SGP::0");
   });
 });

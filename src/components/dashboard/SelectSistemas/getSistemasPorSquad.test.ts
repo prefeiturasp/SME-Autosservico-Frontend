@@ -39,4 +39,19 @@ describe("getSistemasPorSquad", () => {
         const sistemasNovos = getSistemasPorSquad("ASCOM");
         expect(sistemasNovos).not.toContainEqual({ id: "99", nome: "Teste" });
     });
+
+    it("inclui subprojetos de releases quando existir mapeamento", () => {
+        const sistemas = getSistemasPorSquad("COPLAN");
+        const sigEscola = sistemas.find((s) => s.nome === "SigEscola");
+        expect(sigEscola?.jenkinsSubprojects).toEqual([
+            { label: "PTRF-BackEnd", key: "PTRF-BackEnd" },
+            { label: "PTRF-FrontEnd", key: "PTRF-FrontEnd" },
+        ]);
+    });
+
+    it("quando não houver mapeamento (N/E), retorna subprojetos vazios", () => {
+        const sistemas = getSistemasPorSquad("ASCOM");
+        const portal = sistemas.find((s) => s.nome === "Portal Educação");
+        expect(portal?.jenkinsSubprojects).toEqual([]);
+    });
 });

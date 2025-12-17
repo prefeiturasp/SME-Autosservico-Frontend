@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cn, numberToBRL, decodeJwt } from "./utils";
+import { cn, numberToBRL, decodeJwt, formatDDMMYYYY_HHMM_FromMillis, formatDurationMs } from "./utils";
 
 describe("Função cn (clsx + tailwind-merge)", () => {
   it("retorna uma string combinada de classes", () => {
@@ -63,5 +63,29 @@ describe("decodeJwt", () => {
   it("lança erro se o payload não é JSON válido", () => {
     const badBase64 = Buffer.from("notjson").toString("base64url");
     expect(() => decodeJwt(`aaa.${badBase64}.zzz`)).toThrow();
+  });
+});
+
+describe("formatDurationMs", () => {
+  it("formata duração em segundos", () => {
+    expect(formatDurationMs(900)).toBe("0s");
+    expect(formatDurationMs(1000)).toBe("1s");
+  });
+
+  it("formata duração em minutos e segundos", () => {
+    expect(formatDurationMs(88873)).toBe("1m 28s");
+  });
+});
+
+describe("formatDDMMYYYY_HHMM_FromMillis", () => {
+  it("formata data a partir de milissegundos", () => {
+    const ms = 1706266134892;
+    const d = new Date(ms);
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    expect(formatDDMMYYYY_HHMM_FromMillis(ms)).toBe(`${dd}/${mm}/${yyyy} ${hh}:${mi}`);
   });
 });

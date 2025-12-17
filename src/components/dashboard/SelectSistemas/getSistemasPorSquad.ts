@@ -44,10 +44,14 @@ function normalizeName(value: string): string {
 // Fonte de verdade para subprojetos de releases por Squad/Projeto.
 const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, JenkinsSubproject[]>> = {
     ASCOM: {
+        "INTRANET": [{ label: "INTRANET", key: "INTRANET/php-fpm-prod" }],
+        "PORTAL CEU": [{ label: "CEU", key: "CEU/php-fpm-prod" }],
+        "PORTAL EDUCACAO": [{ label: "EDUCACAO", key: "EDUCACAO/php-fpm-prod" }],
         PLATEIA: [{ label: "SME-Plateia-API", key: "SME-Plateia-API" }],
         "PLATEIA APP": [{ label: "SME-Plateia-App", key: "SME-Plateia-App" }],
     },
     CODAE: {
+        "ROLE AGROECOLOGICO": [{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO/main" }],
         SIGPAE: [
             { label: "Frontend", key: "Sigpae-Frontend-branchs" },
             { label: "Backend", key: "Sigpae-Backend" },
@@ -103,6 +107,16 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
     },
     COTIC: {},
     GIPE: {
+        GIPE: [
+            { label: "Gipe-Anexos-Intercorrencias", key: "Gipe-Anexos-Intercorrencias" },
+            { label: "Gipe-Anexos-Intercorrencias-PRs", key: "Gipe-Anexos-Intercorrencias-PRs" },
+            { label: "GIPE-Backend", key: "GIPE-Backend" },
+            { label: "GIPE-Backend-PRs", key: "GIPE-Backend-PRs" },
+            { label: "GIPE-Frontend", key: "GIPE-Frontend" },
+            { label: "GIPE-Frontend-PRs", key: "GIPE-Frontend-PRs" },
+            { label: "Gipe-Intercorrencia", key: "Gipe-Intercorrencia" },
+            { label: "Gipe-Intercorrencia-PRs", key: "Gipe-Intercorrencia-PRs" },
+        ],
         "GIPE-ANEXOS-INTERCORRENCIAS": [
             { label: "Gipe-Anexos-Intercorrencias", key: "Gipe-Anexos-Intercorrencias" },
         ],

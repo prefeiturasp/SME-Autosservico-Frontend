@@ -20,6 +20,19 @@ describe("<JenkinsJob />", () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
       const url = String(input);
 
+      if (url.startsWith("/api/zabbix/jenkins/job?project=PTRF-FrontEnd&env=homolog")) {
+        return okJson({
+          lastBuild: {
+            number: 99,
+            status: "SUCCESS",
+            timestampMs: 99,
+            timestamp: "03/01/2024 00:00",
+            durationMs: 99000,
+            duration: "99s",
+          },
+        });
+      }
+
       if (url.startsWith("/api/zabbix/jenkins/job?project=PTRF-BackEnd")) {
         return okJson({
           lastBuild: {
@@ -63,6 +76,7 @@ describe("<JenkinsJob />", () => {
     );
 
     expect(await screen.findByText("Projeto")).toBeInTheDocument();
+    expect(await screen.findByLabelText("Selecionar ambiente")).toHaveTextContent("Produção");
 
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(
@@ -71,7 +85,7 @@ describe("<JenkinsJob />", () => {
       );
     });
 
-    const trigger = screen.getByRole("combobox");
+    const trigger = screen.getByLabelText("Selecionar projeto");
     fireEvent.click(trigger);
     fireEvent.click(screen.getByText("Frontend"));
 
@@ -81,6 +95,19 @@ describe("<JenkinsJob />", () => {
         expect.any(Object)
       );
     });
+
+    const envTrigger = screen.getByLabelText("Selecionar ambiente");
+    fireEvent.click(envTrigger);
+    fireEvent.click(screen.getByText("Homologação"));
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalledWith(
+        "/api/zabbix/jenkins/job?project=PTRF-FrontEnd&env=homolog",
+        expect.any(Object)
+      );
+    });
+
+    expect(screen.getByLabelText("Selecionar ambiente")).toHaveTextContent("Homologação");
   });
 
   it("com apenas 1 subprojeto: não exige seleção adicional", async () => {
@@ -110,6 +137,7 @@ describe("<JenkinsJob />", () => {
     );
 
     expect(screen.queryByText("Projeto")).not.toBeInTheDocument();
+    expect(await screen.findByLabelText("Selecionar ambiente")).toHaveTextContent("Produção");
 
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(

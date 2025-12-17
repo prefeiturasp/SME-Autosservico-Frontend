@@ -78,6 +78,32 @@ describe("useJenkinsJob", () => {
     expect(result.current.data).toEqual(mockData);
   });
 
+  it("inclui env=homolog quando environment=homolog", async () => {
+    const wrapper = createWrapper();
+    const mockData: JenkinsJobSummary = { lastBuild: { number: 11 } };
+
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => mockData,
+    } as unknown as Response);
+
+    const { result } = renderHook(
+      () =>
+        useJenkinsJob({
+          endpoint: "/api/zabbix/jenkins/job",
+          keyPrefix: "zabbix-jenkins-job",
+          projectName: "SME-NovoSGP",
+          environment: "homolog",
+        }),
+      { wrapper }
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    const calledUrl = (fetchSpy.mock.calls[0][0] as string) || "";
+    expect(calledUrl).toBe("/api/zabbix/jenkins/job?project=SME-NovoSGP&env=homolog");
+  });
+
   it('retorna erro quando res.ok === false (Error("Falha ao buscar dados do Jenkins"))', async () => {
     const wrapper = createWrapper();
 
@@ -101,4 +127,3 @@ describe("useJenkinsJob", () => {
     expect((result.current.error as Error).message).toBe("Falha ao buscar dados do Jenkins");
   });
 });
-

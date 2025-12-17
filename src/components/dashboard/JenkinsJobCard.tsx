@@ -154,7 +154,7 @@ export default function JenkinsJobCard({
 
     return (
         <div className={cn("text-left", className)}>
-            <div className="mt-3 rounded-md bg-white p-3">
+            <div className="mt-1 rounded-md bg-white p-2">
                 <div className="flex items-start justify-between gap-3">
                     <div>
                         <div className="text-sm font-semibold">Versão atual</div>
@@ -178,12 +178,12 @@ export default function JenkinsJobCard({
                 </div>
             </div>
 
-            <div className="mt-3">
+            <div className="mt-2 rounded-md bg-white p-2">
                 <div className="text-sm font-semibold">Histórico</div>
                 {historyVersions.length === 0 ? (
                     <div className="text-sm text-muted-foreground">Sem histórico disponível.</div>
                 ) : (
-                    <div className="mt-2 space-y-3">
+                    <div className="mt-2 space-y-1.5">
                         {historyVersions.map((v) => (
                             <div key={`${v.label}-${v.build.number}`} className="flex items-start justify-between gap-3">
                                 <div>

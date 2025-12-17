@@ -50,9 +50,9 @@ describe("getSistemasPorSquad", () => {
     });
 
     it("quando não houver mapeamento (N/E), retorna subprojetos vazios", () => {
-        const sistemas = getSistemasPorSquad("COTIC");
-        const autosservico = sistemas.find((s) => s.nome === "Autosserviço");
-        expect(autosservico?.jenkinsSubprojects).toEqual([]);
+        const sistemas = getSistemasPorSquad("COGEP");
+        const escolhas = sistemas.find((s) => s.nome === "Escolhas");
+        expect(escolhas?.jenkinsSubprojects).toEqual([]);
     });
 
     it("inclui subprojeto para Portal Educação (php-fpm-prod)", () => {
@@ -77,6 +77,14 @@ describe("getSistemasPorSquad", () => {
         const sistemas = getSistemasPorSquad("CODAE");
         const role = sistemas.find((s) => s.nome === "Rolê Agroecológico");
         expect(role?.jenkinsSubprojects).toEqual([{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO/main" }]);
+    });
+
+    it("inclui subprojeto para Autosserviço", () => {
+        const sistemas = getSistemasPorSquad("COTIC");
+        const autosservico = sistemas.find((s) => s.nome === "Autosserviço");
+        expect(autosservico?.jenkinsSubprojects).toEqual([
+            { label: "SME-Autosservico-Frontend", key: "SME-Autosservico-Frontend" },
+        ]);
     });
 
     it("inclui lista de projetos para GIPE", () => {

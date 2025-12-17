@@ -105,7 +105,9 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
             { label: "PTRF-FrontEnd", key: "PTRF-FrontEnd" },
         ],
     },
-    COTIC: {},
+    COTIC: {
+        AUTOSSERVICO: [{ label: "SME-Autosservico-Frontend", key: "SME-Autosservico-Frontend" }],
+    },
     GIPE: {
         GIPE: [
             { label: "Gipe-Anexos-Intercorrencias", key: "Gipe-Anexos-Intercorrencias" },

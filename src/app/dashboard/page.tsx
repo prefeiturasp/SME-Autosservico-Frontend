@@ -46,10 +46,10 @@ export default function Dashboard() {
 
                 <CardWrapperInfoAmbientes
                     title="Lançamento de Versões"
-                    className="max-w-md mb-5"
+                    className="max-w-sm mb-5 gap-2 py-2"
                 >
                     <JenkinsJob
-                        className="bg-[#F5F5F5] p-3"
+                        className="bg-[#F5F5F5] p-1.5"
                         squad={squadName ?? ""}
                         project={projectName ?? ""}
                         subprojects={jenkinsSubprojects}

@@ -29,6 +29,8 @@ function StatusPill({ status }: { status: string }) {
             ? "Sucesso"
             : status.toUpperCase() === "FAILURE"
               ? "Falha"
+              : status.toUpperCase() === "ABORTED"
+                ? "Abortada"
               : status.toUpperCase() === "IN_PROGRESS"
                 ? "Em andamento"
                 : status.toUpperCase() === "UNKNOWN"
@@ -45,7 +47,7 @@ function StatusPill({ status }: { status: string }) {
                 : "bg-slate-500 text-white";
 
     return (
-        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold", color)}>
+        <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold", color)}>
             {label}
         </span>
     );

@@ -13,11 +13,12 @@ export async function GET(req: NextRequest) {
 
   // Modo padrão: project = chave (fullName) usada no item.get do Zabbix
   const project = (searchParams.get("project") ?? "").trim();
+  const env = (searchParams.get("env") ?? "").trim().toLowerCase();
 
   if (!project) return NextResponse.json({ error: "project é obrigatório" }, { status: 400 });
 
   try {
-    const summary = await getJenkinsJobSummary(project);
+    const summary = await getJenkinsJobSummary(project, undefined, env === "homolog" ? "homolog" : "prod");
     return NextResponse.json(summary);
   } catch (e: unknown) {
     const errorMessage =

@@ -116,6 +116,32 @@ describe("getJenkinsJobSummary", () => {
         );
     });
 
+    it("quando environment=homolog, busca primeiro pelo ambiente de homologação", async () => {
+        const lastvalue = JSON.stringify([
+            {
+                lastBuild: { timestamp: 1706266134892, number: 11, result: "SUCCESS", duration: 88873 },
+            },
+        ]);
+
+        zabbixRpcMock.mockResolvedValueOnce([{ itemid: "1", lastvalue }]);
+
+        const { getJenkinsJobSummary } = await import("@/actions/jenkins-job");
+        const res = await getJenkinsJobSummary("SME-NovoSGP/master", undefined, "homolog");
+
+        expect(res.lastBuild?.number).toBe(11);
+        expect(zabbixRpcMock).toHaveBeenCalledTimes(1);
+        expect(zabbixRpcMock).toHaveBeenCalledWith(
+            "item.get",
+            {
+                output: ["lastvalue"],
+                hostids: "10726",
+                search: { key_: "jenkins.job.mb.get[SME-NovoSGP/homolog]" },
+                filter: { type: 18 },
+            },
+            1
+        );
+    });
+
     it("quando não encontra '<key>' nem '<key>/master', busca por prefixo '<key>/' e escolhe o mais recente", async () => {
         const older = JSON.stringify([
             {

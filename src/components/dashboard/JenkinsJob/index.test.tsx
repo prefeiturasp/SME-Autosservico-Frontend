@@ -62,7 +62,7 @@ describe("<JenkinsJob />", () => {
       )
     );
 
-    expect(await screen.findByText("Subprojeto")).toBeInTheDocument();
+    expect(await screen.findByText("Projeto")).toBeInTheDocument();
 
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(
@@ -109,7 +109,7 @@ describe("<JenkinsJob />", () => {
       )
     );
 
-    expect(screen.queryByText("Subprojeto")).not.toBeInTheDocument();
+    expect(screen.queryByText("Projeto")).not.toBeInTheDocument();
 
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(

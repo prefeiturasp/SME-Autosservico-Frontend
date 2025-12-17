@@ -17,6 +17,8 @@ const mockProject: ProjectItem = {
   nome: "Portal Educação",
   zabbixQueryFrontend: "PRD - Educacao",
   zabbixQueryBackend: "API - Educacao",
+  zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ",
+  zabbixQueryJenkinsJob: "SME-PortalEducacao/master",
 };
 
 describe("useDashboardStore (Zustand)", () => {

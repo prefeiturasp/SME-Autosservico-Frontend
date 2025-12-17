@@ -46,7 +46,7 @@ export default function Dashboard() {
 
                 <CardWrapperInfoAmbientes
                     title="Lançamento de Versões"
-                    className="max-w-sm mb-5"
+                    className="max-w-md mb-5"
                 >
                     <JenkinsJob
                         className="bg-[#F5F5F5] p-3"

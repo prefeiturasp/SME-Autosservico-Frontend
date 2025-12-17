@@ -3,7 +3,15 @@ import { SistemaSchema, SelectedSistemaSchema } from "./schema";
 
 describe("SistemaSchema", () => {
     it("deve validar um objeto Sistema válido", () => {
-        const validSistema = { id: "10", nome: "Novo SGP", zabbixQueryFrontend: "PRD - Novo SGP", zabbixQueryBackend: "PRD - Novo SGP - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ" };
+        const validSistema = {
+            id: "10",
+            nome: "Novo SGP",
+            zabbixQueryFrontend: "PRD - Novo SGP",
+            zabbixQueryBackend: "PRD - Novo SGP - API",
+            zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ",
+            zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master",
+            jenkinsSubprojects: [{ label: "SME-NovoSGP", key: "SME-NovoSGP" }],
+        };
         const result = SistemaSchema.safeParse(validSistema);
 
         expect(result.success).toBe(true);

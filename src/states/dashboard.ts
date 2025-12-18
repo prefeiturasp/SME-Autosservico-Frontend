@@ -1,5 +1,6 @@
 // src/states/dashboard.ts
 import { create } from "zustand";
+import type { JenkinsSubproject } from "@/types/jenkinsSubproject";
 
 export interface SidebarItem {
     title: string;
@@ -14,6 +15,8 @@ export interface ProjectItem {
     zabbixQueryFrontend: string;
     zabbixQueryBackend: string;
     zabbixQueryFilasRabbitMQ: string;
+    zabbixQueryJenkinsJob: string;
+    jenkinsSubprojects?: JenkinsSubproject[];
 }
 
 type State = {

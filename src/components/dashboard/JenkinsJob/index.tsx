@@ -16,7 +16,6 @@ import type { JenkinsSubproject } from "@/types/jenkinsSubproject";
 const EMPTY_SUBPROJECTS: JenkinsSubproject[] = [];
 
 type Props = {
-    readonly squad: string;
     readonly project: string;
     readonly subprojects?: JenkinsSubproject[];
     readonly title?: string;

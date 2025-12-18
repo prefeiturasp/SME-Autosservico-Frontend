@@ -23,28 +23,25 @@ type Props = {
     readonly emptyProjectHint?: string;
 };
 
-function StatusPill({ status }: { status: string }) {
-    const label =
-        status.toUpperCase() === "SUCCESS"
-            ? "Sucesso"
-            : status.toUpperCase() === "FAILURE"
-              ? "Falha"
-              : status.toUpperCase() === "ABORTED"
-                ? "Abortada"
-              : status.toUpperCase() === "IN_PROGRESS"
-                ? "Em andamento"
-                : status.toUpperCase() === "UNKNOWN"
-                  ? "Desconhecido"
-                  : status;
+function StatusPill({ status }: { readonly status: string }) {
+    const statusUpper = status.toUpperCase();
 
-    const color =
-        status === "SUCCESS"
-            ? "bg-emerald-500 text-white"
-            : status === "FAILURE"
-              ? "bg-red-500 text-white"
-              : status === "IN_PROGRESS"
-                ? "bg-amber-500 text-white"
-                : "bg-slate-500 text-white";
+    const labelMap: Record<string, string> = {
+        SUCCESS: "Sucesso",
+        FAILURE: "Falha",
+        ABORTED: "Abortada",
+        IN_PROGRESS: "Em andamento",
+        UNKNOWN: "Desconhecido",
+    };
+
+    const colorMap: Record<string, string> = {
+        SUCCESS: "bg-emerald-500 text-white",
+        FAILURE: "bg-red-500 text-white",
+        IN_PROGRESS: "bg-amber-500 text-white",
+    };
+
+    const label = labelMap[statusUpper] ?? status;
+    const color = colorMap[status] ?? "bg-slate-500 text-white";
 
     return (
         <span className={cn("inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold", color)}>
@@ -53,7 +50,7 @@ function StatusPill({ status }: { status: string }) {
     );
 }
 
-function BuildRow({ label, build }: { label: string; build?: JenkinsBuildInfo }) {
+function BuildRow({ label, build }: { readonly label: string; readonly build?: JenkinsBuildInfo }) {
     return (
         <div className="flex items-start justify-between gap-3">
             <div className="text-sm text-muted-foreground">{label}</div>

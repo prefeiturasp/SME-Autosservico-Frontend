@@ -39,4 +39,63 @@ describe("getSistemasPorSquad", () => {
         const sistemasNovos = getSistemasPorSquad("ASCOM");
         expect(sistemasNovos).not.toContainEqual({ id: "99", nome: "Teste" });
     });
+
+    it("inclui subprojetos de releases quando existir mapeamento", () => {
+        const sistemas = getSistemasPorSquad("COPLAN");
+        const sigEscola = sistemas.find((s) => s.nome === "SigEscola");
+        expect(sigEscola?.jenkinsSubprojects).toEqual([
+            { label: "PTRF-BackEnd", key: "PTRF-BackEnd" },
+            { label: "PTRF-FrontEnd", key: "PTRF-FrontEnd" },
+        ]);
+    });
+
+    it("quando não houver mapeamento (N/E), retorna subprojetos vazios", () => {
+        const sistemas = getSistemasPorSquad("COGEP");
+        const escolhas = sistemas.find((s) => s.nome === "Escolhas");
+        expect(escolhas?.jenkinsSubprojects).toEqual([]);
+    });
+
+    it("inclui subprojeto para Portal Educação (php-fpm-prod)", () => {
+        const sistemas = getSistemasPorSquad("ASCOM");
+        const portal = sistemas.find((s) => s.nome === "Portal Educação");
+        expect(portal?.jenkinsSubprojects).toEqual([{ label: "EDUCACAO", key: "EDUCACAO/php-fpm-prod" }]);
+    });
+
+    it("inclui subprojeto para Intranet (php-fpm-prod)", () => {
+        const sistemas = getSistemasPorSquad("ASCOM");
+        const intranet = sistemas.find((s) => s.nome === "Intranet");
+        expect(intranet?.jenkinsSubprojects).toEqual([{ label: "INTRANET", key: "INTRANET/php-fpm-prod" }]);
+    });
+
+    it("inclui subprojeto para Portal CEU (php-fpm-prod)", () => {
+        const sistemas = getSistemasPorSquad("ASCOM");
+        const portal = sistemas.find((s) => s.nome === "Portal CEU");
+        expect(portal?.jenkinsSubprojects).toEqual([{ label: "CEU", key: "CEU/php-fpm-prod" }]);
+    });
+
+    it("inclui subprojeto para Rolê Agroecológico (main)", () => {
+        const sistemas = getSistemasPorSquad("CODAE");
+        const role = sistemas.find((s) => s.nome === "Rolê Agroecológico");
+        expect(role?.jenkinsSubprojects).toEqual([{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO/main" }]);
+    });
+
+    it("inclui subprojeto para Autosserviço", () => {
+        const sistemas = getSistemasPorSquad("COTIC");
+        const autosservico = sistemas.find((s) => s.nome === "Autosserviço");
+        expect(autosservico?.jenkinsSubprojects).toEqual([
+            { label: "SME-Autosservico-Frontend", key: "SME-Autosservico-Frontend" },
+        ]);
+    });
+
+    it("inclui lista de projetos para GIPE", () => {
+        const sistemas = getSistemasPorSquad("GIPE");
+        const gipe = sistemas.find((s) => s.nome === "GIPE");
+        expect(gipe?.jenkinsSubprojects?.length).toBeGreaterThan(1);
+        expect(gipe?.jenkinsSubprojects).toEqual(
+            expect.arrayContaining([
+                { label: "GIPE-Backend", key: "GIPE-Backend" },
+                { label: "GIPE-Frontend", key: "GIPE-Frontend" },
+            ])
+        );
+    });
 });

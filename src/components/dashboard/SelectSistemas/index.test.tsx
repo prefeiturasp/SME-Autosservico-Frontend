@@ -80,12 +80,16 @@ describe("<SelectSistemas />", () => {
                 nome: "Novo SGP",
                 zabbixQueryFrontend: "PRD - Novo SGP",
                 zabbixQueryBackend: "PRD - Novo SGP - API",
+                zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ",
+                zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master",
             },
             {
                 id: "11",
                 nome: "Serap",
                 zabbixQueryFrontend: "PRD - Serap",
                 zabbixQueryBackend: "PRD - Serap - API",
+                zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ",
+                zabbixQueryJenkinsJob: "SME-Serap/master",
             },
         ]);
 
@@ -108,6 +112,8 @@ describe("<SelectSistemas />", () => {
             nome: "Novo SGP",
             zabbixQueryFrontend: "PRD - Novo SGP",
             zabbixQueryBackend: "PRD - Novo SGP - API",
+            zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ",
+            zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master",
         });
     });
 
@@ -131,12 +137,16 @@ describe("<SelectSistemas />", () => {
                 nome: "Novo SGP",
                 zabbixQueryFrontend: "PRD - Novo SGP",
                 zabbixQueryBackend: "PRD - Novo SGP - API",
+                zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ",
+                zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master",
             },
             {
                 id: "11",
                 nome: "Serap",
                 zabbixQueryFrontend: "PRD - Serap",
                 zabbixQueryBackend: "PRD - Serap - API",
+                zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ",
+                zabbixQueryJenkinsJob: "SME-Serap/master",
             },
         ]);
 
@@ -155,6 +165,8 @@ describe("<SelectSistemas />", () => {
             nome: "Novo SGP",
             zabbixQueryFrontend: "PRD - Novo SGP",
             zabbixQueryBackend: "PRD - Novo SGP - API",
+            zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ",
+            zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master",
         });
     });
 

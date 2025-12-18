@@ -1,36 +1,151 @@
 import { Sistema } from "./schema"; // Importando o tipo do schema
+import type { JenkinsSubproject } from "@/types/jenkinsSubproject";
 
 // Hashtable (Record é uma forma de definir chave/valor no TS)
 const squads: Record<string, Sistema[]> = {
     ASCOM: [
-        { id: "1", nome: "Portal Educação", zabbixQueryFrontend: "PRD - Educacao", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" },
-        { id: "2", nome: "Portal CEU", zabbixQueryFrontend: "PRD - Portal CEU", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" },
-        { id: "3", nome: "Plateia", zabbixQueryFrontend: "PRD - Plateia", zabbixQueryBackend: "PRD - Plateia - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ" },
-        { id: "4", nome: "Plateia App", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" },
-        { id: "5", nome: "Intranet", zabbixQueryFrontend: "PRD - Intranet", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" },
+        { id: "1", nome: "Portal Educação", zabbixQueryFrontend: "PRD - Educacao", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-PortalEducacao/master" },
+        { id: "2", nome: "Portal CEU", zabbixQueryFrontend: "PRD - Portal CEU", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-PortalCEU/master" },
+        { id: "3", nome: "Plateia", zabbixQueryFrontend: "PRD - Plateia", zabbixQueryBackend: "PRD - Plateia - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Plateia/master" },
+        { id: "4", nome: "Plateia App", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Plateia-App/master" },
+        { id: "5", nome: "Intranet", zabbixQueryFrontend: "PRD - Intranet", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Intranet/master" },
     ],
     COGEP: [
-        { id: "6", nome: "Escolhas", zabbixQueryFrontend: "PRD - Escolhas", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" },
-        { id: "7", nome: "Sigla", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" },
+        { id: "6", nome: "Escolhas", zabbixQueryFrontend: "PRD - Escolhas", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Escolhas/master" },
+        { id: "7", nome: "Sigla", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-SIGLA/master" },
     ],
     CODAE: [
-        { id: "8", nome: "SigPAE", zabbixQueryFrontend: "PRD - SIGPAE", zabbixQueryBackend: "PRD - SIGPAE - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ" },
-        { id: "9", nome: "Rolê Agroecológico", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" },
+        { id: "8", nome: "SigPAE", zabbixQueryFrontend: "PRD - SIGPAE", zabbixQueryBackend: "PRD - SIGPAE - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-SIGPAE/master" },
+        { id: "9", nome: "Rolê Agroecológico", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-RoleAgroecologico/master" },
     ],
     COPED: [
-        { id: "10", nome: "Novo SGP", zabbixQueryFrontend: "PRD - Novo SGP", zabbixQueryBackend: "PRD - Novo SGP - Swagger", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ" },
-        { id: "11", nome: "Serap", zabbixQueryFrontend: "PRD - Serap", zabbixQueryBackend: "PRD - Serap - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ" },
-        { id: "12", nome: "Serap Estudantes", zabbixQueryFrontend: "PRD - Serap Estudantes", zabbixQueryBackend: "PRD - Serap Estudantes - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ" },
-        { id: "13", nome: "Cdep", zabbixQueryFrontend: "PRD - CDEP", zabbixQueryBackend: "PRD - CDEP - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ" },
-        { id: "14", nome: "Curriculo da Cidade", zabbixQueryFrontend: "PRD - Curriculo", zabbixQueryBackend: "PRD - Curriculo - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ" },
-        { id: "15", nome: "IDEP", zabbixQueryFrontend: "PRD - Idep", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" },
-        { id: "16", nome: "Conecta Formação", zabbixQueryFrontend: "PRD - Conecta Formacao", zabbixQueryBackend: "PRD - Conecta Formacao - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ" },
+        { id: "10", nome: "Novo SGP", zabbixQueryFrontend: "PRD - Novo SGP", zabbixQueryBackend: "PRD - Novo SGP - Swagger", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master" },
+        { id: "11", nome: "Serap", zabbixQueryFrontend: "PRD - Serap", zabbixQueryBackend: "PRD - Serap - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Serap/master" },
+        { id: "12", nome: "Serap Estudantes", zabbixQueryFrontend: "PRD - Serap Estudantes", zabbixQueryBackend: "PRD - Serap Estudantes - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Serap-Estudantes/master" },
+        { id: "13", nome: "Cdep", zabbixQueryFrontend: "PRD - CDEP", zabbixQueryBackend: "PRD - CDEP - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-CDEP/master" },
+        { id: "14", nome: "Curriculo da Cidade", zabbixQueryFrontend: "PRD - Curriculo", zabbixQueryBackend: "PRD - Curriculo - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Curriculo/master" },
+        { id: "15", nome: "IDEP", zabbixQueryFrontend: "PRD - Idep", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-IDEP/master" },
+        { id: "16", nome: "Conecta Formação", zabbixQueryFrontend: "PRD - Conecta Formacao", zabbixQueryBackend: "PRD - Conecta Formacao - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-ConectaFormacao/master" },
     ],
-    COPLAN: [{ id: "17", nome: "SigEscola", zabbixQueryFrontend: "PRD - PTRF - SIG Escola", zabbixQueryBackend: "PRD - PTRF - SIG Escola - API", zabbixQueryFilasRabbitMQ: "" }],
-    COTIC: [{ id: "18", nome: "Autosserviço", zabbixQueryFrontend: "PRD - AUTOSSERVICO", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" }],
-    GIPE: [{ id: "19", nome: "GIPE", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "" }],
+    COPLAN: [{ id: "17", nome: "SigEscola", zabbixQueryFrontend: "PRD - PTRF - SIG Escola", zabbixQueryBackend: "PRD - PTRF - SIG Escola - API", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-SigEscola/master" }],
+    COTIC: [{ id: "18", nome: "Autosserviço", zabbixQueryFrontend: "PRD - AUTOSSERVICO", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Autosservico-Frontend/master" }],
+    GIPE: [{ id: "19", nome: "GIPE", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-GIPE/master" }],
 };
 
+function normalizeName(value: string): string {
+    return value
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ")
+        .toUpperCase();
+}
+
+// Fonte de verdade para subprojetos de releases por Squad/Projeto.
+const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, JenkinsSubproject[]>> = {
+    ASCOM: {
+        "INTRANET": [{ label: "INTRANET", key: "INTRANET/php-fpm-prod" }],
+        "PORTAL CEU": [{ label: "CEU", key: "CEU/php-fpm-prod" }],
+        "PORTAL EDUCACAO": [{ label: "EDUCACAO", key: "EDUCACAO/php-fpm-prod" }],
+        PLATEIA: [{ label: "SME-Plateia-API", key: "SME-Plateia-API" }],
+        "PLATEIA APP": [{ label: "SME-Plateia-App", key: "SME-Plateia-App" }],
+    },
+    CODAE: {
+        "ROLE AGROECOLOGICO": [{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO/main" }],
+        SIGPAE: [
+            { label: "Frontend", key: "Sigpae-Frontend-branchs" },
+            { label: "Backend", key: "Sigpae-Backend" },
+        ],
+    },
+    COGEP: {
+        SIGLA: [{ label: "sme-sigla-frontend", key: "sme-sigla-frontend" }],
+    },
+    COPED: {
+        CDEP: [
+            { label: "CDEP-BACKEND", key: "CDEP-BACKEND" },
+            { label: "CDEP-FRONTEND", key: "CDEP-FRONTEND" },
+            { label: "CDEP-WORKER", key: "CDEP-WORKER" },
+        ],
+        "CONECTA FORMACAO": [
+            { label: "CONECTAFORMACAO-BACKEND", key: "CONECTAFORMACAO-BACKEND" },
+            {
+                label: "CONECTAFORMACAO-BACKEND-WORKER-PRs",
+                key: "CONECTAFORMACAO-BACKEND-WORKER-PRs",
+            },
+            { label: "CONECTAFORMACAO-FRONTEND", key: "CONECTAFORMACAO-FRONTEND" },
+            { label: "CONECTAFORMACAO-FRONTEND-PRs", key: "CONECTAFORMACAO-FRONTEND-PRs" },
+            { label: "CONECTAFORMACAO-WORKER", key: "CONECTAFORMACAO-WORKER" },
+        ],
+        "CURRICULO DA CIDADE": [
+            { label: "SME-plataforma-curriculo-API", key: "SME-plataforma-curriculo-API" },
+            {
+                label: "SME-plataforma-curriculo-interface",
+                key: "SME-plataforma-curriculo-interface",
+            },
+        ],
+        IDEP: [
+            { label: "SME-Indice_IDEP-API", key: "SME-Indice_IDEP-API" },
+            { label: "SME-Indice_IDEP-Front", key: "SME-Indice_IDEP-Front" },
+        ],
+        "NOVO SGP": [{ label: "SME-NovoSGP", key: "SME-NovoSGP" }],
+        SERAP: [{ label: "SME-Prova-Serap-App", key: "SME-Prova-Serap-App" }],
+        "SERAP ESTUDANTES": [
+            { label: "SME-PROVA-SERAP-API", key: "SME-PROVA-SERAP-API" },
+            { label: "SME-Prova-Serap-App", key: "SME-Prova-Serap-App" },
+            { label: "SME-Prova-Serap-App-Web", key: "SME-Prova-Serap-App-Web" },
+            { label: "SME-PROVA-SERAP-WORKER", key: "SME-PROVA-SERAP-WORKER" },
+            { label: "SME-Proximo-API", key: "SME-Proximo-API" },
+            { label: "SME-Simulador-Prova-Serap-Api", key: "SME-Simulador-Prova-Serap-Api" },
+            { label: "SME-Simulador-Prova-Serap-App", key: "SME-Simulador-Prova-Serap-App" },
+        ],
+    },
+    COPLAN: {
+        SIGESCOLA: [
+            { label: "PTRF-BackEnd", key: "PTRF-BackEnd" },
+            { label: "PTRF-FrontEnd", key: "PTRF-FrontEnd" },
+        ],
+    },
+    COTIC: {
+        AUTOSSERVICO: [{ label: "SME-Autosservico-Frontend", key: "SME-Autosservico-Frontend" }],
+    },
+    GIPE: {
+        GIPE: [
+            { label: "Gipe-Anexos-Intercorrencias", key: "Gipe-Anexos-Intercorrencias" },
+            { label: "Gipe-Anexos-Intercorrencias-PRs", key: "Gipe-Anexos-Intercorrencias-PRs" },
+            { label: "GIPE-Backend", key: "GIPE-Backend" },
+            { label: "GIPE-Backend-PRs", key: "GIPE-Backend-PRs" },
+            { label: "GIPE-Frontend", key: "GIPE-Frontend" },
+            { label: "GIPE-Frontend-PRs", key: "GIPE-Frontend-PRs" },
+            { label: "Gipe-Intercorrencia", key: "Gipe-Intercorrencia" },
+            { label: "Gipe-Intercorrencia-PRs", key: "Gipe-Intercorrencia-PRs" },
+        ],
+        "GIPE-ANEXOS-INTERCORRENCIAS": [
+            { label: "Gipe-Anexos-Intercorrencias", key: "Gipe-Anexos-Intercorrencias" },
+        ],
+        "GIPE-ANEXOS-INTERCORRENCIAS-PRS": [
+            { label: "Gipe-Anexos-Intercorrencias-PRs", key: "Gipe-Anexos-Intercorrencias-PRs" },
+        ],
+        "GIPE-BACKEND": [{ label: "GIPE-Backend", key: "GIPE-Backend" }],
+        "GIPE-BACKEND-PRS": [{ label: "GIPE-Backend-PRs", key: "GIPE-Backend-PRs" }],
+        "GIPE-FRONTEND": [{ label: "GIPE-Frontend", key: "GIPE-Frontend" }],
+        "GIPE-FRONTEND-PRS": [{ label: "GIPE-Frontend-PRs", key: "GIPE-Frontend-PRs" }],
+        "GIPE-INTERCORRENCIA": [{ label: "Gipe-Intercorrencia", key: "Gipe-Intercorrencia" }],
+        "GIPE-INTERCORRENCIA-PRS": [
+            { label: "Gipe-Intercorrencia-PRs", key: "Gipe-Intercorrencia-PRs" },
+        ],
+    },
+};
+
+function getJenkinsSubprojectsForProject(squadName: string, projectName: string): JenkinsSubproject[] {
+    const squadKey = normalizeName(squadName);
+    const projectKey = normalizeName(projectName);
+    return [...(JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT[squadKey]?.[projectKey] ?? [])];
+}
+
 export function getSistemasPorSquad(squadName: string): Sistema[] {
-    return [...(squads[squadName] ?? [])]; // retorna uma cópia do array
+    const sistemas = squads[squadName] ?? [];
+    return sistemas.map((sistema) => ({
+        ...sistema,
+        jenkinsSubprojects: getJenkinsSubprojectsForProject(squadName, sistema.nome),
+    }));
 }

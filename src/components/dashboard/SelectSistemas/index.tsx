@@ -37,6 +37,7 @@ export function SelectSistemas() {
                     zabbixQueryFrontend: selectedSistema.zabbixQueryFrontend,
                     zabbixQueryBackend: selectedSistema.zabbixQueryBackend,
                     zabbixQueryFilasRabbitMQ: selectedSistema.zabbixQueryFilasRabbitMQ,
+                    zabbixQueryJenkinsJob: selectedSistema.zabbixQueryJenkinsJob,
                 });
             }
         },

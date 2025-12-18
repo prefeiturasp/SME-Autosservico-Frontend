@@ -17,7 +17,7 @@ export default auth((req) => {
         return NextResponse.redirect(new URL("/", req.url));
     }
 
-    // Se o usuário está autenticado e tenta acessar a página de login ou a raiz
+    // Se o usuário está autenticado e tenta acessar a página de login ou a raiz,
     // redireciona para o dashboard
     if (pathname === "/" && req.auth) {
         return NextResponse.redirect(new URL("/dashboard", req.url));

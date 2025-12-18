@@ -9,6 +9,11 @@ type ZabbixItemGetResult = { itemid?: string; lastvalue?: string };
 const DEFAULT_HOSTIDS = "10726";
 const ITEM_TYPE = 18;
 
+type ZabbixFetchers = {
+  fetchByKey: (keyValue: string) => Promise<string | undefined>;
+  fetchCandidatesByPrefix: (keyPrefix: string) => Promise<ZabbixItemGetResult[]>;
+};
+
 function scoreSummary(summary: JenkinsJobSummary): number {
   const timestamps = [
     summary.lastBuild?.timestampMs,
@@ -40,15 +45,12 @@ function isHomologEnv(env: string | undefined): boolean {
   return /^(homolog|homologacao|hml|hmg|develop|dev|staging|stage)$/i.test(env);
 }
 
-export async function getJenkinsJobSummary(
-  projectFullName: string,
-  hostids?: string,
-  environment: "prod" | "homolog" = "prod"
-): Promise<JenkinsJobSummary> {
-  const project = projectFullName.trim();
-  if (!project) return {};
-  const resolvedHostids = hostids ?? DEFAULT_HOSTIDS;
+function normalizeProjectFullName(projectFullName: string): string | null {
+  const normalized = projectFullName.trim();
+  return normalized || null;
+}
 
+function createZabbixFetchers(resolvedHostids: string): ZabbixFetchers {
   const fetchByKey = async (keyValue: string) => {
     const params = {
       output: ["lastvalue"],
@@ -82,86 +84,125 @@ export async function getJenkinsJobSummary(
     return result ?? [];
   };
 
+  return { fetchByKey, fetchCandidatesByPrefix };
+}
+
+function safeSummaryFromLastvalue(lastvalue: string): JenkinsJobSummary | null {
+  try {
+    return jenkinsJobSummaryFromLastvalue(lastvalue);
+  } catch {
+    return null;
+  }
+}
+
+async function tryFetchSummaryByKey(
+  fetchByKey: ZabbixFetchers["fetchByKey"],
+  keyValue: string
+): Promise<JenkinsJobSummary | null> {
+  const lastvalue = await fetchByKey(keyValue);
+  if (!lastvalue) return null;
+  return safeSummaryFromLastvalue(lastvalue);
+}
+
+function getBaseAndCurrentEnv(project: string): { base: string; currentEnv?: string } {
+  const base = project.includes("/") ? project.split("/")[0] : project;
+  const currentEnv = project.includes("/") ? project.slice(base.length + 1) : undefined;
+  return { base, currentEnv };
+}
+
+function buildHomologCandidateEnvs(currentEnv?: string): string[] {
+  return [
+    ...(currentEnv && /prod/i.test(currentEnv)
+      ? [
+          currentEnv.replaceAll(/prod/gi, "homolog"),
+          currentEnv.replaceAll(/prod/gi, "hml"),
+        ]
+      : []),
+    "homolog",
+    "homologacao",
+    "hml",
+    "hmg",
+    "develop",
+    "dev",
+    "staging",
+    "stage",
+  ];
+}
+
+async function findBestSummaryFromPrefixCandidates(
+  candidates: ZabbixItemGetResult[],
+  isAllowed: (lastvalue: string) => boolean
+): Promise<JenkinsJobSummary | null> {
+  let best: JenkinsJobSummary | null = null;
+  let bestScore = Number.NEGATIVE_INFINITY;
+
+  for (const candidate of candidates) {
+    if (!candidate.lastvalue) continue;
+    if (!isAllowed(candidate.lastvalue)) continue;
+
+    const summary = safeSummaryFromLastvalue(candidate.lastvalue);
+    if (!summary) continue;
+
+    const score = scoreSummary(summary);
+    if (score <= bestScore) continue;
+
+    bestScore = score;
+    best = summary;
+  }
+
+  return best && Number.isFinite(bestScore) ? best : null;
+}
+
+async function getHomologSummary(
+  project: string,
+  fetchers: ZabbixFetchers
+): Promise<JenkinsJobSummary | null> {
+  const { base, currentEnv } = getBaseAndCurrentEnv(project);
+  const candidateEnvs = buildHomologCandidateEnvs(currentEnv);
+
+  for (const env of candidateEnvs) {
+    const summary = await tryFetchSummaryByKey(fetchers.fetchByKey, `${base}/${env}`);
+    if (summary) return summary;
+  }
+
+  const candidates = await fetchers.fetchCandidatesByPrefix(base);
+  return findBestSummaryFromPrefixCandidates(candidates, (lastvalue) =>
+    isHomologEnv(getEnvFromLastvalue(lastvalue))
+  );
+}
+
+async function getCompatSummary(
+  project: string,
+  fetchers: ZabbixFetchers
+): Promise<JenkinsJobSummary | null> {
+  if (project.includes("/")) return null;
+
+  const withMaster = await tryFetchSummaryByKey(fetchers.fetchByKey, `${project}/master`);
+  if (withMaster) return withMaster;
+
+  const candidates = await fetchers.fetchCandidatesByPrefix(project);
+  return findBestSummaryFromPrefixCandidates(candidates, () => true);
+}
+
+export async function getJenkinsJobSummary(
+  projectFullName: string,
+  hostids?: string,
+  environment: "prod" | "homolog" = "prod"
+): Promise<JenkinsJobSummary> {
+  const project = normalizeProjectFullName(projectFullName);
+  if (!project) return {};
+  const resolvedHostids = hostids ?? DEFAULT_HOSTIDS;
+  const fetchers = createZabbixFetchers(resolvedHostids);
+
   // 1) Tenta como veio (compatível com a requisição padrão especificada)
   if (environment === "prod") {
-    const lastvalue = await fetchByKey(project);
-    if (lastvalue) return jenkinsJobSummaryFromLastvalue(lastvalue);
+    const direct = await tryFetchSummaryByKey(fetchers.fetchByKey, project);
+    if (direct) return direct;
   }
 
   if (environment === "homolog") {
-    const base = project.includes("/") ? project.split("/")[0] : project;
-    const currentEnv = project.includes("/") ? project.slice(base.length + 1) : undefined;
-
-    const candidateEnvs: string[] = [];
-    if (currentEnv) {
-      if (/prod/i.test(currentEnv)) {
-        candidateEnvs.push(currentEnv.replace(/prod/gi, "homolog"));
-        candidateEnvs.push(currentEnv.replace(/prod/gi, "hml"));
-      }
-    }
-
-    candidateEnvs.push("homolog", "homologacao", "hml", "hmg", "develop", "dev", "staging", "stage");
-
-    for (const env of candidateEnvs) {
-      const lv = await fetchByKey(`${base}/${env}`);
-      if (lv) return jenkinsJobSummaryFromLastvalue(lv);
-    }
-
-    // Se não encontrou diretamente, busca por prefixo e escolhe o mais recente dentre os ambientes de homologação disponíveis.
-    const candidates = await fetchCandidatesByPrefix(base);
-    let best: JenkinsJobSummary | null = null;
-    let bestScore = Number.NEGATIVE_INFINITY;
-
-    for (const c of candidates) {
-      if (!c.lastvalue) continue;
-      const env = getEnvFromLastvalue(c.lastvalue);
-      if (!isHomologEnv(env)) continue;
-
-      let summary: JenkinsJobSummary;
-      try {
-        summary = jenkinsJobSummaryFromLastvalue(c.lastvalue);
-      } catch {
-        continue;
-      }
-
-      const score = scoreSummary(summary);
-      if (score > bestScore) {
-        bestScore = score;
-        best = summary;
-      }
-    }
-
-    if (best && Number.isFinite(bestScore)) return best;
-    return {};
+    return (await getHomologSummary(project, fetchers)) ?? {};
   }
 
-  // 2) Compat: quando a chave não inclui branch, tenta `${key}/master` (padrão do exemplo do projeto)
-  if (!project.includes("/")) {
-    const lastvalueWithMaster = await fetchByKey(`${project}/master`);
-    if (lastvalueWithMaster) return jenkinsJobSummaryFromLastvalue(lastvalueWithMaster);
-
-    // 3) Compat: jobs que não possuem "master" (ex.: PR-###) — escolhe o mais recente entre as opções encontradas
-    const candidates = await fetchCandidatesByPrefix(project);
-    let best: JenkinsJobSummary | null = null;
-    let bestScore = Number.NEGATIVE_INFINITY;
-
-    for (const c of candidates) {
-      if (!c.lastvalue) continue;
-      let summary: JenkinsJobSummary;
-      try {
-        summary = jenkinsJobSummaryFromLastvalue(c.lastvalue);
-      } catch {
-        continue;
-      }
-      const score = scoreSummary(summary);
-      if (score > bestScore) {
-        bestScore = score;
-        best = summary;
-      }
-    }
-
-    if (best && Number.isFinite(bestScore)) return best;
-  }
-
-  return {};
+  return (await getCompatSummary(project, fetchers)) ?? {};
 }

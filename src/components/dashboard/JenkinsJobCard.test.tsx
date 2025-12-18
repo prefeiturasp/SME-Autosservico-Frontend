@@ -7,24 +7,29 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import JenkinsJobCard from "./JenkinsJobCard";
 import type { JenkinsJobSummary } from "@/types/jenkins";
 
-vi.mock("@/components/ui/skeleton", () => ({
-  Skeleton: (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <div data-testid="skeleton" {...props} />
-  ),
-}));
+vi.mock("@/components/ui/skeleton", () => {
+  function Skeleton(props: React.HTMLAttributes<HTMLDivElement>) {
+    return <div data-testid="skeleton" {...props} />;
+  }
 
-vi.mock("@/components/ui/button", () => ({
-  Button: React.forwardRef(
-    (
-      { children, ...rest }: React.ButtonHTMLAttributes<HTMLButtonElement>,
-      ref: React.ForwardedRef<HTMLButtonElement>
-    ) => (
+  return { Skeleton };
+});
+
+vi.mock("@/components/ui/button", () => {
+  const Button = React.forwardRef<
+    HTMLButtonElement,
+    React.ButtonHTMLAttributes<HTMLButtonElement>
+  >(function Button({ children, ...rest }, ref) {
+    return (
       <button ref={ref} {...rest}>
         {children}
       </button>
-    )
-  ),
-}));
+    );
+  });
+  Button.displayName = "Button";
+
+  return { Button };
+});
 
 type LiteQuery = {
   data?: JenkinsJobSummary;

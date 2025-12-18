@@ -6,12 +6,10 @@ import JenkinsJob from "@/components/dashboard/JenkinsJob";
 import useDashboardStore from "@/states/dashboard";
 
 export default function Dashboard() {
-    const activeItem = useDashboardStore((state) => state.activeItem);
     const activeProject = useDashboardStore((state) => state.activeProject);
     const projectNameFrontEnd = activeProject?.zabbixQueryFrontend?.trim();
     const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim();
     const projectNameFilasRabbitMQ = activeProject?.zabbixQueryFilasRabbitMQ?.trim();
-    const squadName = activeItem?.title?.trim();
     const projectName = activeProject?.nome?.trim();
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
 
@@ -50,7 +48,6 @@ export default function Dashboard() {
                 >
                     <JenkinsJob
                         className="bg-[#F5F5F5] p-1.5"
-                        squad={squadName ?? ""}
                         project={projectName ?? ""}
                         subprojects={jenkinsSubprojects}
                     />

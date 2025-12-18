@@ -95,8 +95,9 @@ export default function JenkinsJobCard({
             { label: "Última versão com sucesso", build: data.lastSuccessfulBuild },
             { label: "Última versão com falha", build: data.lastFailedBuild },
         ] as const;
+        type HistoryItem = (typeof items)[number];
         const filtered = items
-            .filter((i): i is { label: string; build: JenkinsBuildInfo } => Boolean(i.build))
+            .filter((i): i is { label: HistoryItem["label"]; build: JenkinsBuildInfo } => Boolean(i.build))
             .filter((i) => (currentVersion ? i.build.number !== currentVersion.number : true));
 
         const deduped = new Map<number, { label: string; build: JenkinsBuildInfo }>();
@@ -105,7 +106,7 @@ export default function JenkinsJobCard({
         }
 
         return Array.from(deduped.values());
-    }, [data]);
+    }, [data, currentVersion]);
 
     if (!projectName) {
         return (

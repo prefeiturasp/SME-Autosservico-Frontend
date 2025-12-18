@@ -33,8 +33,8 @@ export async function loginCoreSSO(data: LoginData): Promise<LoginResponse> {
 export async function loginKeycloak(data: LoginData): Promise<LoginResponse> {
     // Parâmetros fixos ou de env
     const clientId = process.env.KEYCLOAK_CLIENT_ID ?? "nome-do-projeto";
-    const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET ?? "secret-key";
     const grantType = process.env.KEYCLOAK_GRANT_TYPE ?? "password";
+    const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET ?? "secret-key";
     const realm = process.env.KEYCLOAK_REALM ?? "SQUAD";
     const password = data.senha;
     const username = data.login;

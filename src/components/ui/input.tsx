@@ -1,13 +1,12 @@
 import * as React from 'react'
 
-import { Props as BaseInputMaskProps } from 'react-input-mask'
+import type { Props as BaseInputMaskProps } from 'react-input-mask'
 import BaseInputMask from '@mona-health/react-input-mask'
 
 import {cn, numberToBRL } from '@/lib/utils'
 import { useFormField } from './form'
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {
@@ -44,23 +43,23 @@ const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
 )
 InputMask.displayName = 'InputMask'
 
-export interface CurrencyInputProps extends InputProps {}
+export type CurrencyInputProps = InputProps
 
 const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
   ({ onChange, ...props }, ref) => {
     return (
       <Input
         {...props}
-        onChange={e => {
-          const cleanedValue = Number(e.target.value.replace(/\D/g, ''))
-          const valueCents = Number(cleanedValue) / 100
-          e.target.value = numberToBRL(valueCents)
-          onChange && onChange(e)
-        }}
-        ref={ref}
-      />
-    )
-  }
+	        onChange={e => {
+	          const cleanedValue = Number(e.target.value.replace(/\D/g, ''))
+	          const valueCents = Number(cleanedValue) / 100
+	          e.target.value = numberToBRL(valueCents)
+	          onChange?.(e)
+	        }}
+	        ref={ref}
+	      />
+	    )
+	  }
 )
 CurrencyInput.displayName = 'CurrencyInput'
 
@@ -77,20 +76,20 @@ const DocumentInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
               .replace(/(\d{3})(\d)/, '$1.$2')
               .replace(/(\d{3})(\d)/, '$1.$2')
               .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-          } else {
-            input.value = cleanedValue
-              .replace(/(\d{2})(\d)/, '$1.$2')
-              .replace(/(\d{3})(\d)/, '$1.$2')
-              .replace(/(\d{3})(\d)/, '$1/$2')
-              .replace(/(\d{4})(\d)/, '$1-$2')
-              .replace(/(-\d{2})\d+/, '$1')
-          }
-          onChange && onChange(e)
-        }}
-        ref={ref}
-      />
-    )
-  }
+	          } else {
+	            input.value = cleanedValue
+	              .replace(/(\d{2})(\d)/, '$1.$2')
+	              .replace(/(\d{3})(\d)/, '$1.$2')
+	              .replace(/(\d{3})(\d)/, '$1/$2')
+	              .replace(/(\d{4})(\d)/, '$1-$2')
+	              .replace(/(-\d{2})\d+/, '$1')
+	          }
+	          onChange?.(e)
+	        }}
+	        ref={ref}
+	      />
+	    )
+	  }
 )
 DocumentInput.displayName = 'DocumentInput'
 
@@ -106,18 +105,18 @@ const PhoneInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
             input.value = cleanedValue
               .replace(/(\d{2})(\d)/, '($1) $2')
               .replace(/(\d{4})(\d)/, '$1-$2')
-          } else {
-            input.value = cleanedValue
-              .replace(/(\d{2})(\d)/, '($1) $2')
-              .replace(/(\d{5})(\d)/, '$1-$2')
-              .replace(/(-\d{4})\d+/, '$1')
-          }
-          onChange && onChange(e)
-        }}
-        ref={ref}
-      />
-    )
-  }
+	          } else {
+	            input.value = cleanedValue
+	              .replace(/(\d{2})(\d)/, '($1) $2')
+	              .replace(/(\d{5})(\d)/, '$1-$2')
+	              .replace(/(-\d{4})\d+/, '$1')
+	          }
+	          onChange?.(e)
+	        }}
+	        ref={ref}
+	      />
+	    )
+	  }
 )
 PhoneInput.displayName = 'PhoneInput'
 

@@ -4,7 +4,7 @@ import { DefaultJWT } from "next-auth/jwt";
 // Estende as interfaces existentes do NextAuth
 declare module "next-auth" {
     interface User extends DefaultUser {
-        rf: string; // Registro Funcional (RF)
+        rf: string;
         cpf?: string;
         situacaoUsuario?: number;
         situacaoGrupo?: number;
@@ -13,7 +13,6 @@ declare module "next-auth" {
             sistema: number;
             perfis: string[];
         }[];
-        // Keycloak fields
         groups?: string[];
         given_name?: string;
         family_name?: string;
@@ -21,7 +20,7 @@ declare module "next-auth" {
 
     interface Session extends DefaultSession {
         user: {
-            rf: string; // Registro Funcional (RF)
+            rf: string;
             cpf?: string;
             situacaoUsuario?: number;
             situacaoGrupo?: number;
@@ -30,17 +29,17 @@ declare module "next-auth" {
                 sistema: number;
                 perfis: string[];
             }[];
-            // Keycloak fields
             groups?: string[];
             given_name?: string;
             family_name?: string;
         } & DefaultSession["user"];
+        expires_at?: number;
     }
 }
 
 declare module "next-auth/jwt" {
     interface JWT extends DefaultJWT {
-        rf: string; // Registro Funcional (RF)
+        rf: string;
         cpf?: string;
         situacaoUsuario?: number;
         situacaoGrupo?: number;
@@ -49,9 +48,9 @@ declare module "next-auth/jwt" {
             sistema: number;
             perfis: string[];
         }[];
-        // Keycloak fields
         groups?: string[];
         given_name?: string;
         family_name?: string;
+        exp?: number;
     }
 }

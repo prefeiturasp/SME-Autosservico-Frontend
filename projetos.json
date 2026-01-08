@@ -1,0 +1,678 @@
+{
+    "count": 67,
+    "total_count": 67,
+    "projects": [
+      {
+        "id": "c2366323-de35-4303-b9f5-ff9dabaae08e",
+        "name": "NUTAC - Transparência",
+        "description": "Projetos de Transparência de Informações e ações.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/c2366323-de35-4303-b9f5-ff9dabaae08e",
+        "state": "wellFormed",
+        "revision": 1056,
+        "visibility": "private",
+        "last_update_time": "2025-12-08T18:41:19.097Z"
+      },
+      {
+        "id": "cffdf85b-c085-431c-a4a7-56a9d0a70b05",
+        "name": "COTIC - Auto Serviço",
+        "description": "Auto Serviço é um Sistema de leitura de Saúde das máquinas e ferramentas para tomada de decisão de P.O.s\n",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/cffdf85b-c085-431c-a4a7-56a9d0a70b05",
+        "state": "wellFormed",
+        "revision": 1004,
+        "visibility": "private",
+        "last_update_time": "2025-08-05T16:46:43.723Z"
+      },
+      {
+        "id": "c1dcf343-60ee-40b6-a30a-3b9c12c6d220",
+        "name": "Suspenso - Novo SGP - AMCom - COPED",
+        "description": "Desenvolvimento do Novo SGP.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/c1dcf343-60ee-40b6-a30a-3b9c12c6d220",
+        "state": "wellFormed",
+        "revision": 940,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:58:38.88Z"
+      },
+      {
+        "id": "c82dc1aa-a742-4ea1-8df3-33a7eadb7d70",
+        "name": "Suspenso - SME Conecta Formação - AMCom - COPED",
+        "description": "Sistema de Gestão de Formação",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/c82dc1aa-a742-4ea1-8df3-33a7eadb7d70",
+        "state": "wellFormed",
+        "revision": 945,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:02:19.077Z"
+      },
+      {
+        "id": "df80ad90-407b-4f58-8a29-430604912a37",
+        "name": "Suspenso - SME Demanda PTRF - AMCom - COPLAN",
+        "description": "O Sig.Escola visa: \n\na) apoiar os processos de gestão e prestação de contas de recursos financeiros das unidades educacionais da Rede Municipal de Educação de São Paulo, \n\nb) apoiar o acompanhamento e fiscalização dos referidos recursos pelas Diretorias Regionais de Educação e \n\nc) auxiliar na gestão e avaliação dos programas de transferência de recursos por parte da Secretaria Municipal de Educação. O Sistema inicialmente foi concebido para apoiar os processos de gestão e prestação de contas do Programa de Transferência de Recursos Financeiros (PTRF).",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/df80ad90-407b-4f58-8a29-430604912a37",
+        "state": "wellFormed",
+        "revision": 947,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:03:30.583Z"
+      },
+      {
+        "id": "f77de57e-b4a4-4418-995e-9cba39dd8708",
+        "name": "CODAE - Alimentação",
+        "description": "Projetos vinculados à Alimentação Escolar nas Unidades da Rede Municipal de Educação.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/f77de57e-b4a4-4418-995e-9cba39dd8708",
+        "state": "wellFormed",
+        "revision": 992,
+        "visibility": "private",
+        "last_update_time": "2025-07-10T12:33:28.023Z"
+      },
+      {
+        "id": "3b551b16-e2f6-4f69-96fb-d2899899de96",
+        "name": "COCEU",
+        "description": "Projetos referentes a atividades do CEU ou patrocinada pelo COCEU: Platéia e Programa Visitas monitoradas.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/3b551b16-e2f6-4f69-96fb-d2899899de96",
+        "state": "wellFormed",
+        "revision": 978,
+        "visibility": "private",
+        "last_update_time": "2025-06-11T18:02:32.357Z"
+      },
+      {
+        "id": "ed13a1f7-3812-4c3a-8a02-a031114ed5f0",
+        "name": "Suspenso - SME Cadastro de Imóveis - AMCom - COGEP",
+        "description": "Célula criada para desenvolvimento do produto de cadastro de imóveis.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/ed13a1f7-3812-4c3a-8a02-a031114ed5f0",
+        "state": "wellFormed",
+        "revision": 935,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:55:10.35Z"
+      },
+      {
+        "id": "b531d6b7-24f8-4979-b90d-dcab697f59ab",
+        "name": "Nuc Adm - SIGNA",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/b531d6b7-24f8-4979-b90d-dcab697f59ab",
+        "state": "wellFormed",
+        "revision": 1052,
+        "visibility": "private",
+        "last_update_time": "2025-10-28T13:02:07.25Z"
+      },
+      {
+        "id": "a4dec378-90ce-4213-9893-6346f4a6bcd9",
+        "name": "Suspenso - Atividades Design Serviços - AMCom",
+        "description": "Atividades relacionadas ao trabalho do Design de Serviços",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/a4dec378-90ce-4213-9893-6346f4a6bcd9",
+        "state": "wellFormed",
+        "revision": 714,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:14:51.457Z"
+      },
+      {
+        "id": "de4823d8-ce86-46b9-8c55-e8e6b7486d01",
+        "name": "SME - Treinamento",
+        "description": "Projeto para treinamento e aprendizado em relação às configurações do Azure DevOps da SME",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/de4823d8-ce86-46b9-8c55-e8e6b7486d01",
+        "state": "wellFormed",
+        "revision": 858,
+        "visibility": "private",
+        "last_update_time": "2024-11-07T13:38:10.647Z"
+      },
+      {
+        "id": "2991292b-bf44-4231-acf7-1f052073cda8",
+        "name": "COTIC - DevOps",
+        "description": "Atividades de DevOps, Segurança, \nArquitetura e Infraestrutura Lógica",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/2991292b-bf44-4231-acf7-1f052073cda8",
+        "state": "wellFormed",
+        "revision": 973,
+        "visibility": "private",
+        "last_update_time": "2025-04-29T12:34:23.49Z"
+      },
+      {
+        "id": "4e88e87d-3882-4c70-9265-258eabcb937f",
+        "name": "SME - Gerentes de Portfólio",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/4e88e87d-3882-4c70-9265-258eabcb937f",
+        "state": "wellFormed",
+        "revision": 1027,
+        "visibility": "private",
+        "last_update_time": "2025-09-11T18:35:27.25Z"
+      },
+      {
+        "id": "52ce043c-20b0-4d94-a252-504e3b0a0ff2",
+        "name": "Suspenso - SME Alimentação Logística - AMCom - CODAE",
+        "description": "Projeto para atendimento da área de abastecimento da CODAE - Sistema de Abastecimento",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/52ce043c-20b0-4d94-a252-504e3b0a0ff2",
+        "state": "wellFormed",
+        "revision": 934,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:54:44.86Z"
+      },
+      {
+        "id": "41c05277-c961-4e61-afe7-1694377b85d4",
+        "name": "Suspenso - SME - Sustentação Sistema de Limpeza - AMCom - COSERV",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/41c05277-c961-4e61-afe7-1694377b85d4",
+        "state": "wellFormed",
+        "revision": 954,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:07:16.657Z"
+      },
+      {
+        "id": "8fe2e159-0821-479c-9625-b7efb6e016f0",
+        "name": "Suspenso - SME - Platéia - AMCom - COCEU",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/8fe2e159-0821-479c-9625-b7efb6e016f0",
+        "state": "wellFormed",
+        "revision": 930,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:52:22.34Z"
+      },
+      {
+        "id": "02bdd9dd-477f-45b4-8627-bd5ceaaaab22",
+        "name": "Suspenso - CLOSED - SME - Pedagógico - AMCom - COPED",
+        "description": "Atividades relacionadas à célula de Pedagógico:\n- SGP, \n- SERAP\n- Demais Sistemas",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/02bdd9dd-477f-45b4-8627-bd5ceaaaab22",
+        "state": "wellFormed",
+        "revision": 939,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:58:15.42Z"
+      },
+      {
+        "id": "7618992f-3234-41d3-992d-9a6a3b4f98d2",
+        "name": "Suspenso - SME - Vaga na Creche - AMCom - NUTAC",
+        "description": "Demanda de atualização do sistema fila da creche.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/7618992f-3234-41d3-992d-9a6a3b4f98d2",
+        "state": "wellFormed",
+        "revision": 953,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:06:44.83Z"
+      },
+      {
+        "id": "df005d09-490c-4fa4-8005-dcf68021eca0",
+        "name": "Suspenso - SME Comunicação - AMCom",
+        "description": "Atividades relacionadas à célula de Comunicação:\n- Livro Aberto \n- Relatório Anual\n- Portal SME\n- Pátio Digital",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/df005d09-490c-4fa4-8005-dcf68021eca0",
+        "state": "wellFormed",
+        "revision": 726,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:32:47.943Z"
+      },
+      {
+        "id": "638bf485-9eb9-4fa5-bd06-af3fafe0e5ae",
+        "name": "Suspenso - Novo SGP Plano de Melhorias do IPT - AMCom - COPED",
+        "description": "Projeto somente para acompanhamento das ações do plano. \nAs histórias efetivas estarão nos respectivos projetos.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/638bf485-9eb9-4fa5-bd06-af3fafe0e5ae",
+        "state": "wellFormed",
+        "revision": 942,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:59:30.54Z"
+      },
+      {
+        "id": "ed2bebb4-ced7-4f36-bc32-25158f758d35",
+        "name": "COSERV",
+        "description": "Projetos sob responsabilidade de COSERV\n\n* Sistema de Limpeza\n* Portal do Uniforme\n* Portal do Material Escolar\n* Bens Patrimoniais\n",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/ed2bebb4-ced7-4f36-bc32-25158f758d35",
+        "state": "wellFormed",
+        "revision": 976,
+        "visibility": "private",
+        "last_update_time": "2025-05-16T17:51:41.46Z"
+      },
+      {
+        "id": "6485ec57-95fa-4403-bc5a-aa2d4be9914c",
+        "name": "SME - Scrum Master",
+        "description": "Projeto destinado as atividades dos Scrum Masters",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/6485ec57-95fa-4403-bc5a-aa2d4be9914c",
+        "state": "wellFormed",
+        "revision": 1019,
+        "visibility": "private",
+        "last_update_time": "2025-09-09T14:50:52.933Z"
+      },
+      {
+        "id": "145473d1-11ae-465e-964c-9fae1dc7e047",
+        "name": "Suspenso - Ateliê de Software - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/145473d1-11ae-465e-964c-9fae1dc7e047",
+        "state": "wellFormed",
+        "revision": 713,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:14:14.51Z"
+      },
+      {
+        "id": "847972f0-f883-4d71-b1d8-5624af27ae9c",
+        "name": "SME - Sustentação",
+        "description": "KANBAN para gestão das demandas de Sustentação - Hotfix | Bugfix ",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/847972f0-f883-4d71-b1d8-5624af27ae9c",
+        "state": "wellFormed",
+        "revision": 1053,
+        "visibility": "private",
+        "last_update_time": "2025-10-28T20:14:41.01Z"
+      },
+      {
+        "id": "0b58ecd5-9e31-4506-a06c-32fdd13d5466",
+        "name": "EMFORPEF - Formação",
+        "description": "Projetos sob responsabilidade de EMFORPEF\n \"Escola Municipal de Formação de Profissionais da Educação do Futuro\"\n\n* CDEP\n* Conecta Formação",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/0b58ecd5-9e31-4506-a06c-32fdd13d5466",
+        "state": "wellFormed",
+        "revision": 1055,
+        "visibility": "private",
+        "last_update_time": "2025-11-18T13:33:31.24Z"
+      },
+      {
+        "id": "c1257716-39d2-4ca0-a4e5-7eff4da7fc0e",
+        "name": "Suspenso - SME Demandas COMAPRE - AMCom",
+        "description": "Sistema para gestão dos 2.000 edifícios da SME, garantindo que haja visibilidade de informações prediais, identificações de melhorias necessárias e apoio à priorização. Na fase 1 do projeto, será desenvolvida a etapa de levantamento cadastral, criando instrumento para que vistoriadores possam cadastrar as informações dos edifícios. Confia mais em: \n\nhttps://smeprefeituraspgov.sharepoint.com/:b:/r/sites/amcom/Shared%20Documents/AMCom/Design%20de%20Servi%C3%A7os/2.%20Descobertas%20realizadas/COMAPRE/Gest%C3%A3o%20Predial/COMAPRE%20-%20Gesta%CC%83o%20Predial%20-%20Fase%201.pdf?csf=1&web=1&e=0ukgwj",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/c1257716-39d2-4ca0-a4e5-7eff4da7fc0e",
+        "state": "wellFormed",
+        "revision": 937,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:56:52.17Z"
+      },
+      {
+        "id": "aa9c3851-9a64-41b8-8c40-5256b78ccec9",
+        "name": "Suspenso - Novo SGP Aplicativos - AMCom - COPED",
+        "description": "SGP - Construção dos aplicativos pedagógicos",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/aa9c3851-9a64-41b8-8c40-5256b78ccec9",
+        "state": "wellFormed",
+        "revision": 941,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:59:02.66Z"
+      },
+      {
+        "id": "080128ce-5678-4a6a-a8a3-6c204a719b47",
+        "name": "Suspenso - Projeto Teste para Treinamento Azure DevOps - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/080128ce-5678-4a6a-a8a3-6c204a719b47",
+        "state": "wellFormed",
+        "revision": 741,
+        "visibility": "public",
+        "last_update_time": "2024-11-01T13:53:31.6Z"
+      },
+      {
+        "id": "58a564ef-c8bc-40fd-a237-6ac616945f34",
+        "name": "Suspenso - CLOSED - Novo SGP - Performance - AMCom - COPED",
+        "description": "Time apartado para melhorias de performance do SGP",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/58a564ef-c8bc-40fd-a237-6ac616945f34",
+        "state": "wellFormed",
+        "revision": 938,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:57:19.81Z"
+      },
+      {
+        "id": "8217b3ef-9b0e-4b12-a2b0-a4fe910279ea",
+        "name": "Suspenso - SME CDEP - AMCom - COPED",
+        "description": "Desenvolvimento do sistema de Centro de Documentação da Educação Paulistana - CDEP",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/8217b3ef-9b0e-4b12-a2b0-a4fe910279ea",
+        "state": "wellFormed",
+        "revision": 944,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:00:24.23Z"
+      },
+      {
+        "id": "e41c445a-7194-425e-b56c-4e15dded820f",
+        "name": "Suspenso - Projeto para guardar históricos - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/e41c445a-7194-425e-b56c-4e15dded820f",
+        "state": "wellFormed",
+        "revision": 813,
+        "visibility": "public",
+        "last_update_time": "2024-11-06T11:31:49.287Z"
+      },
+      {
+        "id": "ed2fe6db-5c13-4c87-8752-a92efd8dfc60",
+        "name": "Suspenso - CLOSED - SME IDEP - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/ed2fe6db-5c13-4c87-8752-a92efd8dfc60",
+        "state": "wellFormed",
+        "revision": 814,
+        "visibility": "private",
+        "last_update_time": "2024-11-06T11:31:49.317Z"
+      },
+      {
+        "id": "b4b9c876-d178-4c36-8ba7-0aecfa649a8d",
+        "name": "Suspenso - SME - Sustentação Escola Aberta - AMCom - NUTAC",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/b4b9c876-d178-4c36-8ba7-0aecfa649a8d",
+        "state": "wellFormed",
+        "revision": 952,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:06:07.9Z"
+      },
+      {
+        "id": "8853305e-4ac0-4fae-a853-c1651ef85d5f",
+        "name": "Suspenso - CLOSED - SME - Treinamentos - AMCom",
+        "description": "Célula para tratar os treinamentos de PO e técnicos",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/8853305e-4ac0-4fae-a853-c1651ef85d5f",
+        "state": "wellFormed",
+        "revision": 815,
+        "visibility": "private",
+        "last_update_time": "2024-11-06T11:31:49.353Z"
+      },
+      {
+        "id": "86eb0969-46b0-41fe-b2a4-5e4e2acdbbf4",
+        "name": "Suspenso - Teste de Projeto para Teste Automatizado - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/86eb0969-46b0-41fe-b2a4-5e4e2acdbbf4",
+        "state": "wellFormed",
+        "revision": 746,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T14:01:11.203Z"
+      },
+      {
+        "id": "2adf9619-d33f-4f8f-9177-79a681b537e8",
+        "name": "COPED - Pedagógico",
+        "description": "Projetos Pedagógicos sob responsabilidade de COPED\n* Novo SGP\n* Serap\n* Serap Estudantes\n* Currículo da Cidade\n* IDEP\n",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/2adf9619-d33f-4f8f-9177-79a681b537e8",
+        "state": "wellFormed",
+        "revision": 1057,
+        "visibility": "private",
+        "last_update_time": "2025-12-17T18:24:17.83Z"
+      },
+      {
+        "id": "e52e0bec-7733-4001-bd99-f7c05636128f",
+        "name": "Suspenso - CLOSED - SME - Revisão do Catálogo - AMCom",
+        "description": "Projeto para realização de revisão no catálogo de serviços",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/e52e0bec-7733-4001-bd99-f7c05636128f",
+        "state": "wellFormed",
+        "revision": 743,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:54:51.843Z"
+      },
+      {
+        "id": "972e9a67-67ef-498e-aab2-e9e258e818bf",
+        "name": "Suspenso - Time de Produto - AMCom",
+        "description": "Projeto interno para organização do time de produto e gestão das demandas.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/972e9a67-67ef-498e-aab2-e9e258e818bf",
+        "state": "wellFormed",
+        "revision": 736,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:48:22.783Z"
+      },
+      {
+        "id": "5f802aff-a941-4f64-9cde-df4243a26f8a",
+        "name": "Suspenso - SME Currículo da Cidade - AMCom - COPED",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/5f802aff-a941-4f64-9cde-df4243a26f8a",
+        "state": "wellFormed",
+        "revision": 946,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:02:46.073Z"
+      },
+      {
+        "id": "3a477575-932f-47dd-b02a-1597e7a07db5",
+        "name": "COTIC - Design de Serviços",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/3a477575-932f-47dd-b02a-1597e7a07db5",
+        "state": "wellFormed",
+        "revision": 1001,
+        "visibility": "private",
+        "last_update_time": "2025-07-15T13:40:15.81Z"
+      },
+      {
+        "id": "92ae6993-42ec-40a8-98f1-172142a9d76a",
+        "name": "Suspenso - SME Demanda Cadastro Infantil - AMCom",
+        "description": "Criação de formulário para pré cadastro de aluno na educação infantil",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/92ae6993-42ec-40a8-98f1-172142a9d76a",
+        "state": "wellFormed",
+        "revision": 731,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:43:53.013Z"
+      },
+      {
+        "id": "4a345dd4-9449-4916-99a8-8c9beb34bb99",
+        "name": "Suspenso - SME  Arquitetura - AMcom - COTIC",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/4a345dd4-9449-4916-99a8-8c9beb34bb99",
+        "state": "wellFormed",
+        "revision": 951,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:05:39.993Z"
+      },
+      {
+        "id": "1ab9918e-4813-4ce3-beac-57d61d498ada",
+        "name": "Suspenso - SME Escolhas - AMCom - COGEP",
+        "description": "Demandas do Sistema Escolhas (bugs e melhorias)",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/1ab9918e-4813-4ce3-beac-57d61d498ada",
+        "state": "wellFormed",
+        "revision": 936,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:55:34.8Z"
+      },
+      {
+        "id": "c38453e2-b444-4975-98ab-516a64cf77e6",
+        "name": "Suspenso - CLOSED - Melhorias gerais do Ateliê - AMCom",
+        "description": "Projeto para melhorias que envolvam o Ateliê como um todo e que tragam ganho efetivo para a operação.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/c38453e2-b444-4975-98ab-516a64cf77e6",
+        "state": "wellFormed",
+        "revision": 745,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:57:29.073Z"
+      },
+      {
+        "id": "89419834-faa2-4ccd-a5d7-1a06578de207",
+        "name": "Suspenso - SME Contratos - AMCom",
+        "description": "Atividades relacionadas à célula de contratos - COAD",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/89419834-faa2-4ccd-a5d7-1a06578de207",
+        "state": "wellFormed",
+        "revision": 728,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:38:31.107Z"
+      },
+      {
+        "id": "8ba5d415-0118-41e1-be1f-962de2bd51e7",
+        "name": "COTIC - Projetos Rapidos",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/8ba5d415-0118-41e1-be1f-962de2bd51e7",
+        "state": "wellFormed",
+        "revision": 867,
+        "visibility": "private",
+        "last_update_time": "2024-11-25T12:41:32.227Z"
+      },
+      {
+        "id": "24e201ad-777f-417a-b793-474f94c7113b",
+        "name": "Suspenso - SME - Portal do Material Escolar - AMCom - COSERV",
+        "description": "Portal para cadastramento de fornecedores de material escolar e consulta de pontos de venda pelos pais e responsáveis.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/24e201ad-777f-417a-b793-474f94c7113b",
+        "state": "wellFormed",
+        "revision": 948,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:04:00.39Z"
+      },
+      {
+        "id": "a6ad43b8-2116-41bb-97c3-a3c4d6517db3",
+        "name": "Suspenso - SME - Visitas Monitoradas - AMCom - COCEU",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/a6ad43b8-2116-41bb-97c3-a3c4d6517db3",
+        "state": "wellFormed",
+        "revision": 931,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:53:05.85Z"
+      },
+      {
+        "id": "a7efde5e-6061-4672-993a-89d84a20cf88",
+        "name": "COGED - Manutenção",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/a7efde5e-6061-4672-993a-89d84a20cf88",
+        "state": "wellFormed",
+        "revision": 966,
+        "visibility": "private",
+        "last_update_time": "2025-04-14T19:38:09.657Z"
+      },
+      {
+        "id": "9517625e-d03b-4045-bc4f-69692f861ed6",
+        "name": "COPLAN - PTRF",
+        "description": "Projeto responsável pela prestação de contas do Projeto de Transferência de Recursos Financeiros.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/9517625e-d03b-4045-bc4f-69692f861ed6",
+        "state": "wellFormed",
+        "revision": 1058,
+        "visibility": "private",
+        "last_update_time": "2025-12-26T18:37:15.487Z"
+      },
+      {
+        "id": "f3759824-f263-46ce-ac18-f6df36c952f2",
+        "name": "COMAPRE - Obras",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/f3759824-f263-46ce-ac18-f6df36c952f2",
+        "state": "wellFormed",
+        "revision": 968,
+        "visibility": "private",
+        "last_update_time": "2025-04-14T19:39:47.767Z"
+      },
+      {
+        "id": "1296d783-e0d3-4cf5-918d-f82ca21e057c",
+        "name": "ASCOM - Comunicação",
+        "description": "Setor ligado ao Gabinete de SME responsável pela comunicação da Secretaria de Educação Municipal",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/1296d783-e0d3-4cf5-918d-f82ca21e057c",
+        "state": "wellFormed",
+        "revision": 977,
+        "visibility": "private",
+        "last_update_time": "2025-06-11T17:23:48.153Z"
+      },
+      {
+        "id": "7e92ae7b-7c5d-42b3-8ccb-3229aa6f7d19",
+        "name": "GIPE - Desenvolvimento",
+        "description": "GIPE é responsável por coordenar o Comitê de Proteção Escolar e desenvolver ações de promoção e prevenção que garantam ambientes escolares seguros, acolhedores e protegidos contra diferentes formas de violência",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/7e92ae7b-7c5d-42b3-8ccb-3229aa6f7d19",
+        "state": "wellFormed",
+        "revision": 1037,
+        "visibility": "private",
+        "last_update_time": "2025-09-25T14:59:23.667Z"
+      },
+      {
+        "id": "cd03fdc3-98ab-4906-ad21-df24676e05fe",
+        "name": "Suspenso - SME Alimentação - AMCom - CODAE",
+        "description": "Atividades relacionadas à célula de Alimentação:\n- Prato Aberto\n- Papa",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/cd03fdc3-98ab-4906-ad21-df24676e05fe",
+        "state": "wellFormed",
+        "revision": 933,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:54:12.91Z"
+      },
+      {
+        "id": "a9791487-9d46-4b0f-bdbb-de37501787dd",
+        "name": "Suspenso - SME Dados Analíticos - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/a9791487-9d46-4b0f-bdbb-de37501787dd",
+        "state": "wellFormed",
+        "revision": 730,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:40:13.19Z"
+      },
+      {
+        "id": "eb2201d9-5852-4ed9-a882-ac5ec704acfc",
+        "name": "Suspenso - SME - Portal do Uniformes - AMCom - COSERV",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/eb2201d9-5852-4ed9-a882-ac5ec704acfc",
+        "state": "wellFormed",
+        "revision": 949,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:04:24.74Z"
+      },
+      {
+        "id": "6bbf1693-bda0-486d-9bb8-8931bbdc64f2",
+        "name": "Suspenso - SME Esteira de Projetos Rápidos - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/6bbf1693-bda0-486d-9bb8-8931bbdc64f2",
+        "state": "wellFormed",
+        "revision": 738,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:50:27.27Z"
+      },
+      {
+        "id": "bd1a795a-42dd-4c65-8d4e-99a11b87f228",
+        "name": "COGEP - Recursos Humanos",
+        "description": "Projetos referentes ao Processo de RH",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/bd1a795a-42dd-4c65-8d4e-99a11b87f228",
+        "state": "wellFormed",
+        "revision": 975,
+        "visibility": "private",
+        "last_update_time": "2025-05-15T13:33:39.6Z"
+      },
+      {
+        "id": "54686322-d19c-43bf-841c-90ba0d018721",
+        "name": "SUSPENSO - CLOSED - SME - Demandas Emergenciais - AMCom",
+        "description": "Espaço para atendimento de demandas que forem tratadas fora das células já existentes.",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/54686322-d19c-43bf-841c-90ba0d018721",
+        "state": "wellFormed",
+        "revision": 1005,
+        "visibility": "private",
+        "last_update_time": "2025-08-07T18:03:51.093Z"
+      },
+      {
+        "id": "df2a0559-541e-4c61-9de4-431b9dfb9977",
+        "name": "Suspenso - SME Demandas COCEU - AMCom - COCEU",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/df2a0559-541e-4c61-9de4-431b9dfb9977",
+        "state": "wellFormed",
+        "revision": 932,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:53:36.453Z"
+      },
+      {
+        "id": "b9ca9356-ed71-4210-afa8-596e7eb9ac35",
+        "name": "Suspenso - SME Design System - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/b9ca9356-ed71-4210-afa8-596e7eb9ac35",
+        "state": "wellFormed",
+        "revision": 735,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:47:36.28Z"
+      },
+      {
+        "id": "7f055aa1-0034-4c25-947c-552da6303279",
+        "name": "Suspenso - Atividades Infra-Devops - AMCom - COTIC",
+        "description": "Equipe de Infraestrutura DevOps",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/7f055aa1-0034-4c25-947c-552da6303279",
+        "state": "wellFormed",
+        "revision": 950,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T15:05:17.33Z"
+      },
+      {
+        "id": "254c402c-d6eb-4b45-9100-4844e18b64db",
+        "name": "Suspenso - CLOSED - SME  - API Integração - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/254c402c-d6eb-4b45-9100-4844e18b64db",
+        "state": "wellFormed",
+        "revision": 750,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T14:09:39.19Z"
+      },
+      {
+        "id": "c9b99f20-3b4d-464b-a2eb-69d1f704e9d3",
+        "name": "Suspenso - Serap - AMCom - COPED",
+        "description": "Old - AMCom\nBugs e melhorias do Serap",
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/c9b99f20-3b4d-464b-a2eb-69d1f704e9d3",
+        "state": "wellFormed",
+        "revision": 943,
+        "visibility": "private",
+        "last_update_time": "2025-03-10T14:59:56.547Z"
+      },
+      {
+        "id": "2a9271dc-4165-48a7-8b3c-8483a1ff09aa",
+        "name": "Suspenso - CLOSED - Atualização Cadastral - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/2a9271dc-4165-48a7-8b3c-8483a1ff09aa",
+        "state": "wellFormed",
+        "revision": 747,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T14:02:22.49Z"
+      },
+      {
+        "id": "63628382-7edd-4ff3-bc5c-7a98bf80c4d6",
+        "name": "Suspenso - Catálogo de USTs - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/63628382-7edd-4ff3-bc5c-7a98bf80c4d6",
+        "state": "wellFormed",
+        "revision": 716,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:16:19.133Z"
+      },
+      {
+        "id": "584017bb-19d7-471b-9000-736ce1d01c3c",
+        "name": "Suspenso - CLOSED - SME - Controle de Acervo - AMCom",
+        "description": null,
+        "url": "https://dev.azure.com/SME-Spassu/_apis/projects/584017bb-19d7-471b-9000-736ce1d01c3c",
+        "state": "wellFormed",
+        "revision": 744,
+        "visibility": "private",
+        "last_update_time": "2024-11-01T13:56:34.91Z"
+      }
+    ],
+    "continuation_token": null,
+    "has_more": false
+  }

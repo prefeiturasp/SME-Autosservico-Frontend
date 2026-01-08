@@ -64,6 +64,26 @@ function EnvironmentSelect({
     );
 }
 
+type HeaderProps = {
+    readonly title: string;
+    readonly contentOnly: boolean;
+    readonly showEnvironmentSelect: boolean;
+    readonly environment: "prod" | "homolog";
+    readonly onEnvironmentChange?: (env: "prod" | "homolog") => void;
+};
+
+function Header({ title, contentOnly, showEnvironmentSelect, environment, onEnvironmentChange }: HeaderProps) {
+    if (contentOnly && !title) return null;
+    return (
+        <div className="flex items-center justify-between mb-4">
+            <span className="font-bold text-[14px] text-[#111827]">{title}</span>
+            {showEnvironmentSelect && onEnvironmentChange && (
+                <EnvironmentSelect value={environment} onChange={onEnvironmentChange} />
+            )}
+        </div>
+    );
+}
+
 export default function JenkinsJobCard({
     title,
     className,
@@ -91,22 +111,18 @@ export default function JenkinsJobCard({
 
     const cardClasses = contentOnly ? "" : "bg-white rounded-[5px] shadow-[3px_4px_6px_0px_rgba(0,0,0,0.1)] p-5";
 
-    const Header = () => {
-        if (contentOnly && !title) return null;
-        return (
-            <div className="flex items-center justify-between mb-4">
-                <span className="font-bold text-[14px] text-[#111827]">{title}</span>
-                {showEnvironmentSelect && onEnvironmentChange && (
-                    <EnvironmentSelect value={environment} onChange={onEnvironmentChange} />
-                )}
-            </div>
-        );
+    const headerProps: HeaderProps = {
+        title,
+        contentOnly,
+        showEnvironmentSelect,
+        environment,
+        onEnvironmentChange,
     };
 
     if (!projectName) {
         return (
             <div className={cn(cardClasses, className)}>
-                <Header />
+                <Header {...headerProps} />
                 <div className="text-sm text-[#6B7280] text-center">{emptyProjectHint}</div>
             </div>
         );
@@ -115,7 +131,7 @@ export default function JenkinsJobCard({
     if (isLoading || isFetching) {
         return (
             <div className={cn(cardClasses, className)}>
-                <Header />
+                <Header {...headerProps} />
                 <div className="space-y-3">
                     <div className="bg-[#F5F5F5] rounded-[5px] p-4">
                         <Skeleton className="h-5 w-24 mb-2" />
@@ -133,7 +149,7 @@ export default function JenkinsJobCard({
     if (isError || !data) {
         return (
             <div className={cn(cardClasses, className)}>
-                <Header />
+                <Header {...headerProps} />
                 <div className="text-sm text-[#6B7280] mb-4">Não foi possível carregar os dados.</div>
                 <div className="flex justify-center">
                     <Button onClick={() => refetch()} variant="secondary" size="sm">
@@ -148,7 +164,7 @@ export default function JenkinsJobCard({
     if (!lastReleasedVersion) {
         return (
             <div className={cn(cardClasses, className)}>
-                <Header />
+                <Header {...headerProps} />
                 <div className="text-sm text-[#6B7280]">Sem dados de versão para este projeto.</div>
             </div>
         );
@@ -156,7 +172,7 @@ export default function JenkinsJobCard({
 
     return (
         <div className={cn(cardClasses, className)}>
-            <Header />
+            <Header {...headerProps} />
             
             <div className="space-y-3">
                 <div className="bg-[#F5F5F5] rounded-[5px] p-4 flex items-center gap-3">

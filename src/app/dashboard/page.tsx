@@ -1,9 +1,10 @@
 "use client";
 import CardWrapperInfoAmbientes from "@/components/dashboard/CardWrapperInfoAmbientes";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
+
 import Filas from "@/components/dashboard/SaudeDosServidores/Filas";
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
-import AzureDevOpsBacklog from "@/components/dashboard/AzureDevOpsBacklog";
+
 import useDashboardStore from "@/states/dashboard";
 
 export default function Dashboard() {
@@ -13,22 +14,13 @@ export default function Dashboard() {
     const projectNameFilasRabbitMQ = activeProject?.zabbixQueryFilasRabbitMQ?.trim();
     const projectName = activeProject?.nome?.trim();
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
-    const azureDevopsProjectName = activeProject?.azureDevopsProjectName?.trim();
 
     return (
         <div className="border-b bg-background px-6 py-4">
-            <div className="grid grid-cols-4 gap-4 mb-4">
-                <div className="col-span-2">
-                    <JenkinsJob
-                        project={projectName ?? ""}
-                        subprojects={jenkinsSubprojects}
-                    />
-                </div>
-            </div>
-            <div className="grid grid-cols-4 gap-4 mb-4">
+            <div className="flex space-x-4 mb-6">
                 <CardWrapperInfoAmbientes
                     title="Disponibilidade do ambiente"
-                    className="max-w-sm"
+                    className="max-w-sm mb-5"
                 >
                     <Producao
                         className="bg-[#F5F5F5] p-3"
@@ -38,7 +30,7 @@ export default function Dashboard() {
 
                 <CardWrapperInfoAmbientes
                     title="Saúde do servidor (Workloads)"
-                    className="max-w-sm"
+                    className="max-w-sm mb-5"
                 >
                     <Filas
                         title="Fila"
@@ -51,17 +43,15 @@ export default function Dashboard() {
                         projectName={projectNameBackEnd ?? ""}
                     />
                 </CardWrapperInfoAmbientes>
-            </div>
 
-            <div className="grid grid-cols-4 gap-4">
                 <CardWrapperInfoAmbientes
-                    title="Bugs"
-                    className="col-span-4 gap-2 py-2"
+                    title="Lançamento de Versões"
+                    className="max-w-sm mb-5 gap-2 py-2"
                 >
-                    <AzureDevOpsBacklog
-                        className="p-[2px]"
+                    <JenkinsJob
+                        className="bg-[#F5F5F5] p-1.5"
                         project={projectName ?? ""}
-                        azureDevopsProjectName={azureDevopsProjectName}
+                        subprojects={jenkinsSubprojects}
                     />
                 </CardWrapperInfoAmbientes>
             </div>

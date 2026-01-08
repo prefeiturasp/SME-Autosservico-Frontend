@@ -127,14 +127,15 @@ export default function BacklogCard({
     }
 
     if (isLoading || isFetching) {
+        const skeletonKeys = ["skeleton-0", "skeleton-1", "skeleton-2"];
         return (
             <div className={cn(cardClasses, className)}>
                 <div className="flex items-center justify-between mb-4">
                     {title && <span className="font-bold text-[14px] text-[#111827]">{title}</span>}
                 </div>
                 <div className="space-y-4">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="flex items-center">
+                    {skeletonKeys.map((skeletonKey) => (
+                        <div key={skeletonKey} className="flex items-center">
                             <Skeleton className="h-4 w-16 mr-8" />
                             <Skeleton className="h-4 flex-1 mr-8" />
                             <Skeleton className="h-7 w-[120px] rounded-full mr-8" />

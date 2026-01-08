@@ -2,6 +2,8 @@ import "server-only";
 import axios from "axios";
 import type { BacklogResponse } from "@/types/backlog";
 
+const DEFAULT_ORGANIZATION = "SME-Spassu";
+
 export const azureDevOpsApi = axios.create({
   baseURL: process.env.AZURE_DEVOPS_API_URL,
   timeout: 30000,
@@ -16,6 +18,7 @@ export async function getBacklog(
 ): Promise<BacklogResponse> {
   const response = await azureDevOpsApi.get<BacklogResponse>("/backlog", {
     params: {
+      organization: DEFAULT_ORGANIZATION,
       project_name: projectName,
       pat: process.env.AZURE_DEVOPS_PAT,
       ...params,

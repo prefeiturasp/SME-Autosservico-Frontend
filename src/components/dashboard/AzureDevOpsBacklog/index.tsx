@@ -15,6 +15,9 @@ export default function AzureDevOpsBacklog({ project, azureDevopsProjectName, cl
         endpoint: "/api/azure-devops/backlog",
         keyPrefix: "azure-devops-backlog",
         projectName: azureDevopsProjectName ?? "",
+        filters: {
+            workItemTypes: ["Bug"],
+        },
     });
 
     if (!project) {

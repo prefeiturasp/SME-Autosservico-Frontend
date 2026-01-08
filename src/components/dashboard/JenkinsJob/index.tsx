@@ -23,7 +23,7 @@ type Props = {
 };
 
 export default function JenkinsJob({
-    title = "Lançamento de Versões",
+    title = "Lançamentos",
     className,
     project,
     subprojects: subprojectsProp,
@@ -61,148 +61,105 @@ export default function JenkinsJob({
     });
 
     if (!project) {
-        return <JenkinsJobCard title={title} className={className} projectName="" query={query} />;
+        return (
+            <JenkinsJobCard 
+                title={title} 
+                className={className} 
+                projectName="" 
+                query={query}
+                showEnvironmentSelect
+                environment={environment}
+                onEnvironmentChange={setEnvironment}
+            />
+        );
     }
 
     if (subprojects.length === 0) {
         return (
-            <div className={cn("text-center", className)}>
-                <div className="font-semibold text-xl">{title}</div>
-                <div className="text-sm text-muted-foreground">
+            <div className={cn("bg-white rounded-[5px] shadow-[3px_4px_6px_0px_rgba(0,0,0,0.1)] p-5", className)}>
+                <div className="font-bold text-[14px] text-[#111827] mb-4">{title}</div>
+                <div className="text-sm text-[#6B7280] text-center">
                     Sem lançamentos disponíveis para este projeto.
                 </div>
             </div>
         );
     }
 
-    return (
-        <div className={cn("space-y-2", className)}>
-            {subprojects.length > 0 ? (
-                <div className="bg-white shadow rounded-lg">
-                    <div className="px-2 py-2">
-                        {hasMultipleSubprojects ? (
-                            <>
-                                <div className="text-sm font-semibold pb-1">Projeto</div>
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <div className="flex-1 min-w-[200px]">
-                                        <Select
-                                            value={selectedKey}
-                                            onValueChange={(value) =>
-                                                setSelectedKey(value)
-                                            }
-                                        >
-                                            <SelectTrigger
-                                                size="sm"
-                                                className="w-full min-w-0"
-                                                aria-label="Selecionar projeto"
-                                            >
-                                                <SelectValue placeholder="Selecione" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {subprojects.map((s) => (
-                                                    <SelectItem
-                                                        key={s.key}
-                                                        value={s.key}
-                                                        className="focus:bg-[#3b82f6] focus:text-white !focus:ring-0 !focus-visible:ring-0 focus:outline-none"
-                                                    >
-                                                        {s.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <div className="shrink-0">
-                                        <Select
-                                            value={environment}
-                                            onValueChange={(value) =>
-                                                setEnvironment(
-                                                    value === "homolog"
-                                                        ? "homolog"
-                                                        : "prod"
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger
-                                                size="sm"
-                                                className="w-full rounded-full border-transparent bg-slate-100 px-2 text-xs font-semibold text-slate-700 shadow-none hover:bg-slate-200"
-                                                aria-label="Selecionar ambiente"
-                                            >
-                                                <span className="text-[10px] font-semibold text-slate-500">
-                                                    Ambiente
-                                                </span>
-                                                <SelectValue placeholder="Selecione" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem
-                                                    value="prod"
-                                                    className="focus:bg-[#3b82f6] focus:text-white !focus:ring-0 !focus-visible:ring-0 focus:outline-none"
-                                                >
-                                                    Produção
-                                                </SelectItem>
-                                                <SelectItem
-                                                    value="homolog"
-                                                    className="focus:bg-[#3b82f6] focus:text-white !focus:ring-0 !focus-visible:ring-0 focus:outline-none"
-                                                >
-                                                    Homologação
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="flex items-center gap-2">
-                                <div className="flex-1">
-                                    <Select
-                                        value={environment}
-                                        onValueChange={(value) =>
-                                            setEnvironment(
-                                                value === "homolog"
-                                                    ? "homolog"
-                                                    : "prod"
-                                            )
-                                        }
-                                    >
-                                        <SelectTrigger
-                                            size="sm"
-                                            className="w-full rounded-full border-transparent bg-slate-100 px-2 text-xs font-semibold text-slate-700 shadow-none hover:bg-slate-200"
-                                            aria-label="Selecionar ambiente"
-                                        >
-                                            <span className="text-[10px] font-semibold text-slate-500">
-                                                Ambiente
-                                            </span>
-                                            <SelectValue placeholder="Selecione" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem
-                                                value="prod"
-                                                className="focus:bg-[#3b82f6] focus:text-white !focus:ring-0 !focus-visible:ring-0 focus:outline-none"
-                                            >
-                                                Produção
-                                            </SelectItem>
-                                            <SelectItem
-                                                value="homolog"
-                                                className="focus:bg-[#3b82f6] focus:text-white !focus:ring-0 !focus-visible:ring-0 focus:outline-none"
-                                            >
-                                                Homologação
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+    if (hasMultipleSubprojects) {
+        return (
+            <div className={cn("bg-white rounded-[5px] shadow-[3px_4px_6px_0px_rgba(0,0,0,0.1)] p-5", className)}>
+                <div className="flex items-center justify-between mb-4">
+                    <span className="font-bold text-[14px] text-[#111827]">{title}</span>
+                    <Select
+                        value={environment}
+                        onValueChange={(v) => setEnvironment(v === "homolog" ? "homolog" : "prod")}
+                    >
+                        <SelectTrigger
+                            size="sm"
+                            className="w-auto rounded-full border-transparent bg-slate-100 px-3 text-xs font-medium text-slate-700 shadow-none hover:bg-slate-200 gap-1"
+                            aria-label="Selecionar ambiente"
+                        >
+                            <SelectValue placeholder="Ambiente" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="prod" className="focus:bg-[#3b82f6] focus:text-white">
+                                Produção
+                            </SelectItem>
+                            <SelectItem value="homolog" className="focus:bg-[#3b82f6] focus:text-white">
+                                Homologação
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
-            ) : null}
 
-            <JenkinsJobCard
-                title={title}
-                className={hasMultipleSubprojects ? "" : undefined}
-                projectName={selectedKey}
-                query={query}
-                emptyProjectHint="Selecione um projeto"
-            />
-        </div>
+                <div className="mb-4">
+                    <div className="text-sm font-semibold text-[#111827] mb-2">Projeto</div>
+                    <Select
+                        value={selectedKey}
+                        onValueChange={(value) => setSelectedKey(value)}
+                    >
+                        <SelectTrigger
+                            size="sm"
+                            className="w-full"
+                            aria-label="Selecionar projeto"
+                        >
+                            <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {subprojects.map((s) => (
+                                <SelectItem
+                                    key={s.key}
+                                    value={s.key}
+                                    className="focus:bg-[#3b82f6] focus:text-white"
+                                >
+                                    {s.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <JenkinsJobCard
+                    title=""
+                    projectName={selectedKey}
+                    query={query}
+                    emptyProjectHint="Selecione um projeto"
+                    contentOnly
+                />
+            </div>
+        );
+    }
+
+    return (
+        <JenkinsJobCard
+            title={title}
+            className={className}
+            projectName={selectedKey}
+            query={query}
+            emptyProjectHint="Selecione um projeto"
+            showEnvironmentSelect
+            environment={environment}
+            onEnvironmentChange={setEnvironment}
+        />
     );
 }

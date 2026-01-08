@@ -1,35 +1,34 @@
 import { Sistema } from "./schema"; // Importando o tipo do schema
 import type { JenkinsSubproject } from "@/types/jenkinsSubproject";
 
-// Hashtable (Record é uma forma de definir chave/valor no TS)
 const squads: Record<string, Sistema[]> = {
     ASCOM: [
-        { id: "1", nome: "Portal Educação", zabbixQueryFrontend: "PRD - Educacao", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-PortalEducacao/master" },
-        { id: "2", nome: "Portal CEU", zabbixQueryFrontend: "PRD - Portal CEU", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-PortalCEU/master" },
-        { id: "3", nome: "Plateia", zabbixQueryFrontend: "PRD - Plateia", zabbixQueryBackend: "PRD - Plateia - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Plateia/master" },
-        { id: "4", nome: "Plateia App", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Plateia-App/master" },
-        { id: "5", nome: "Intranet", zabbixQueryFrontend: "PRD - Intranet", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Intranet/master" },
+        { id: "1", nome: "Portal Educação", zabbixQueryFrontend: "PRD - Educacao", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-PortalEducacao/master", azureDevopsProjectName: "ASCOM - Comunicação" },
+        { id: "2", nome: "Portal CEU", zabbixQueryFrontend: "PRD - Portal CEU", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-PortalCEU/master", azureDevopsProjectName: "COCEU" },
+        { id: "3", nome: "Plateia", zabbixQueryFrontend: "PRD - Plateia", zabbixQueryBackend: "PRD - Plateia - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Plateia/master", azureDevopsProjectName: "COCEU" },
+        { id: "4", nome: "Plateia App", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Plateia-App/master", azureDevopsProjectName: "COCEU" },
+        { id: "5", nome: "Intranet", zabbixQueryFrontend: "PRD - Intranet", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Intranet/master", azureDevopsProjectName: "ASCOM - Comunicação" },
     ],
     COGEP: [
-        { id: "6", nome: "Escolhas", zabbixQueryFrontend: "PRD - Escolhas", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Escolhas/master" },
-        { id: "7", nome: "Sigla", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-SIGLA/master" },
+        { id: "6", nome: "Escolhas", zabbixQueryFrontend: "PRD - Escolhas", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Escolhas/master", azureDevopsProjectName: "COGEP - Recursos Humanos" },
+        { id: "7", nome: "Sigla", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-SIGLA/master", azureDevopsProjectName: "COGEP - Recursos Humanos" },
     ],
     CODAE: [
-        { id: "8", nome: "SigPAE", zabbixQueryFrontend: "PRD - SIGPAE", zabbixQueryBackend: "PRD - SIGPAE - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-SIGPAE/master" },
-        { id: "9", nome: "Rolê Agroecológico", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-RoleAgroecologico/master" },
+        { id: "8", nome: "SigPAE", zabbixQueryFrontend: "PRD - SIGPAE", zabbixQueryBackend: "PRD - SIGPAE - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-SIGPAE/master", azureDevopsProjectName: "CODAE - Alimentação" },
+        { id: "9", nome: "Rolê Agroecológico", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-RoleAgroecologico/master", azureDevopsProjectName: "CODAE - Alimentação" },
     ],
     COPED: [
-        { id: "10", nome: "Novo SGP", zabbixQueryFrontend: "PRD - Novo SGP", zabbixQueryBackend: "PRD - Novo SGP - Swagger", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master" },
-        { id: "11", nome: "Serap", zabbixQueryFrontend: "PRD - Serap", zabbixQueryBackend: "PRD - Serap - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Serap/master" },
-        { id: "12", nome: "Serap Estudantes", zabbixQueryFrontend: "PRD - Serap Estudantes", zabbixQueryBackend: "PRD - Serap Estudantes - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Serap-Estudantes/master" },
-        { id: "13", nome: "Cdep", zabbixQueryFrontend: "PRD - CDEP", zabbixQueryBackend: "PRD - CDEP - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-CDEP/master" },
-        { id: "14", nome: "Curriculo da Cidade", zabbixQueryFrontend: "PRD - Curriculo", zabbixQueryBackend: "PRD - Curriculo - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Curriculo/master" },
-        { id: "15", nome: "IDEP", zabbixQueryFrontend: "PRD - Idep", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-IDEP/master" },
-        { id: "16", nome: "Conecta Formação", zabbixQueryFrontend: "PRD - Conecta Formacao", zabbixQueryBackend: "PRD - Conecta Formacao - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-ConectaFormacao/master" },
+        { id: "10", nome: "Novo SGP", zabbixQueryFrontend: "PRD - Novo SGP", zabbixQueryBackend: "PRD - Novo SGP - Swagger", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master", azureDevopsProjectName: "COPED - Pedagógico" },
+        { id: "11", nome: "Serap", zabbixQueryFrontend: "PRD - Serap", zabbixQueryBackend: "PRD - Serap - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Serap/master", azureDevopsProjectName: "COPED - Pedagógico" },
+        { id: "12", nome: "Serap Estudantes", zabbixQueryFrontend: "PRD - Serap Estudantes", zabbixQueryBackend: "PRD - Serap Estudantes - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Serap-Estudantes/master", azureDevopsProjectName: "COPED - Pedagógico" },
+        { id: "13", nome: "Cdep", zabbixQueryFrontend: "PRD - CDEP", zabbixQueryBackend: "PRD - CDEP - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-CDEP/master", azureDevopsProjectName: "EMFORPEF - Formação" },
+        { id: "14", nome: "Curriculo da Cidade", zabbixQueryFrontend: "PRD - Curriculo", zabbixQueryBackend: "PRD - Curriculo - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Curriculo/master", azureDevopsProjectName: "COPED - Pedagógico" },
+        { id: "15", nome: "IDEP", zabbixQueryFrontend: "PRD - Idep", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-IDEP/master", azureDevopsProjectName: "COPED - Pedagógico" },
+        { id: "16", nome: "Conecta Formação", zabbixQueryFrontend: "PRD - Conecta Formacao", zabbixQueryBackend: "PRD - Conecta Formacao - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-ConectaFormacao/master", azureDevopsProjectName: "EMFORPEF - Formação" },
     ],
-    COPLAN: [{ id: "17", nome: "SigEscola", zabbixQueryFrontend: "PRD - PTRF - SIG Escola", zabbixQueryBackend: "PRD - PTRF - SIG Escola - API", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-SigEscola/master" }],
-    COTIC: [{ id: "18", nome: "Autosserviço", zabbixQueryFrontend: "PRD - AUTOSSERVICO", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Autosservico-Frontend/master" }],
-    GIPE: [{ id: "19", nome: "GIPE", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-GIPE/master" }],
+    COPLAN: [{ id: "17", nome: "SigEscola", zabbixQueryFrontend: "PRD - PTRF - SIG Escola", zabbixQueryBackend: "PRD - PTRF - SIG Escola - API", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-SigEscola/master", azureDevopsProjectName: "COPLAN - PTRF" }],
+    COTIC: [{ id: "18", nome: "Autosserviço", zabbixQueryFrontend: "PRD - AUTOSSERVICO", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Autosservico-Frontend/master", azureDevopsProjectName: "COTIC - Auto Serviço" }],
+    GIPE: [{ id: "19", nome: "GIPE", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-GIPE/master", azureDevopsProjectName: "GIPE - Desenvolvimento" }],
 };
 
 function normalizeName(value: string): string {

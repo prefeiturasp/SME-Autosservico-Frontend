@@ -17,6 +17,7 @@ export interface ProjectItem {
     zabbixQueryFilasRabbitMQ: string;
     zabbixQueryJenkinsJob: string;
     jenkinsSubprojects?: JenkinsSubproject[];
+    azureDevopsProjectName?: string;
 }
 
 type State = {

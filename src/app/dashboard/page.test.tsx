@@ -91,8 +91,7 @@ describe("Dashboard page", () => {
     // Filas
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent("Filas RabbitMQ");
 
-    // Jenkins
-    expect(screen.getByTestId("card-Lançamento de Versões")).toBeInTheDocument();
+    // Jenkins (não está envolto em CardWrapperInfoAmbientes)
     expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("Novo SGP::0");
   });
 

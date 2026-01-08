@@ -60,21 +60,21 @@ describe("<JenkinsJobCard />", () => {
   it("mostra o hint quando projectName está ausente", () => {
     render(
       <JenkinsJobCard
-        title="Versões"
+        title="Lançamentos"
         className="bg-muted p-3"
         query={makeQuery()}
         emptyProjectHint="Selecione um projeto por favor"
       />
     );
 
-    expect(screen.getByText("Versões")).toBeInTheDocument();
+    expect(screen.getByText("Lançamentos")).toBeInTheDocument();
     expect(screen.getByText("Selecione um projeto por favor")).toBeInTheDocument();
   });
 
   it("renderiza estado de loading", () => {
     render(
       <JenkinsJobCard
-        title="Versões"
+        title="Lançamentos"
         projectName="SME-NovoSGP-Docs/master"
         query={makeQuery({ isLoading: true })}
       />
@@ -87,7 +87,7 @@ describe("<JenkinsJobCard />", () => {
     const refetch = vi.fn();
     render(
       <JenkinsJobCard
-        title="Versões"
+        title="Lançamentos"
         projectName="SME-NovoSGP-Docs/master"
         query={makeQuery({ isError: true, refetch })}
       />
@@ -102,7 +102,7 @@ describe("<JenkinsJobCard />", () => {
   it("sucesso sem builds -> mostra mensagem de ausência de dados", () => {
     render(
       <JenkinsJobCard
-        title="Versões"
+        title="Lançamentos"
         projectName="SME-NovoSGP-Docs/master"
         query={makeQuery({ data: {} })}
       />
@@ -111,14 +111,14 @@ describe("<JenkinsJobCard />", () => {
     expect(screen.getByText("Sem dados de versão para este projeto.")).toBeInTheDocument();
   });
 
-  it("sucesso -> lista as versões disponíveis", () => {
+  it("sucesso -> exibe versão realizada com ícone de relógio", () => {
     render(
       <JenkinsJobCard
-        title="Versões"
+        title="Lançamentos"
         projectName="SME-NovoSGP-Docs/master"
         query={makeQuery({
           data: {
-            lastBuild: {
+            lastSuccessfulBuild: {
               number: 11,
               status: "SUCCESS",
               timestampMs: 1706266134892,
@@ -131,24 +131,54 @@ describe("<JenkinsJobCard />", () => {
       />
     );
 
-    expect(screen.getAllByText("Versão atual").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText(/Versão #11/)).toBeInTheDocument();
-    expect(screen.getByText(/26\/01\/2024 10:22/)).toBeInTheDocument();
-    expect(screen.getByText("Sucesso")).toBeInTheDocument();
-    expect(screen.getByText("Histórico")).toBeInTheDocument();
-    expect(screen.getByText("Sem histórico disponível.")).toBeInTheDocument();
+    expect(screen.getByText("v11")).toBeInTheDocument();
+    expect(screen.getByText(/Realizado em: 26\/01\/2024 10:22/)).toBeInTheDocument();
   });
 
-  it("abre modal de detalhes da versão ao clicar no botão de informação da linha", async () => {
+  it("exibe versão agendada quando lastBuild é diferente de lastSuccessfulBuild", () => {
     render(
       <JenkinsJobCard
-        title="Versões"
+        title="Lançamentos"
         projectName="SME-NovoSGP-Docs/master"
         query={makeQuery({
           data: {
             lastBuild: {
               number: 12,
-              status: "FAILURE",
+              status: "IN_PROGRESS",
+              timestampMs: 1706352534892,
+              timestamp: "27/01/2024 10:22",
+              durationMs: 0,
+              duration: "0s",
+            },
+            lastSuccessfulBuild: {
+              number: 11,
+              status: "SUCCESS",
+              timestampMs: 1706266134892,
+              timestamp: "26/01/2024 10:22",
+              durationMs: 88873,
+              duration: "1m 28s",
+            },
+          },
+        })}
+      />
+    );
+
+    expect(screen.getByText("v11")).toBeInTheDocument();
+    expect(screen.getByText(/Realizado em: 26\/01\/2024 10:22/)).toBeInTheDocument();
+    expect(screen.getByText("v12")).toBeInTheDocument();
+    expect(screen.getByText(/Agendado para: 27\/01\/2024 10:22/)).toBeInTheDocument();
+  });
+
+  it("não exibe versão agendada quando lastBuild é igual a lastSuccessfulBuild", () => {
+    render(
+      <JenkinsJobCard
+        title="Lançamentos"
+        projectName="SME-NovoSGP-Docs/master"
+        query={makeQuery({
+          data: {
+            lastBuild: {
+              number: 11,
+              status: "SUCCESS",
               timestampMs: 1706266134892,
               timestamp: "26/01/2024 10:22",
               durationMs: 88873,
@@ -162,30 +192,13 @@ describe("<JenkinsJobCard />", () => {
               durationMs: 88873,
               duration: "1m 28s",
             },
-            lastFailedBuild: {
-              number: 10,
-              status: "FAILURE",
-              timestampMs: 1704216262092,
-              timestamp: "02/01/2024 17:04",
-              durationMs: 133777,
-              duration: "2m 13s",
-            },
           },
         })}
       />
     );
 
-    expect(screen.getByText("Versão atual")).toBeInTheDocument();
-    expect(screen.getByText("Última versão com sucesso")).toBeInTheDocument();
-    expect(screen.getByText("Última versão com falha")).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole("button", { name: "Ver detalhes da versão #10" }));
-
-    expect(await screen.findByText("Detalhes da versão #10")).toBeInTheDocument();
-    expect(screen.getAllByText("Última versão com falha").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("#10")).toBeInTheDocument();
-    expect(screen.getAllByText("Falha").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("Timestamp (ms)")).toBeInTheDocument();
-    expect(screen.getByText("Duração (ms)")).toBeInTheDocument();
+    expect(screen.getByText("v11")).toBeInTheDocument();
+    expect(screen.getByText(/Realizado em:/)).toBeInTheDocument();
+    expect(screen.queryByText(/Agendado para:/)).not.toBeInTheDocument();
   });
 });

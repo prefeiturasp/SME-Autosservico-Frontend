@@ -29,8 +29,8 @@ function StatusBadge({ status }: { readonly status: BugStatus }) {
             iconColor: "text-[#6B7280]",
         },
         "Em andamento": {
-            container: "bg-[#FEF3C7] border border-[#F59E0B] text-[#92400E]",
-            iconColor: "text-[#F59E0B]",
+            container: "bg-[#F59E0B] border border-[#F59E0B] text-black",
+            iconColor: "text-black",
         },
         "Resolvido": {
             container: "bg-[#22C55E] text-white",
@@ -57,9 +57,15 @@ function StatusBadge({ status }: { readonly status: BugStatus }) {
 
 function getWorkItemTypeConfig(workItemType?: string) {
     if (!workItemType) return { color: "text-[#6B7280]", icon: FileText, label: "Item" };
-    
+
     const normalized = workItemType.toLowerCase();
-    
+
+    if (normalized === "hotfix") {
+        return { color: "text-[#EF4444]", icon: Bug, label: "HotFix" };
+    }
+    if (normalized === "bugfix") {
+        return { color: "text-[#3B82F6]", icon: Bug, label: "BugFix" };
+    }
     if (normalized.includes("bug")) {
         return { color: "text-[#EF4444]", icon: Bug, label: "Bug" };
     }

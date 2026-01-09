@@ -257,4 +257,95 @@ describe("<BacklogCard /> - Bugs", () => {
         expect(screen.getByText("Bug")).toBeInTheDocument();
         expect(screen.getByText("Tarefa")).toBeInTheDocument();
     });
+
+    it("exibe HotFix com label e cor correta (vermelho)", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [
+                            {
+                                id: 141001,
+                                title: "[SGP] Erro crítico em produção",
+                                work_item_type: "HotFix",
+                                state: "Active",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />
+        );
+
+        expect(screen.getByText("HotFix")).toBeInTheDocument();
+    });
+
+    it("exibe BugFix com label e cor correta (azul)", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [
+                            {
+                                id: 141002,
+                                title: "[SGP] Correção de bug no calendário",
+                                work_item_type: "BugFix",
+                                state: "New",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />
+        );
+
+        expect(screen.getByText("BugFix")).toBeInTheDocument();
+    });
+
+    it("exibe lista mista de HotFix e BugFix corretamente", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 3,
+                        parents: [],
+                        children: [
+                            {
+                                id: 141001,
+                                title: "[SGP] Erro crítico",
+                                work_item_type: "HotFix",
+                                state: "Active",
+                            },
+                            {
+                                id: 141002,
+                                title: "[SGP] Correção de bug",
+                                work_item_type: "BugFix",
+                                state: "New",
+                            },
+                            {
+                                id: 141003,
+                                title: "[SGP] Outro bug",
+                                work_item_type: "BugFix",
+                                state: "Resolved",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />
+        );
+
+        expect(screen.getByText("HotFix")).toBeInTheDocument();
+        expect(screen.getAllByText("BugFix")).toHaveLength(2);
+    });
 });

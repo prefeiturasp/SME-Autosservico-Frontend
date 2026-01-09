@@ -4,9 +4,15 @@ import { render, screen } from "@testing-library/react";
 import { cleanup } from "@testing-library/react";
 import AzureDevOpsBacklog from "@/components/dashboard/AzureDevOpsBacklog";
 
-// Mock simples do hook
+// Mock do hook com retorno válido
 vi.mock("@/hooks/useAzureDevOpsBacklog", () => ({
-  useAzureDevOpsBacklog: vi.fn(),
+  useAzureDevOpsBacklog: vi.fn(() => ({
+    data: undefined,
+    isLoading: false,
+    isFetching: false,
+    isError: false,
+    refetch: vi.fn(),
+  })),
 }));
 
 describe("AzureDevOpsBacklog (Dashboard)", () => {

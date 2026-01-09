@@ -13,7 +13,6 @@ export default function Dashboard() {
     const projectNameFilasRabbitMQ = activeProject?.zabbixQueryFilasRabbitMQ?.trim();
     const projectName = activeProject?.nome?.trim();
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
-    const azureDevopsProjectName = activeProject?.azureDevopsProjectName?.trim();
 
     return (
         <div className="border-b bg-background px-6 py-4">
@@ -61,7 +60,6 @@ export default function Dashboard() {
                     <AzureDevOpsBacklog
                         className="p-[2px]"
                         project={projectName ?? ""}
-                        azureDevopsProjectName={azureDevopsProjectName}
                     />
                 </CardWrapperInfoAmbientes>
             </div>

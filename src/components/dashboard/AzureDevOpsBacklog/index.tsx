@@ -9,7 +9,6 @@ import { getProjectIdentifiers, matchesBugToProject } from "./bugFilters";
 
 type Props = {
     readonly project?: string;
-    readonly azureDevopsProjectName?: string;
     readonly className?: string;
 };
 

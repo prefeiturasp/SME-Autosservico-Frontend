@@ -78,17 +78,17 @@ export function extractTitleIdentifiers(title: string): string[] {
     const identifiers: string[] = [];
 
     // Extrai identificadores entre colchetes: [SGP], [SIGPAE], etc.
-    const bracketMatches = normalizedTitle.match(/\[([^\]]+)\]/g);
-    if (bracketMatches) {
-        for (const match of bracketMatches) {
-            const content = match.slice(1, -1).trim();
-            if (content) identifiers.push(content);
-        }
+    const bracketRegex = /\[([^\]]+)\]/g;
+    let bracketMatch: RegExpExecArray | null;
+    while ((bracketMatch = bracketRegex.exec(normalizedTitle)) !== null) {
+        const content = bracketMatch[1].trim();
+        if (content) identifiers.push(content);
     }
 
     // Também considera o início do título antes de ":" ou "-" como possível identificador
     // Ex: "SGP - Erro no login" ou "SIGPAE: Problema no cadastro"
-    const prefixMatch = normalizedTitle.match(/^([A-Z0-9\s-]+?)[\s]*[-:]/);
+    const prefixRegex = /^([A-Z0-9\s-]+?)\s*[-:]/;
+    const prefixMatch = prefixRegex.exec(normalizedTitle);
     if (prefixMatch) {
         const prefix = prefixMatch[1].trim();
         if (prefix.length >= 2 && prefix.length <= 30) {

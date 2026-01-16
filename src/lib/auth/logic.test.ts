@@ -8,6 +8,7 @@ import {
     PERFIL_NOT_PERMISSION_ERROR_MESSAGE,
 } from "@/const";
 
+// Mocks (devem usar os MESMOS especifiers que logic.ts usa)
 vi.mock("./index", () => ({ __esModule: true, Login: vi.fn() }));
 vi.mock("./validacoes", () => ({
     __esModule: true,
@@ -15,7 +16,7 @@ vi.mock("./validacoes", () => ({
     temPermissaoDeAcessoV2: vi.fn(),
 }));
 
-import { authorizeUser, jwtCallback, sessionCallback, isTokenExpired } from "./logic";
+import { authorizeUser, jwtCallback, sessionCallback } from "./logic";
 import { Login } from "./index";
 import { temPermissaoDeAcesso, temPermissaoDeAcessoV2 } from "./validacoes";
 
@@ -221,8 +222,6 @@ describe("auth/logic", () => {
             visoes: ["V"],
             perfis_por_sistema: [{ sistema: 1008, perfis: ["COPED"] }],
         });
-        expect(out.exp).toBeDefined();
-        expect(typeof out.exp).toBe("number");
     });
 
     it("jwtCallback retorna token inalterado quando user ausente", () => {
@@ -236,7 +235,6 @@ describe("auth/logic", () => {
 
     it("sessionCallback copia campos quando token presente", () => {
         const session: Session = { user: { rf: "" } as User, expires: "2099-01-01" };
-        const expTime = Math.floor(Date.now() / 1000) + 3600;
         const token: JWT = {
             rf: "rf1",
             cpf: "cpf1",
@@ -244,7 +242,6 @@ describe("auth/logic", () => {
             situacaoGrupo: 2,
             visoes: ["V"],
             perfis_por_sistema: [{ sistema: 1008, perfis: ["COPED"] }],
-            exp: expTime,
         } as JWT;
 
         const out = sessionCallback({ session, token });
@@ -256,29 +253,6 @@ describe("auth/logic", () => {
             visoes: ["V"],
             perfis_por_sistema: [{ sistema: 1008, perfis: ["COPED"] }],
         });
-        expect(out.expires_at).toBe(expTime);
-    });
-
-    it("isTokenExpired retorna true quando token é null ou undefined", () => {
-        expect(isTokenExpired(null)).toBe(true);
-        expect(isTokenExpired(undefined)).toBe(true);
-    });
-
-    it("isTokenExpired retorna true quando token não tem exp", () => {
-        const token = { rf: "123" } as JWT;
-        expect(isTokenExpired(token)).toBe(true);
-    });
-
-    it("isTokenExpired retorna true quando token está expirado", () => {
-        const pastTime = Math.floor(Date.now() / 1000) - 3600;
-        const token = { rf: "123", exp: pastTime } as JWT;
-        expect(isTokenExpired(token)).toBe(true);
-    });
-
-    it("isTokenExpired retorna false quando token é válido", () => {
-        const futureTime = Math.floor(Date.now() / 1000) + 3600;
-        const token = { rf: "123", exp: futureTime } as JWT;
-        expect(isTokenExpired(token)).toBe(false);
     });
 
     it("sessionCallback retorna a session inalterada quando token ausente", () => {

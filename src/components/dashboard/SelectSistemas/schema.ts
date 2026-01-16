@@ -1,16 +1,5 @@
+// src/components/dashboard/SelectSistemas/schema.ts
 import { z } from "zod";
-import type { JenkinsSubproject } from "@/types/jenkinsSubproject";
-
-export interface Sistema {
-  id: string;
-  nome: string;
-  zabbixQueryFrontend: string;
-  zabbixQueryBackend: string;
-  zabbixQueryFilasRabbitMQ: string;
-  zabbixQueryJenkinsJob: string;
-  jenkinsSubprojects?: JenkinsSubproject[];
-  azureDevopsProjectName?: string;
-}
 
 const JenkinsSubprojectSchema = z.object({
   label: z.string(),
@@ -25,12 +14,15 @@ export const SistemaSchema = z.object({
   zabbixQueryFilasRabbitMQ: z.string(),
   zabbixQueryJenkinsJob: z.string(),
   jenkinsSubprojects: z.array(JenkinsSubprojectSchema).optional(),
-  azureDevopsProjectName: z.string().optional(),
 });
 
-export const SelectedSistemaSchema = z
-  .string()
-  .min(1, "Selecione um sistema válido")
-  .refine((val) => val !== "invalid", {
-    message: "Opção inválida selecionada",
+export type Sistema = z.infer<typeof SistemaSchema>;
+
+// Schema para validar o valor selecionado
+export const SelectedSistemaSchema = z.string()
+  .nonempty("Selecione um sistema válido")
+  .refine(value => value !== "invalid", {
+    message: "Opção inválida selecionada"
   });
+
+export type SelectedSistema = z.infer<typeof SelectedSistemaSchema>;

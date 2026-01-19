@@ -153,8 +153,8 @@ function containsAnyKnownIdentifier(searchText: string): boolean {
  * Bugs sem identificadores conhecidos aparecem em todos os projetos.
  */
 export function matchesBugToProject(bug: WorkItem, projectIdentifiers: string[]): boolean {
-    const normalizedTitle = normalizeText(bug.title || "");
-    const normalizedTags = normalizeText(bug.tags || "");
+    const normalizedTitle = normalizeText(bug.title ?? "");
+    const normalizedTags = normalizeText(bug.tags ?? "");
 
     // Combina título e tags para busca
     const searchText = `${normalizedTitle} ${normalizedTags}`;

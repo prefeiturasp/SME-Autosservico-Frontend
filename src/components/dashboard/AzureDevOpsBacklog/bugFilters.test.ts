@@ -148,10 +148,10 @@ describe("bugFilters", () => {
             ...overrides,
         });
 
-        it("retorna false para bug sem tags e sem identificador no título", () => {
+        it("retorna true para bug sem tags e sem identificador no título (aparece em todos os projetos)", () => {
             const bug = createBug({ title: "Bug genérico sem identificador", tags: undefined });
             const identifiers = getProjectIdentifiers("Novo SGP");
-            expect(matchesBugToProject(bug, identifiers)).toBe(false);
+            expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
 
         it("faz match por tag", () => {

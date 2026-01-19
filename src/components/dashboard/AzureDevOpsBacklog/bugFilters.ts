@@ -122,20 +122,59 @@ export function identifiersMatch(id1: string, id2: string): boolean {
 }
 
 /**
- * Verifica se um bug pertence a um projeto baseado no título e tags
+ * Retorna todos os identificadores conhecidos de todos os projetos.
+ */
+function getAllKnownIdentifiers(): string[] {
+    const allIdentifiers: string[] = [];
+    for (const identifiers of Object.values(PROJECT_IDENTIFIERS)) {
+        allIdentifiers.push(...identifiers);
+    }
+    return allIdentifiers;
+}
+
+/**
+ * Verifica se o texto contém algum identificador de projeto conhecido.
+ */
+function containsAnyKnownIdentifier(searchText: string): boolean {
+    const allIdentifiers = getAllKnownIdentifiers();
+    const cleanSearchText = searchText.replace(/[-\s]/g, "");
+
+    return allIdentifiers.some((id) => {
+        if (searchText.includes(id)) return true;
+        const cleanId = id.replace(/[-\s]/g, "");
+        if (cleanSearchText.includes(cleanId)) return true;
+        return false;
+    });
+}
+
+/**
+ * Verifica se um bug pertence a um projeto baseado no título e tags.
+ * Busca os identificadores do projeto em qualquer lugar do título ou das tags.
+ * Bugs sem identificadores conhecidos aparecem em todos os projetos.
  */
 export function matchesBugToProject(bug: WorkItem, projectIdentifiers: string[]): boolean {
-    const bugTags = parseTags(bug.tags);
-    const titleIdentifiers = extractTitleIdentifiers(bug.title);
+    const normalizedTitle = normalizeText(bug.title ?? "");
+    const normalizedTags = normalizeText(bug.tags ?? "");
 
-    // Combina tags e identificadores do título
-    const allBugIdentifiers = [...bugTags, ...titleIdentifiers];
+    // Combina título e tags para busca
+    const searchText = `${normalizedTitle} ${normalizedTags}`;
 
-    // Se o bug não tem nenhum identificador, não faz match
-    if (allBugIdentifiers.length === 0) return false;
+    // Bugs sem título e sem tags aparecem em todos os projetos
+    if (searchText.trim().length === 0) return true;
 
-    // Verifica se algum identificador do projeto faz match com algum identificador do bug
-    return projectIdentifiers.some((projectId) =>
-        allBugIdentifiers.some((bugId) => identifiersMatch(projectId, bugId))
-    );
+    // Se o bug não contém nenhum identificador conhecido, aparece em todos os projetos
+    if (!containsAnyKnownIdentifier(searchText)) return true;
+
+    // Verifica se algum identificador do projeto aparece no título ou nas tags
+    const cleanSearchText = searchText.replace(/[-\s]/g, "");
+    return projectIdentifiers.some((projectId) => {
+        // Busca exata do identificador
+        if (searchText.includes(projectId)) return true;
+
+        // Busca sem hífens e espaços
+        const cleanProjectId = projectId.replace(/[-\s]/g, "");
+        if (cleanSearchText.includes(cleanProjectId)) return true;
+
+        return false;
+    });
 }

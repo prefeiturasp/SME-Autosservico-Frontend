@@ -4,15 +4,12 @@ Funcionalidade: Login
   Contexto:
     Dado que eu acesso o sistema
 
-  Esquema do Cenário: Acesso ao sistema "<cenario>"
-    Quando eu insiro o RF "<rf>" e senha "<senha>"
+  Esquema do Cenário: Acesso ao sistema - <cenario>
+    Quando eu informo o RF do tipo "<tipo_rf>" e a senha do tipo "<tipo_senha>"
     E clico no botão de acessar
-    Então o resultado esperado para "<cenario>" deve ser exibido
+    Então o resultado esperado para o cenário "<cenario>" deve ser exibido
 
     Exemplos:
-      | cenario             | rf       | senha      |
-      | Login válido padrão | 6605656  | Sgp5656    |
-      | Login inválido      | 7210418  | Sgp@123    |
-      | Senha em branco     | 7210418  |            |
-      | RF em branco        |          | Sgp@123    |
-
+      | cenario             | tipo_rf      | tipo_senha      |
+      | Login válido padrão | rf_valido    | senha_valida    |
+      | Login inválido      | rf_invalido  | senha_invalida  |

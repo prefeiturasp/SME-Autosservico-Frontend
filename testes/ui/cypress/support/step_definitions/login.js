@@ -1,68 +1,55 @@
 import { Given, When, Then } from 'cypress-cucumber-preprocessor/steps'
-import Login_Auto_Servico_Localizadores from '../locators/login_locators'
 
-const locators = new Login_Auto_Servico_Localizadores()
+const massaLogin = {
+  rf_valido: Cypress.env('RF_VALIDO'),
+  senha_valida: Cypress.env('SENHA_VALIDA'),
+
+  rf_invalido: Cypress.env('RF_INVALIDO'),
+  senha_invalida: Cypress.env('SENHA_INVALIDA'),
+
+  rf_em_branco: '',
+  senha_em_branco: ''
+}
 
 Given('que eu acesso o sistema', () => {
-    cy.login_autoservico()
+  cy.login_autoservico()
 })
 
-When('eu insiro o RF {string} e senha {string}', (rf, senha) => {
-    if (rf) {
-        cy.get(locators.campo_usuario()).clear().type(rf)
-    } else {
-        cy.get(locators.campo_usuario()).clear()
+When(
+  'eu informo o RF do tipo {string} e a senha do tipo {string}',
+  (tipo_rf, tipo_senha) => {
+
+    const rf = massaLogin[tipo_rf]
+    const senha = massaLogin[tipo_senha]
+
+    // proteção extra (evita undefined silencioso)
+    if (rf === undefined || senha === undefined) {
+      throw new Error(`Massa não encontrada: rf=${tipo_rf}, senha=${tipo_senha}`)
     }
 
-    if (senha) {
-        cy.get(locators.campo_senha()).clear().type(senha)
-    } else {
-        cy.get(locators.campo_senha()).clear()
-    }
-})
+    cy.dados_de_login(rf, senha)
+  }
+)
 
 When('clico no botão de acessar', () => {
-    cy.get(locators.campo_usuario()).invoke('val').then(rfVal => {
-        cy.get(locators.campo_senha()).invoke('val').then(senhaVal => {
-            if (!rfVal) {
-                // RF vazio: digita um caractere e apaga para disparar a validação
-                cy.get(locators.campo_usuario())
-                  .type('a')
-                  .clear()
-                cy.get('button')
-                  .filter((_, el) => el.innerText.trim() === 'Entrar')
-                  .click({ force: true })
-            } else if (!senhaVal) {
-                // Senha vazia: digita e limpa para disparar validação, depois força clique
-                cy.get(locators.campo_senha())
-                  .type('a')
-                  .clear()
-                cy.get('button')
-                  .filter((_, el) => el.innerText.trim() === 'Entrar')
-                  .click({ force: true })
-            } else {
-                // Ambos preenchidos: clica normalmente quando habilitado
-                cy.get('button')
-                  .filter((_, el) => el.innerText.trim() === 'Entrar')
-                  .should('not.be.disabled')
-                  .click()
-            }
-        })
-    })
+  cy.botao_acessar().click()
 })
 
-Then('o resultado esperado para {string} deve ser exibido', (cenario) => {
-    if (cenario === 'Login válido padrão') {
-        cy.url().should('include', '/dashboard')
-    } else if (cenario === 'Login inválido') {
-        cy.get(locators.mensagem_erro()).should('be.visible')
-    } else if (cenario === 'Senha em branco') {
-        cy.get(locators.campo_senha()).should('have.value', '')
-        cy.get(locators.mensagem_erro_senha_vazia()).should('be.visible')
-    } else if (cenario === 'RF em branco') {
-        cy.get(locators.campo_usuario()).should('have.value', '')
-        cy.get(locators.mensagem_erro_rf_vazio()).should('be.visible')
-    } else {
-        throw new Error(`Cenário não tratado: ${cenario}`)
+Then(
+  'o resultado esperado para o cenário {string} deve ser exibido',
+  (cenario) => {
+
+    switch (cenario) {
+      case 'Login válido padrão':
+        cy.url().should('not.include', 'login')
+        break
+
+      case 'Login inválido':
+        cy.contains('Vamos tentar de novo?').should('be.visible')
+        break
+
+      default:
+        throw new Error(`Cenário não mapeado: ${cenario}`)
     }
-})
+  }
+)

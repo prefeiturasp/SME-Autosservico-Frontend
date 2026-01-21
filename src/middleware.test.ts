@@ -88,10 +88,10 @@ describe("Middleware de Autenticação", () => {
         mockAuthState = null;
     });
 
+    // Testes para Rotas Protegidas
     describe("Rotas Protegidas", () => {
-        it("deve permitir acesso quando autenticado com token válido", async () => {
-            const futureTime = Math.floor(Date.now() / 1000) + 3600;
-            mockAuthState = { user: { name: "John Doe" }, expires_at: futureTime };
+        it("deve permitir acesso quando autenticado", async () => {
+            mockAuthState = { user: { name: "John Doe" } };
             const req = createMockRequest("/dashboard");
             const ctx = createMockContext();
             const result = await middleware(req, ctx);
@@ -99,33 +99,12 @@ describe("Middleware de Autenticação", () => {
             expect(NextResponse.next).toHaveBeenCalled();
             expect(result).toEqual({ _type: "next" });
         });
-
-        it("deve redirecionar para login quando token expirado", async () => {
-            const pastTime = Math.floor(Date.now() / 1000) - 3600;
-            mockAuthState = { user: { name: "John Doe" }, expires_at: pastTime };
-            const req = createMockRequest("/dashboard");
-            const ctx = createMockContext();
-            await middleware(req, ctx);
-
-            expect(NextResponse.redirect).toHaveBeenCalled();
-            const redirectCall = (NextResponse.redirect as ReturnType<typeof vi.fn>).mock.calls[0][0];
-            expect(redirectCall.toString()).toContain("expired=true");
-        });
-
-        it("deve redirecionar para login quando expires_at não existe", async () => {
-            mockAuthState = { user: { name: "John Doe" } };
-            const req = createMockRequest("/dashboard");
-            const ctx = createMockContext();
-            await middleware(req, ctx);
-
-            expect(NextResponse.redirect).toHaveBeenCalled();
-        });
     });
 
+    // Testes para Redirecionamentos de Login
     describe("Redirecionamentos de Login", () => {
         it("deve redirecionar usuário autenticado para /dashboard ao acessar /", async () => {
-            const futureTime = Math.floor(Date.now() / 1000) + 3600;
-            mockAuthState = { user: { name: "John Doe" }, expires_at: futureTime };
+            mockAuthState = { user: { name: "John Doe" } };
             const req = createMockRequest("/");
             const ctx = createMockContext();
             await middleware(req, ctx);
@@ -137,16 +116,6 @@ describe("Middleware de Autenticação", () => {
 
         it("não deve redirecionar usuário não autenticado em /login", async () => {
             const req = createMockRequest("/login");
-            const ctx = createMockContext();
-            await middleware(req, ctx);
-
-            expect(NextResponse.next).toHaveBeenCalled();
-        });
-
-        it("não deve redirecionar para dashboard se sessão expirada", async () => {
-            const pastTime = Math.floor(Date.now() / 1000) - 3600;
-            mockAuthState = { user: { name: "John Doe" }, expires_at: pastTime };
-            const req = createMockRequest("/");
             const ctx = createMockContext();
             await middleware(req, ctx);
 
@@ -172,8 +141,7 @@ describe("Middleware de Autenticação", () => {
         it.each(publicRoutes)(
             "deve permitir acesso autenticado em %s",
             async (route) => {
-                const futureTime = Math.floor(Date.now() / 1000) + 3600;
-                mockAuthState = { user: { name: "John Doe" }, expires_at: futureTime };
+                mockAuthState = { user: { name: "John Doe" } };
                 const req = createMockRequest(route);
                 const ctx = createMockContext();
                 await middleware(req, ctx);

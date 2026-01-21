@@ -73,8 +73,6 @@ export async function authorizeUser(
     };
 }
 
-const TOKEN_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
-
 export function jwtCallback({ token, user }: { token: JWT; user?: User }): JWT {
     if (user) {
         token.id = user.id;
@@ -84,18 +82,12 @@ export function jwtCallback({ token, user }: { token: JWT; user?: User }): JWT {
         token.situacaoGrupo = user.situacaoGrupo;
         token.visoes = user.visoes;
         token.perfis_por_sistema = user.perfis_por_sistema;
+        // Keycloak fields
         token.groups = user.groups;
         token.given_name = user.given_name;
         token.family_name = user.family_name;
-        token.exp = Math.floor(Date.now() / 1000) + TOKEN_MAX_AGE_SECONDS;
     }
     return token;
-}
-
-export function isTokenExpired(token: JWT | null | undefined): boolean {
-    if (!token?.exp) return true;
-    const currentTime = Math.floor(Date.now() / 1000);
-    return currentTime >= token.exp;
 }
 
 export function sessionCallback({
@@ -112,10 +104,10 @@ export function sessionCallback({
         session.user.situacaoGrupo = token.situacaoGrupo;
         session.user.visoes = token.visoes;
         session.user.perfis_por_sistema = token.perfis_por_sistema;
+        // Keycloak fields
         session.user.groups = token.groups;
         session.user.given_name = token.given_name;
         session.user.family_name = token.family_name;
-        session.expires_at = token.exp;
     }
     return session;
 }

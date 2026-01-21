@@ -1,17 +1,16 @@
 # language: pt
+Funcionalidade: Monitoramento - SME AutoServiço
 
-Funcionalidade: Acessar painel de monitoramento dos sistemas
- Cenário: Acessar o dashboard com sucesso
-    Dado que eu estou na página de login
-    Quando eu insiro o RF "6913261" e senha "Sgp3261"
-    E clico no botão de Entrar
+  Contexto:
+    Dado que eu acesso o sistema
+    Quando eu informo o RF do tipo "rf_valido" e a senha do tipo "senha_valida"
+    E clico no botão de acessar
+    Então o resultado esperado para o cenário "Login válido padrão" deve ser exibido
+
+  Cenário: Acessar o dashboard com sucesso
     Então devo ter acesso ao dashboard
 
- Cenário: Consultar sistema se houver falha
-    Dado que eu estou na página de login
-    Quando eu insiro o RF "6913261" e senha "Sgp3261"
-    E clico no botão de Entrar
-    Então devo ter acesso ao dashboard
-    E clico no menu Acom
-    E seleciono o sistema Portal Educação
+  Cenário: Consultar sistema com possível incidente
+    Quando clico no menu "ASCOM"
+    E seleciono o sistema "Portal Educação"
     Então devo ver se há algum incidente no sistema

@@ -64,7 +64,7 @@ export function SelectSistemas() {
                     <p className="pb-2">
                         Selecione um sistema para visualizar as informações
                     </p>
-                    <div className="w-full pb-3">
+                    <div id="onboarding-select-sistema" className="w-full pb-3">
                         <Select
                             value={selectedValue}
                             onValueChange={(value) => {

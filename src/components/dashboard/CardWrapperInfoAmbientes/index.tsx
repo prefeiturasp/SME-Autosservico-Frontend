@@ -5,18 +5,20 @@ import { cn } from "@/lib/utils";
 import { Lightbulb } from "lucide-react";
 
 type Props = {
+    id?: string;
     title?: string;
     readonly className?: string;
     readonly children: React.ReactNode;
 };
 
 export default function CardWrapperInfoAmbientes({
+    id,
     title = "Disponibilidade do ambiente",
     className,
     children,
 }: Readonly<Props>) {
     return (
-        <Card className={cn("rounded-md shadow-sm gap-3 py-3 px-1", className)}>
+        <Card id={id} className={cn("rounded-md shadow-sm gap-3 py-3 px-1", className)}>
             <CardHeader className="pb-1 px-4 flex items-center justify-between">
                 <CardTitle className="text-lg">
                     {title}

@@ -9,6 +9,8 @@ import {
 import { AppSidebar } from "@/components/dashboard/Sidebar/app-sidebar";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { SelectSistemas } from "@/components/dashboard/SelectSistemas";
+import { WelcomeModal } from "@/components/dashboard/Onboarding/WelcomeModal";
+import { TourOverlay } from "@/components/dashboard/Onboarding/TourOverlay";
 
 export default function DashboardLayout({
     children,
@@ -25,10 +27,14 @@ export default function DashboardLayout({
                 <AppSidebar />
                 <SidebarInset>
                     <SidebarTrigger className="md:hidden" />
-                    <PageHeader />
-                    <SelectSistemas />
+                    <div id="onboarding-header-section">
+                        <PageHeader />
+                        <SelectSistemas />
+                    </div>
                     {children}
                 </SidebarInset>
+                <WelcomeModal />
+                <TourOverlay />
             </SidebarProvider>
         </SessionProvider>
     );

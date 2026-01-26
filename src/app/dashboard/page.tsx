@@ -17,7 +17,7 @@ export default function Dashboard() {
     return (
         <div className="border-b bg-background px-6 py-4">
             <div className="grid grid-cols-4 gap-4 mb-4">
-                <div className="col-span-2">
+                <div id="onboarding-lancamentos" className="col-span-2">
                     <JenkinsJob
                         project={projectName ?? ""}
                         subprojects={jenkinsSubprojects}
@@ -26,6 +26,7 @@ export default function Dashboard() {
             </div>
             <div className="grid grid-cols-4 gap-4 mb-4">
                 <CardWrapperInfoAmbientes
+                    id="onboarding-disponibilidade"
                     title="Disponibilidade do ambiente"
                     className="max-w-sm"
                 >
@@ -36,6 +37,7 @@ export default function Dashboard() {
                 </CardWrapperInfoAmbientes>
 
                 <CardWrapperInfoAmbientes
+                    id="onboarding-saude-servidor"
                     title="Saúde do servidor (Workloads)"
                     className="max-w-sm"
                 >
@@ -54,6 +56,7 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-4 gap-4">
                 <CardWrapperInfoAmbientes
+                    id="onboarding-bugs"
                     title="Bugs"
                     className="col-span-4 gap-2 py-2"
                 >

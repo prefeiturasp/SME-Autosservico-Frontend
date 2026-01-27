@@ -64,7 +64,10 @@ function getWorkItemTypeConfig(workItemType?: string) {
         return { color: "text-[#EF4444]", icon: Bug, label: "HotFix" };
     }
     if (normalized === "bugfix") {
-        return { color: "text-[#3B82F6]", icon: Bug, label: "BugFix" };
+        return { color: "text-[#F97316]", icon: Bug, label: "BugFix" };
+    }
+    if (normalized === "não impeditivo" || normalized === "nao impeditivo") {
+        return { color: "text-[#3B82F6]", icon: Bug, label: "Não Impeditivo" };
     }
     if (normalized.includes("bug")) {
         return { color: "text-[#EF4444]", icon: Bug, label: "Bug" };

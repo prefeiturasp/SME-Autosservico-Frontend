@@ -175,13 +175,13 @@ export default function JenkinsJobCard({
             <Header {...headerProps} />
             
             <div className="space-y-3">
-                <div className="bg-[#F5F5F5] rounded-[5px] p-4 flex items-center gap-3">
-                    <Clock className="w-6 h-6 text-[#3B82F6] flex-shrink-0" />
+                <div className="bg-[#DCFCE7] rounded-[5px] p-4 flex items-center gap-3">
+                    <Clock className="w-6 h-6 text-[#22C55E] flex-shrink-0" />
                     <div>
                         <div className="font-bold text-[14px] text-[#111827]">
                             v{lastReleasedVersion.number}
                         </div>
-                        <div className="text-[12px] text-[#6B7280]">
+                        <div className="text-[12px] text-[#166534]">
                             Realizado em: {lastReleasedVersion.timestamp}
                         </div>
                     </div>

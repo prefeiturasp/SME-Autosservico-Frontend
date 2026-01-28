@@ -81,4 +81,24 @@ describe("<WelcomeModal />", () => {
         expect(screen.getByText(/preparamos um pequeno tour/i)).toBeInTheDocument();
         expect(screen.getByText(/vamos iniciar\?/i)).toBeInTheDocument();
     });
+
+    it("deve exibir o botão de fechar (X)", () => {
+        useOnboardingStore.setState({ isWelcomeModalOpen: true });
+
+        render(<WelcomeModal />);
+
+        expect(screen.getByRole("button", { name: /fechar/i })).toBeInTheDocument();
+    });
+
+    it("deve fechar o modal ao clicar no botão X", () => {
+        useOnboardingStore.setState({ isWelcomeModalOpen: true });
+
+        render(<WelcomeModal />);
+
+        const closeButton = screen.getByRole("button", { name: /fechar/i });
+        fireEvent.click(closeButton);
+
+        const state = useOnboardingStore.getState();
+        expect(state.isWelcomeModalOpen).toBe(false);
+    });
 });

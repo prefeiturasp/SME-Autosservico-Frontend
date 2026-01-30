@@ -19,6 +19,7 @@ pipeline {
         ALLURE_PATH = 'testes/ui/allure-results'
         WORKSPACE_DIR = "${env.WORKSPACE}"
         CYPRESS_CACHE_FOLDER = '/root/.cache/Cypress'
+        CI = 'true'
     }
 
     stages {
@@ -36,43 +37,48 @@ pipeline {
                         credentialsId: 'jenkins_registry',
                         url: 'https://registry.sme.prefeitura.sp.gov.br/repository/sme-registry/'
                     ) {
-                        sh '''
-                            docker pull registry.sme.prefeitura.sp.gov.br/devops/cypress-agent:14.5.2
+                        withCredentials([
+                            file(credentialsId: 'cypress_env_autosservico', variable: 'ENV_FILE')
+                        ]) {
+                            sh '''
+                                echo "📁 Preparando variáveis de ambiente"
+                                mkdir -p tests/api
+                                cp "$ENV_FILE" tests/api/.env
 
-                            docker run --rm \
-                              -e CI=true \
-                              -e CYPRESS_CACHE_FOLDER=/root/.cache/Cypress \
-                              -v "$WORKSPACE/testes/ui:/app" \
-                              -v "$WORKSPACE/.cache:/root/.cache" \
-                              -w /app \
-                              registry.sme.prefeitura.sp.gov.br/devops/cypress-agent:14.5.2 \
-                              sh -c "
-                                echo '📦 Limpando dependências antigas...' &&
-                                rm -rf node_modules package-lock.json &&
+                                docker pull registry.sme.prefeitura.sp.gov.br/devops/cypress-agent:14.5.2
 
-                                echo '📦 Instalando dependências (npm ci)...' &&
-                                npm ci &&
+                                docker run --rm \
+                                  -e CI=true \
+                                  -e CYPRESS_CACHE_FOLDER=/root/.cache/Cypress \
+                                  -v "$WORKSPACE/testes/ui:/app" \
+                                  -v "$WORKSPACE/.cache:/root/.cache" \
+                                  -w /app \
+                                  registry.sme.prefeitura.sp.gov.br/devops/cypress-agent:14.5.2 \
+                                  sh -c "
+                                    echo '🧹 Limpando ambiente...' &&
+                                    rm -rf node_modules package-lock.json allure-results &&
 
-                                echo '🧪 Executando Cypress em modo headless (CI)...' &&
-                                npx cypress-cloud run \
-                                  --browser chrome \
-                                  --headless \
-                                  --record \
-                                  --key somekey \
-                                  --ci-build-id SME-AUTOSSERVICO_JENKINS-${BUILD_NUMBER} \
-                                  --config viewportWidth=1920,viewportHeight=1080,video=false &&
+                                    echo '📦 Instalando dependências (npm ci)...' &&
+                                    npm ci &&
 
-                                echo '🔐 Ajustando permissões...' &&
-                                chown -R 1001:1001 . &&
-                                chmod -R 777 .
-                              "
-                        '''
+                                    echo '🧪 Executando Cypress (headless)...' &&
+                                    npx cypress run \
+                                      --browser chrome \
+                                      --headless \
+                                      --config viewportWidth=1920,viewportHeight=1080,video=false &&
+                                      
+                                    echo '🔐 Ajustando permissões...' &&
+                                    chown -R 1001:1001 . &&
+                                    chmod -R 777 .
+                                  "
+                            '''
+                        }
                     }
 
-                    echo "✅ Execução do Cypress finalizada."
+                    echo "✅ Testes Cypress finalizados."
 
                     def logText = currentBuild.rawBuild.getLog(50).join('\n')
-                    def match = logText =~ /Recorded Run:\\s*(https?:\\/\\/\\S+)/
+                    def match = logText =~ /Recorded Run:\s*(https?:\/\/\S+)/
                     if (match) {
                         env.CYPRESS_RUN_URL = match[0][1]
                     }
@@ -144,15 +150,15 @@ pipeline {
 }
 
 /* ===============================
-   FUNÇÃO TELEGRAM
+   TELEGRAM
    =============================== */
 def sendTelegram(message) {
 
     def messageTemplate = (
-        "<b>Job:</b> <a href='${JOB_URL}'>${JOB_NAME}</a>\\n\\n" +
-        "<b>Status:</b> ${message}\\n" +
-        "<b>Build:</b> ${BUILD_DISPLAY_NAME}\\n" +
-        "<b>Cypress:</b> <a href='${env.CYPRESS_RUN_URL}'>Dashboard</a>\\n" +
+        "<b>Job:</b> <a href='${JOB_URL}'>${JOB_NAME}</a>\n\n" +
+        "<b>Status:</b> ${message}\n" +
+        "<b>Build:</b> ${BUILD_DISPLAY_NAME}\n" +
+        "<b>Cypress:</b> <a href='${env.CYPRESS_RUN_URL}'>Dashboard</a>\n" +
         "<b>Log:</b> <a href='${env.BUILD_URL}console'>Console</a>"
     )
 

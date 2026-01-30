@@ -50,10 +50,11 @@ module.exports = defineConfig({
       // =====================
       // ENV (LOGIN)
       // =====================
-      enhancedConfig.env.RF_VALIDO = process.env.CYPRESS_RF_VALIDO
-      enhancedConfig.env.SENHA_VALIDA = process.env.CYPRESS_SENHA_VALIDA
-      enhancedConfig.env.RF_INVALIDO = process.env.CYPRESS_RF_INVALIDO
-      enhancedConfig.env.SENHA_INVALIDA = process.env.CYPRESS_SENHA_INVALIDA
+      enhancedConfig.env.RF_VALIDO = process.env.RF_VALIDO
+      enhancedConfig.env.SENHA_VALIDA = process.env.SENHA_VALIDA
+      enhancedConfig.env.RF_INVALIDO = process.env.RF_INVALIDO
+      enhancedConfig.env.SENHA_INVALIDA = process.env.SENHA_INVALIDA
+
 
       // =====================
       // ENV (DB)

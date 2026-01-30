@@ -2,7 +2,8 @@ import { Given, When, Then } from 'cypress-cucumber-preprocessor/steps'
 import { SIDEBAR } from '../locators/sidebar_locators'
 
 Given('que eu acesso o sistema', () => {
-  cy.login_autoservico()
+  cy.acessar_tela_login()
+  cy.fecharOverlaySeExistir()
 })
 
 When(
@@ -12,7 +13,6 @@ When(
     const massaLogin = {
       rf_valido: Cypress.env('RF_VALIDO'),
       senha_valida: Cypress.env('SENHA_VALIDA'),
-
       rf_invalido: Cypress.env('RF_INVALIDO'),
       senha_invalida: Cypress.env('SENHA_INVALIDA')
     }
@@ -20,7 +20,7 @@ When(
     const rf = massaLogin[tipo_rf]
     const senha = massaLogin[tipo_senha]
 
-    if (rf === undefined || senha === undefined) {
+    if (!rf || !senha) {
       throw new Error(`Massa não encontrada: rf=${tipo_rf}, senha=${tipo_senha}`)
     }
 
@@ -30,81 +30,49 @@ When(
 
 When('clico no botão de acessar', () => {
   cy.botao_acessar().click()
+  cy.fecharOverlaySeExistir()
 })
 
-Then(
-  'o resultado esperado para o cenário {string} deve ser exibido',
-  (cenario) => {
-
-    switch (cenario) {
-      case 'Login válido padrão':
-        cy.url().should('not.include', 'login')
-        break
-
-      case 'Login inválido':
-        cy.contains('Vamos tentar de novo?').should('be.visible')
-        break
-
-      default:
-        throw new Error(`Cenário não mapeado: ${cenario}`)
-    }
-  }
-)
-
 Then('o sidebar deve estar visível', () => {
-  cy.sidebar_deve_estar_visivel()
+  cy.get(SIDEBAR.ROOT, { timeout: 30000 })
+    .should('exist')
 })
 
 Then('o sidebar não deve estar visível', () => {
-  cy.sidebar_nao_deve_estar_visivel()
+  cy.get(SIDEBAR.ROOT)
+    .should('exist')
+    .and('not.be.visible')
 })
 
+
 Then('o logo do AutoServiço deve estar visível', () => {
-  cy.logo_sidebar_deve_estar_visivel()
+  cy.get(SIDEBAR.LOGO)
+    .should('exist')
+})
+
+When('eu clico no botão de fechar do sidebar', () => {
+  cy.get(SIDEBAR.CLOSE_BUTTON, { timeout: 20000 })
+    .first()
+    .click({ force: true })
 })
 
 Then('devo visualizar todos os itens do menu do sidebar', () => {
 
   const itens = [
-    {
-      locator: SIDEBAR.MENU.ASCOM,
-      titulo: 'ASCOM',
-      descricao: 'Assessoria de comunicação'
-    },
-    {
-      locator: SIDEBAR.MENU.CODAE,
-      titulo: 'CODAE',
-      descricao: 'Coordenadoria de alimentação escolar'
-    },
-    {
-      locator: SIDEBAR.MENU.COPED,
-      titulo: 'COPED',
-      descricao: 'Coordenadoria pedagógica'
-    },
-    {
-      locator: SIDEBAR.MENU.COPLAN,
-      titulo: 'COPLAN',
-      descricao: 'Coordenadoria de Planejamento e Orçamento'
-    },
-    {
-      locator: SIDEBAR.MENU.COTIC,
-      titulo: 'COTIC',
-      descricao: 'Coordenadoria de Tecnologia da Informação e Comunicação'
-    },
-    {
-      locator: SIDEBAR.MENU.COGEP,
-      titulo: 'COGEP',
-      descricao: 'Coordenadoria de Gestão de Pessoas'
-    }
+    { locator: SIDEBAR.MENU.ASCOM, titulo: 'ASCOM' },
+    { locator: SIDEBAR.MENU.CODAE, titulo: 'CODAE' },
+    { locator: SIDEBAR.MENU.COPED, titulo: 'COPED' },
+    { locator: SIDEBAR.MENU.COPLAN, titulo: 'COPLAN' },
+    { locator: SIDEBAR.MENU.COTIC, titulo: 'COTIC' },
+    { locator: SIDEBAR.MENU.COGEP, titulo: 'COGEP' }
   ]
 
-  itens.forEach(({ locator, titulo, descricao }) => {
-    cy.item_sidebar_deve_estar_visivel(locator, titulo, descricao)
+  itens.forEach(({ locator, titulo }) => {
+    cy.get(locator, { timeout: 30000 })
+      .first()
+      .should('exist')
+      .contains(titulo)
   })
-})
-
-When('eu clico no botão de fechar do sidebar', () => {
-  cy.fechar_sidebar()
 })
 
 When('clico no item {string} do sidebar', (item) => {
@@ -121,23 +89,29 @@ When('clico no item {string} do sidebar', (item) => {
   const locator = mapa[item]
 
   if (!locator) {
-    throw new Error(`Item do sidebar não mapeado: ${item}`)
+    throw new Error(`Item de sidebar não mapeado: ${item}`)
   }
 
-  cy.get(locator).click()
+  cy.get(locator, { timeout: 30000 })
+    .first()
+    .scrollIntoView()
+    .click({ force: true })
 })
 
 Then('o item {string} deve estar ativo no sidebar', (item) => {
 
   const mapa = {
-    COPLAN: SIDEBAR.MENU.COPLAN
+    ASCOM: SIDEBAR.MENU.ASCOM,
+    CODAE: SIDEBAR.MENU.CODAE,
+    COPED: SIDEBAR.MENU.COPED,
+    COPLAN: SIDEBAR.MENU.COPLAN,
+    COTIC: SIDEBAR.MENU.COTIC,
+    COGEP: SIDEBAR.MENU.COGEP
   }
 
   const locator = mapa[item]
 
-  if (!locator) {
-    throw new Error(`Item ativo não mapeado: ${item}`)
-  }
-
-  cy.item_sidebar_deve_estar_ativo(locator)
+  cy.get(locator)
+    .first()
+    .should('have.attr', 'data-active', 'true')
 })

@@ -35,7 +35,7 @@
     "cypress-plugin-steps": "^1.1.1",
     "cypress-postgresql": "^1.0.8",
     "cypress-xpath": "^2.0.1",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.6.1",
     "esbuild": "^0.25.2",
     "json-loader": "^0.5.7",
     "mocha-allure-reporter": "^1.4.0",

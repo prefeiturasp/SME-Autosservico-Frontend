@@ -10,6 +10,6 @@ Funcionalidade: Login
     Então o resultado esperado para o cenário "<cenario>" deve ser exibido
 
     Exemplos:
-      | cenario             | tipo_rf      | tipo_senha      |
-      | Login válido padrão | rf_valido    | senha_valida    |
-      | Login inválido      | rf_invalido  | senha_invalida  |
+      | cenario             | tipo_rf     | tipo_senha     |
+      | Login válido padrão | rf_valido   | senha_valida   |
+      | Login inválido      | rf_invalido | senha_invalida |

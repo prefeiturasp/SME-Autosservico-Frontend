@@ -32,8 +32,8 @@ pipeline {
                     withDockerRegistry(credentialsId: 'jenkins_registry', url: 'https://registry.sme.prefeitura.sp.gov.br/repository/sme-registry/') {
                         withCredentials([file(credentialsId: "cypress_env_autosservico", variable: 'env')]){   
                             sh '''
-                                touch tests/api/.env
-                                cp "$env" "tests/api/.env"
+                                touch testes/ui/.env
+                                cp "$env" "testes/ui/.env"
                                 docker pull registry.sme.prefeitura.sp.gov.br/devops/cypress-agent:14.5.2
                                 docker run \
                                     --rm \

@@ -30,29 +30,33 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'jenkins_registry', url: 'https://registry.sme.prefeitura.sp.gov.br/repository/sme-registry/') {
-                        sh '''
-                            docker pull registry.sme.prefeitura.sp.gov.br/devops/cypress-agent:14.5.2
-                            docker run \
-                                --rm \
-                                -v "$WORKSPACE/testes/ui:/app" \
-                                -w /app \
-                                registry.sme.prefeitura.sp.gov.br/devops/cypress-agent:14.5.2 \
-                                sh -c "rm -rf allure-results && \
-                                       npm install && \
-                                       npm install cypress@14.5.2 cypress-cloud@beta \
-                                       @shelex/cypress-allure-plugin allure-mocha crypto-js@4.1.1 --save-dev && \
-                                       npx cypress-cloud run \
-                                            --parallel \
-                                            --browser chrome \
-                                            --headed true \
-                                            --record \
-                                            --key somekey \
-                                            --reporter mocha-allure-reporter \
-                                            --reporter-options reportDir=allure-results \
-                                            --ci-build-id SME-AUTOSSERVICO_JENKINS-BUILD-${BUILD_NUMBER} && \
-                                       chown 1001:1001 * -R && \
-                                       chmod 777 * -R"
-                        '''
+                        withCredentials([file(credentialsId: "cypress_env_autosservico", variable: 'env')]){   
+                            sh '''
+                                touch tests/api/.env
+                                cp "$env" "tests/api/.env"
+                                docker pull registry.sme.prefeitura.sp.gov.br/devops/cypress-agent:14.5.2
+                                docker run \
+                                    --rm \
+                                    -v "$WORKSPACE/testes/ui:/app" \
+                                    -w /app \
+                                    registry.sme.prefeitura.sp.gov.br/devops/cypress-agent:14.5.2 \
+                                    sh -c "rm -rf allure-results && \
+                                        npm install && \
+                                        npm install cypress@14.5.2 cypress-cloud@beta \
+                                        @shelex/cypress-allure-plugin allure-mocha crypto-js@4.1.1 --save-dev && \
+                                        npx cypress-cloud run \
+                                                --parallel \
+                                                --browser chrome \
+                                                --headed true \
+                                                --record \
+                                                --key somekey \
+                                                --reporter mocha-allure-reporter \
+                                                --reporter-options reportDir=allure-results \
+                                                --ci-build-id SME-AUTOSSERVICO_JENKINS-BUILD-${BUILD_NUMBER} && \
+                                        chown 1001:1001 * -R && \
+                                        chmod 777 * -R"
+                            '''
+                        }
                     }
                     echo "Testes Cypress finalizados."
                     def logText = currentBuild.rawBuild.getLog(20).join('\n')

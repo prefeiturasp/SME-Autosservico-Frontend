@@ -14,7 +14,7 @@ const squads: Record<string, Sistema[]> = {
         { id: "7", nome: "Sigla", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-SIGLA/master", azureDevopsProjectName: "COGEP - Recursos Humanos" },
     ],
     CODAE: [
-        { id: "8", nome: "SigPAE", zabbixQueryFrontend: "PRD - SIGPAE", zabbixQueryBackend: "PRD - SIGPAE - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-SIGPAE/master", azureDevopsProjectName: "CODAE - Alimentação" },
+        { id: "8", nome: "SigPAE", zabbixQueryFrontend: "PRD - SIGPAE", zabbixQueryBackend: "PRD - SIGPAE - API", zabbixQueryFilasRabbitMQ: "PRD - Celery Sigpae", zabbixQueryJenkinsJob: "SME-SIGPAE/master", azureDevopsProjectName: "CODAE - Alimentação" },
         { id: "9", nome: "Rolê Agroecológico", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-RoleAgroecologico/master", azureDevopsProjectName: "CODAE - Alimentação" },
     ],
     COPED: [
@@ -26,7 +26,7 @@ const squads: Record<string, Sistema[]> = {
         { id: "15", nome: "IDEP", zabbixQueryFrontend: "PRD - Idep", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-IDEP/master", azureDevopsProjectName: "COPED - Pedagógico" },
         { id: "16", nome: "Conecta Formação", zabbixQueryFrontend: "PRD - Conecta Formacao", zabbixQueryBackend: "PRD - Conecta Formacao - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-ConectaFormacao/master", azureDevopsProjectName: "EMFORPEF - Formação" },
     ],
-    COPLAN: [{ id: "17", nome: "SigEscola", zabbixQueryFrontend: "PRD - PTRF - SIG Escola", zabbixQueryBackend: "PRD - PTRF - SIG Escola - API", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-SigEscola/master", azureDevopsProjectName: "COPLAN - PTRF" }],
+    COPLAN: [{ id: "17", nome: "SigEscola", zabbixQueryFrontend: "PRD - PTRF - SIG Escola", zabbixQueryBackend: "PRD - PTRF - SIG Escola - API", zabbixQueryFilasRabbitMQ: "PRD - Celery PTRF", zabbixQueryJenkinsJob: "SME-SigEscola/master", azureDevopsProjectName: "COPLAN - PTRF" }],
     COTIC: [{ id: "18", nome: "Autosserviço", zabbixQueryFrontend: "PRD - AUTOSSERVICO", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Autosservico-Frontend/master", azureDevopsProjectName: "COTIC - Auto Serviço" }],
     GIPE: [{ id: "19", nome: "GIPE", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-GIPE/master", azureDevopsProjectName: "GIPE - Desenvolvimento" }],
 };

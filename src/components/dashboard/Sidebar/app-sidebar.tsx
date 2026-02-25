@@ -51,13 +51,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         });
     }, [setActiveItem]);
 
-    // Mostrar loading enquanto não tem dados
     if (allowedItems.length === 0) {
         return (
             <Sidebar collapsible="icon" data-testid="sidebar-root" {...props} className="m-2">
                 <SidebarContent>
-                    <div className="p-4">Carregando...</div>
+                    <div className="p-4 text-sm text-gray-500">
+                        Nenhuma coordenadoria disponível para o seu perfil.
+                    </div>
                 </SidebarContent>
+                <SidebarFooter>
+                    <SignOutButton
+                        variant="link"
+                        className="[&_svg]:size-7 text-white no-underline hover:no-underline justify-end"
+                    >
+                        <span>Sair</span> <LogoutIcon />
+                    </SignOutButton>
+                </SidebarFooter>
             </Sidebar>
         );
     }

@@ -22,7 +22,6 @@ export async function authorizeUser(
         senha: credentials.password as string,
     }, loginVersion);
 
-    console.log("XXXXXXXXXXXxx Login response:", loginResponse);
     if (loginResponse.status === 401 || (!loginResponse.nome && loginResponse.detail)) {
         throw new Error(PERFIL_NOT_FOUND_ERROR_MESSAGE);
     }
@@ -87,8 +86,9 @@ export function jwtCallback({ token, user }: { token: JWT; user?: User }): JWT {
         token.groups = user.groups;
         token.given_name = user.given_name;
         token.family_name = user.family_name;
-        token.exp = Math.floor(Date.now() / 1000) + TOKEN_MAX_AGE_SECONDS;
     }
+
+    token.exp = Math.floor(Date.now() / 1000) + TOKEN_MAX_AGE_SECONDS;
     return token;
 }
 

@@ -2,6 +2,7 @@
 import CardWrapperInfoAmbientes from "@/components/dashboard/CardWrapperInfoAmbientes";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
 import Filas from "@/components/dashboard/SaudeDosServidores/Filas";
+import DatabaseStatusCard from "@/components/dashboard/DatabaseStatusCard";
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
 import AzureDevOpsBacklog from "@/components/dashboard/AzureDevOpsBacklog";
 import useDashboardStore from "@/states/dashboard";
@@ -73,6 +74,20 @@ export default function Dashboard() {
                         className="bg-[#F5F5F5] p-3"
                         projectName={projectNameBackEnd ?? ""}
                     />
+                </CardWrapperInfoAmbientes>
+
+                <CardWrapperInfoAmbientes
+                    id="onboarding-banco-dados"
+                    title="Banco de dados"
+                    className="max-w-sm"
+                    tooltipContent={
+                        <p>
+                            Essa seção monitora o estado de saúde e disponibilidade
+                            dos bancos de dados utilizados pelo sistema.
+                        </p>
+                    }
+                >
+                    <DatabaseStatusCard systemName={projectName ?? ""} className="bg-[#F5F5F5] p-3" />
                 </CardWrapperInfoAmbientes>
             </div>
 

@@ -14,8 +14,9 @@ type Props = {
 
 function InstanceBadge({ instance }: { readonly instance: DatabaseInstanceStatus }) {
   const available = instance.available;
+  const roleLabel = instance.role === "escrita" ? "Escrita" : "Leitura";
   const title = instance.role
-    ? `Banco de dados principal (${instance.role === "escrita" ? "Escrita" : "Leitura"})`
+    ? `Banco de dados principal (${roleLabel})`
     : "Banco de dados principal";
 
   return (

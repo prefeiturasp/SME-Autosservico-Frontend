@@ -63,6 +63,13 @@ vi.mock("@/components/dashboard/JenkinsJob", () => ({
   ),
 }));
 
+vi.mock("@/components/dashboard/DatabaseStatusCard", () => ({
+  __esModule: true,
+  default: ({ systemName }: { systemName?: string }) => (
+    <div data-testid="database-status-card">{systemName ?? ""}</div>
+  ),
+}));
+
 describe("Dashboard page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -93,6 +100,9 @@ describe("Dashboard page", () => {
 
     // Jenkins (não está envolto em CardWrapperInfoAmbientes)
     expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("Novo SGP::0");
+
+    // Banco de dados
+    expect(screen.getByTestId("database-status-card")).toHaveTextContent("Novo SGP");
   });
 
   test("quando não há projeto ativo, passa strings vazias para os filhos (ramo do ??)", () => {
@@ -104,6 +114,7 @@ describe("Dashboard page", () => {
     expect(screen.getByTestId("producao-API Service")).toHaveTextContent("");
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent("");
     expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("::0");
+    expect(screen.getByTestId("database-status-card")).toHaveTextContent("");
   });
 
   test("trima os nomes antes de passar (ramo do ?.trim())", () => {

@@ -82,8 +82,8 @@ export default function Dashboard() {
                     className="max-w-sm"
                     tooltipContent={
                         <p>
-                            Essa seção monitora o estado de saúde e disponibilidade
-                            dos bancos de dados utilizados pelo sistema.
+                            Nesta seção você acompanhará a comunicação do sistema com
+                            os bancos de dados e informações das aplicações.
                         </p>
                     }
                 >

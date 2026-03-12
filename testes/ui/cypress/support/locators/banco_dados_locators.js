@@ -16,6 +16,10 @@ class Banco_Dados_Localizadores {
 
   botao_ascom = 'span[data-testid="sidebar-button-ascom"]'
 
+  botao_coped = 'span[data-testid="sidebar-button-coped"]'
+
+  botao_cogep = 'span[data-testid="sidebar-button-cogep"]'
+
   select_sistema = '#onboarding-select-sistema button'
 
 }

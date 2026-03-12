@@ -14,6 +14,8 @@ When('clico no menu lateral {string}', (menu) => {
   const menuMap = {
     'ASCOM': locators.botao_ascom,
     'COTIC': locators.botao_cotic,
+    'COPED': locators.botao_coped,
+    'COGEP': locators.botao_cogep,
   }
 
   const seletor = menuMap[menu]

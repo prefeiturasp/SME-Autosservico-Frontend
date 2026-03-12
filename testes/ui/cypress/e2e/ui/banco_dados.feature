@@ -13,15 +13,15 @@ Funcionalidade: Banco de dados - SME AutoServiço
   Cenário: Exibir status do banco ao selecionar sistema com MySQL
     Quando clico no menu lateral "ASCOM"
     E seleciono o sistema "Portal Educação" no select
-    Então devo ver o título "Banco de dados principal" no card de banco de dados
+    Então devo ver o título "Banco de dados" no card de banco de dados
     E devo ver o badge de status no card de banco de dados
 
   Cenário: Exibir duas instâncias ao selecionar sistema com escrita e leitura
-    Quando clico no menu lateral "COTIC"
+    Quando clico no menu lateral "COPED"
     E seleciono o sistema "Novo SGP" no select
     Então devo ver 2 badges de status no card de banco de dados
 
   Cenário: Exibir mensagem para sistema sem banco de dados
-    Quando clico no menu lateral "COTIC"
+    Quando clico no menu lateral "COGEP"
     E seleciono o sistema "Escolhas" no select
     Então devo ver a mensagem "Sem banco de dados" no card

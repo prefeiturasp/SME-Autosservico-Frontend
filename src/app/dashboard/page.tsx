@@ -81,10 +81,17 @@ export default function Dashboard() {
                     title="Banco de dados"
                     className="max-w-sm"
                     tooltipContent={
-                        <p>
-                            Nesta seção você acompanhará a comunicação do sistema com
-                            os bancos de dados e informações das aplicações.
-                        </p>
+                        <>
+                            <p className="mb-4">
+                                Essa seção acompanha a comunicação do sistema com
+                                os bancos de dados e informações das aplicações.
+                            </p>
+                            <p>
+                                Visa garantir que o banco esteja funcionando bem,
+                                acessível e respondendo corretamente às consultas
+                                das aplicações.
+                            </p>
+                        </>
                     }
                 >
                     <DatabaseStatusCard systemName={projectName ?? ""} className="bg-[#F5F5F5] p-3" />

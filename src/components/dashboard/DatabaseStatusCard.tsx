@@ -22,7 +22,9 @@ function InstanceBadge({ instance }: { readonly instance: DatabaseInstanceStatus
   return (
     <div className="mb-2 last:mb-0 text-center">
       <div className="font-semibold text-xl">{title}</div>
-      <div className="text-sm text-muted-foreground">Sem incidentes recentes</div>
+      {available && (
+        <div className="text-sm text-muted-foreground">Sem incidentes recentes</div>
+      )}
       <div
         className={cn(
           "mt-1 h-6 w-full rounded-full px-2",

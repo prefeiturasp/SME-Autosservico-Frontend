@@ -27,17 +27,17 @@ describe("fetchDatabaseStatus", () => {
     expect(result.instances).toEqual([]);
   });
 
-  it("MySQL com lastvalue '1' → available: false (hardcoded para teste)", async () => {
+  it("MySQL com lastvalue '1' → available: true", async () => {
     mockZabbixRpc.mockResolvedValueOnce([{ itemid: "1", lastvalue: "1" }]);
 
     const result = await fetchDatabaseStatus("Portal Educação");
     expect(result.hasDatabase).toBe(true);
     expect(result.instances).toHaveLength(1);
-    expect(result.instances[0].available).toBe(false);
+    expect(result.instances[0].available).toBe(true);
     expect(result.instances[0].dbType).toBe("mysql");
   });
 
-  it("MySQL com lastvalue '0' → available: false (hardcoded para teste)", async () => {
+  it("MySQL com lastvalue '0' → available: false", async () => {
     mockZabbixRpc.mockResolvedValueOnce([{ itemid: "1", lastvalue: "0" }]);
 
     const result = await fetchDatabaseStatus("Portal Educação");

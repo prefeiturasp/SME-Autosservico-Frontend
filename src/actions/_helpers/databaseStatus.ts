@@ -28,8 +28,7 @@ export async function fetchDatabaseStatus(systemName: string): Promise<DatabaseS
           output: ["itemid", "lastvalue"],
         });
 
-        const lastvalue =
-          cfg.dbType === "mysql" ? "0" : (items?.[0]?.lastvalue ?? "");
+        const lastvalue = items?.[0]?.lastvalue ?? "";
         return {
           label: cfg.label,
           dbType: cfg.dbType,

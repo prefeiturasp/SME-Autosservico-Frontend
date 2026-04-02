@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { SelectSistemas } from "@/components/dashboard/SelectSistemas";
 import { WelcomeModal } from "@/components/dashboard/Onboarding/WelcomeModal";
 import { TourOverlay } from "@/components/dashboard/Onboarding/TourOverlay";
+import { SessionGuard } from "@/components/dashboard/SessionGuard";
 
 export default function DashboardLayout({
     children,
@@ -23,19 +24,21 @@ export default function DashboardLayout({
             refetchOnWindowFocus={false}
             refetchWhenOffline={false}
         >
-            <SidebarProvider>
-                <AppSidebar />
-                <SidebarInset>
-                    <SidebarTrigger className="md:hidden" />
-                    <div id="onboarding-header-section">
-                        <PageHeader />
-                        <SelectSistemas />
-                    </div>
-                    {children}
-                </SidebarInset>
-                <WelcomeModal />
-                <TourOverlay />
-            </SidebarProvider>
+            <SessionGuard>
+                <SidebarProvider>
+                    <AppSidebar />
+                    <SidebarInset>
+                        <SidebarTrigger className="md:hidden" />
+                        <div id="onboarding-header-section">
+                            <PageHeader />
+                            <SelectSistemas />
+                        </div>
+                        {children}
+                    </SidebarInset>
+                    <WelcomeModal />
+                    <TourOverlay />
+                </SidebarProvider>
+            </SessionGuard>
         </SessionProvider>
     );
 }

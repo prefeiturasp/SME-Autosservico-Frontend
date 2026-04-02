@@ -57,6 +57,15 @@ export const TOUR_STEPS: TourStep[] = [
         centered: true,
     },
     {
+        id: "banco-dados",
+        targetId: "onboarding-banco-dados",
+        title: "Banco de dados",
+        description:
+            "Essa seção acompanha a comunicação do sistema com os bancos de dados e informações das aplicações. Visa garantir que o banco esteja funcionando bem, acessível e respondendo corretamente às consultas das aplicações.",
+        placement: "right",
+        centered: true,
+    },
+    {
         id: "bugs",
         targetId: "onboarding-bugs",
         title: "Bugs",

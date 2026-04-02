@@ -225,11 +225,13 @@ describe("auth/logic", () => {
         expect(typeof out.exp).toBe("number");
     });
 
-    it("jwtCallback retorna token inalterado quando user ausente", () => {
+    it("jwtCallback renova exp mesmo quando user ausente (sliding session)", () => {
         const token: JWT = { foo: "bar" } as unknown as JWT;
         const out = jwtCallback({ token });
         expect(out).toBe(token);
         expect((out as Record<string, unknown>).foo).toBe("bar");
+        expect(out.exp).toBeDefined();
+        expect(typeof out.exp).toBe("number");
     });
 
     // ---------- sessionCallback ----------

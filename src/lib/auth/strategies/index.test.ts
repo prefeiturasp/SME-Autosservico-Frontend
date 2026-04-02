@@ -7,12 +7,14 @@ vi.mock("@/lib/axios", () => ({
     autenticaCoreSSO: { post: vi.fn() },
     autenticaKeycloak: { post: vi.fn() },
 }));
-vi.mock("../../utils", () => ({
-    decodeJwt: vi.fn(() => ({ name: "Nome", preferred_username: "user", groups: ["G1"] })),
+
+const mockJwtVerify = vi.fn();
+vi.mock("jose", () => ({
+    createRemoteJWKSet: vi.fn(() => "mock-jwks"),
+    jwtVerify: (...args: unknown[]) => mockJwtVerify(...args),
 }));
 
 import { autenticaCoreSSO, autenticaKeycloak } from "@/lib/axios";
-import { decodeJwt } from "../../utils";
 
 describe("loginCoreSSO", () => {
     const OLD_ENV = process.env;
@@ -123,9 +125,11 @@ describe("loginKeycloak", () => {
         await expect(loginKeycloak({ login: "a", senha: "b" })).rejects.toThrow();
     });
 
-    it("retorna payload decodificado e token em caso de sucesso", async () => {
+    it("retorna payload verificado com assinatura válida e token em caso de sucesso", async () => {
         vi.mocked(autenticaKeycloak.post).mockResolvedValueOnce({ data: { access_token: "tok123" } });
-        vi.mocked(decodeJwt).mockReturnValueOnce({ name: "Nome", preferred_username: "user", groups: ["G1"] });
+        mockJwtVerify.mockResolvedValueOnce({
+            payload: { name: "Nome", preferred_username: "user", groups: ["G1"] },
+        });
         const resp = await loginKeycloak({ login: "a", senha: "b" });
         expect(resp).toMatchObject({ name: "Nome", preferred_username: "user", groups: ["G1"], keycloakToken: "tok123" });
         expect(autenticaKeycloak.post).toHaveBeenCalledWith(
@@ -133,6 +137,7 @@ describe("loginKeycloak", () => {
             expect.any(URLSearchParams),
             expect.objectContaining({ headers: { "Content-Type": "application/x-www-form-urlencoded" } })
         );
+        expect(mockJwtVerify).toHaveBeenCalledWith("tok123", "mock-jwks");
     });
 
     it("retorna status e detail em erro AxiosError com response", async () => {

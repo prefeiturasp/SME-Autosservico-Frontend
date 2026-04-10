@@ -5,6 +5,7 @@ import Filas from "@/components/dashboard/SaudeDosServidores/Filas";
 import DatabaseStatusCard from "@/components/dashboard/DatabaseStatusCard";
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
 import AzureDevOpsBacklog from "@/components/dashboard/AzureDevOpsBacklog";
+import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import useDashboardStore from "@/states/dashboard";
 
 export default function Dashboard() {
@@ -95,6 +96,25 @@ export default function Dashboard() {
                     }
                 >
                     <DatabaseStatusCard systemName={projectName ?? ""} className="bg-[#F5F5F5] p-3" />
+                </CardWrapperInfoAmbientes>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 mb-4">
+                <CardWrapperInfoAmbientes
+                    id="onboarding-horarios-pico"
+                    title="Horarios de pico"
+                    className="col-span-4 gap-2 py-2"
+                    tooltipContent={
+                        <p>
+                            Essa secao mostra os horarios com maior volume de acessos ao sistema,
+                            permitindo identificar os picos de uso ao longo do dia.
+                        </p>
+                    }
+                >
+                    <PeakHoursChart
+                        systemName={projectName ?? ""}
+                        className="p-[2px]"
+                    />
                 </CardWrapperInfoAmbientes>
             </div>
 

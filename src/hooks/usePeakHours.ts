@@ -6,7 +6,6 @@ type Options = {
   systemName: string;
 };
 
-// TODO: substituir mock por chamada real a API
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fetchPeakHours(systemName: string): Promise<PeakHoursResponse> {
   await new Promise((resolve) => setTimeout(resolve, 600));

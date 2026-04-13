@@ -9,39 +9,18 @@ import {
   ResponsiveContainer,
   Rectangle,
 } from "recharts";
-import type { XAxisTickContentProps, BarShapeProps } from "recharts";
+import type { BarShapeProps, XAxisTickContentProps } from "recharts";
 import type { HourlyAccess } from "@/types/peakHours";
 import { DEVICE_COLORS, DEVICE_KEYS, OFF_PEAK_COLOR } from "./constants";
 import ChartTooltip from "./ChartTooltip";
 import ChartLegend from "./ChartLegend";
 import PeakBadge from "./PeakBadge";
+import PeakHourTick from "./PeakHourTick";
 
 type Props = {
   readonly data: HourlyAccess[];
   readonly peakHour: string;
 };
-
-function PeakHourTick({
-  x,
-  y,
-  payload,
-  peakHour,
-}: XAxisTickContentProps & { peakHour: string }) {
-  const value = String(payload?.value ?? "");
-  const isPeak = value === peakHour;
-  return (
-    <text
-      x={Number(x)}
-      y={Number(y) + 14}
-      textAnchor="middle"
-      fontSize={12}
-      fontWeight={isPeak ? 700 : 400}
-      fill={isPeak ? "#1F2937" : "#9CA3AF"}
-    >
-      {value}
-    </text>
-  );
-}
 
 function createBarShape(
   deviceKey: (typeof DEVICE_KEYS)[number],
@@ -69,6 +48,13 @@ function createBarShape(
   };
 }
 
+function renderPeakHourTick(
+  peakHour: string,
+  props: XAxisTickContentProps,
+) {
+  return <PeakHourTick {...props} peakHour={peakHour} />;
+}
+
 export default function Chart({ data, peakHour }: Props) {
   return (
     <div>
@@ -82,9 +68,7 @@ export default function Chart({ data, peakHour }: Props) {
             dataKey="hour"
             axisLine={false}
             tickLine={false}
-            tick={(props: XAxisTickContentProps) => (
-              <PeakHourTick {...props} peakHour={peakHour} />
-            )}
+            tick={renderPeakHourTick.bind(null, peakHour)}
           />
           <YAxis hide />
           <Tooltip

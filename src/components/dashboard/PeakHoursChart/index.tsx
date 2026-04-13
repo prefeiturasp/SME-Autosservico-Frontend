@@ -19,9 +19,9 @@ function LoadingSkeleton({ className }: { readonly className?: string }) {
         <Skeleton className="h-8 w-24" />
       </div>
       <div className="flex items-end gap-1">
-        {Array.from({ length: 24 }).map((_, i) => (
+        {Array.from({ length: 24 }).map((value) => (
           <Skeleton
-            key={i}
+            key={value?.toString() ?? ""}
             className="flex-1"
             style={{ height: `${Math.random() * 120 + 40}px` }}
           />

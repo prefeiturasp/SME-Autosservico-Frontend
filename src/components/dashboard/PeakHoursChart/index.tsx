@@ -58,7 +58,7 @@ export default function PeakHoursChart({ systemName, className }: Props) {
     return (
       <div className={cn("text-center py-12", className)}>
         <p className="text-sm text-muted-foreground">
-          Nao foi possivel carregar os horarios de pico.
+          Não foi possível carregar os horários de pico.
         </p>
         <Button
           onClick={() => refetch()}

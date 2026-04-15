@@ -102,11 +102,11 @@ export default function Dashboard() {
             <div className="grid grid-cols-4 gap-4 mb-4">
                 <CardWrapperInfoAmbientes
                     id="onboarding-horarios-pico"
-                    title="Horarios de pico"
+                    title="Horários de pico"
                     className="col-span-4 gap-2 py-2"
                     tooltipContent={
                         <p>
-                            Essa secao mostra os horarios com maior volume de acessos ao sistema,
+                            Essa seção mostra os horários com maior volume de acessos ao sistema,
                             permitindo identificar os picos de uso ao longo do dia.
                         </p>
                     }

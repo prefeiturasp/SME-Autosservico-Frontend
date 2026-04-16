@@ -15,8 +15,11 @@ export default defineConfig({
       'src/**/*.test.tsx',
     ],
     coverage: {
+      provider: 'v8',
       reporter: ['text', 'lcov'],
       reportsDirectory: './coverage',
+      all: true,
+      include: ['src/**/*.{ts,tsx}'],
       exclude: [
         '**/.next/**', // 👈 Exclui TUDO dentro de .next/
         'src/components/ui/**', // 👈 Exclui apenas a pasta 'ui' dentro de components

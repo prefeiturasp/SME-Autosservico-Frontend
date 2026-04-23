@@ -1,7 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { cleanup } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
 import AzureDevOpsBacklog from "@/components/dashboard/AzureDevOpsBacklog";
 
 // Mock do hook com retorno válido

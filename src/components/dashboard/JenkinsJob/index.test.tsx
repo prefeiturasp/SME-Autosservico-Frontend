@@ -11,6 +11,12 @@ function okJson(data: unknown) {
   } as unknown as Response;
 }
 
+function fetchUrl(input: RequestInfo | URL): string {
+  if (typeof input === "string") return input;
+  if (input instanceof URL) return input.toString();
+  return input.url;
+}
+
 describe("<JenkinsJob />", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -18,7 +24,7 @@ describe("<JenkinsJob />", () => {
 
   it("com múltiplos subprojetos: mostra select e atualiza automaticamente ao trocar", async () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
-      const url = String(input);
+      const url = fetchUrl(input);
 
       if (url.startsWith("/api/zabbix/jenkins/job?project=PTRF-FrontEnd&env=homolog")) {
         return okJson({
@@ -65,7 +71,6 @@ describe("<JenkinsJob />", () => {
     render(
       withClient(
         <JenkinsJob
-          squad="COPLAN"
           project="SigEscola"
           subprojects={[
             { label: "Backend", key: "PTRF-BackEnd" },
@@ -112,7 +117,7 @@ describe("<JenkinsJob />", () => {
 
   it("com apenas 1 subprojeto: não exige seleção adicional", async () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
-      const url = String(input);
+      const url = fetchUrl(input);
 
       if (url.startsWith("/api/zabbix/jenkins/job?project=SME-NovoSGP")) {
         return okJson({
@@ -132,7 +137,7 @@ describe("<JenkinsJob />", () => {
 
     render(
       withClient(
-        <JenkinsJob squad="COPED" project="Novo SGP" subprojects={[{ label: "SME-NovoSGP", key: "SME-NovoSGP" }]} />
+        <JenkinsJob project="Novo SGP" subprojects={[{ label: "SME-NovoSGP", key: "SME-NovoSGP" }]} />
       )
     );
 
@@ -149,7 +154,7 @@ describe("<JenkinsJob />", () => {
 
   it("projeto N/E (ou sem chaves): não busca releases e mostra mensagem", async () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
-      const url = String(input);
+      const url = fetchUrl(input);
 
       if (url.startsWith("/api/zabbix/jenkins/job?")) {
         throw new Error("Não deveria chamar endpoint de job");
@@ -158,7 +163,7 @@ describe("<JenkinsJob />", () => {
       throw new Error(`fetch inesperado: ${url}`);
     });
 
-    render(withClient(<JenkinsJob squad="ASCOM" project="Portal Educação" subprojects={[]} />));
+    render(withClient(<JenkinsJob project="Portal Educação" subprojects={[]} />));
 
     expect(
       await screen.findByText("Sem lançamentos disponíveis para este projeto.")

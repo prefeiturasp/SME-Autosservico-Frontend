@@ -8,7 +8,7 @@ import JenkinsJobCard from "./JenkinsJobCard";
 import type { JenkinsJobSummary } from "@/types/jenkins";
 
 vi.mock("@/components/ui/skeleton", () => {
-  function Skeleton(props: React.HTMLAttributes<HTMLDivElement>) {
+  function Skeleton(props: Readonly<React.HTMLAttributes<HTMLDivElement>>) {
     return <div data-testid="skeleton" {...props} />;
   }
 

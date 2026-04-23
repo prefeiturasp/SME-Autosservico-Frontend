@@ -33,11 +33,18 @@ describe("getSistemasPorSquad", () => {
 
     it("não deve mutar o array original dos squads", () => {
         const sistemas = getSistemasPorSquad("ASCOM");
-        sistemas.push({ id: "99", nome: "Teste" });
+        const novoSistema = {
+            id: "99",
+            nome: "Teste",
+            zabbixQueryFrontend: "",
+            zabbixQueryBackend: "",
+            zabbixQueryFilasRabbitMQ: "",
+            zabbixQueryJenkinsJob: "",
+        };
+        sistemas.push(novoSistema);
 
-        // ✅ Chamada subsequente não deve conter o item mutado
         const sistemasNovos = getSistemasPorSquad("ASCOM");
-        expect(sistemasNovos).not.toContainEqual({ id: "99", nome: "Teste" });
+        expect(sistemasNovos).not.toContainEqual(novoSistema);
     });
 
     it("inclui subprojetos de releases quando existir mapeamento", () => {

@@ -9,16 +9,23 @@ type Props = {
   readonly className?: string;
 };
 
-const TREND_LABEL: Record<MetricTrend, string> = {
-  "on-average": "Na média",
-  above: "Acima da média",
-  below: "Abaixo da média",
-};
-
 function formatDuration(totalSeconds: number) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
+}
+
+function buildTrendLabel(
+  trend: MetricTrend,
+  currentSeconds: number,
+  averageSeconds: number
+): string {
+  if (trend === "on-average") return "Na média";
+  const percentage = Math.round(
+    Math.abs((currentSeconds - averageSeconds) / averageSeconds) * 100
+  );
+  const suffix = trend === "above" ? "acima da média" : "abaixo da média";
+  return `${percentage}% ${suffix}`;
 }
 
 export default function AverageSessionCard({ systemName, className }: Props) {
@@ -36,7 +43,11 @@ export default function AverageSessionCard({ systemName, className }: Props) {
       errorMessage="Não foi possível carregar a média de sessão."
       value={data ? formatDuration(data.currentSeconds) : undefined}
       trend={data?.trend}
-      trendLabel={data ? TREND_LABEL[data.trend] : undefined}
+      trendLabel={
+        data
+          ? buildTrendLabel(data.trend, data.currentSeconds, data.averageSeconds)
+          : undefined
+      }
       comparison={data ? `média: ${formatDuration(data.averageSeconds)}` : undefined}
       className={className}
     />

@@ -16,7 +16,7 @@ const TREND_CONFIG: Record<
   },
   below: {
     Icon: ArrowDown,
-    className: "bg-[#FEF3C7] text-[#92400E]",
+    className: "bg-[#FCE7E7] text-[#991B1B]",
   },
 };
 

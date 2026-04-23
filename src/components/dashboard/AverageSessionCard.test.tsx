@@ -96,7 +96,7 @@ describe("<AverageSessionCard />", () => {
     expect(screen.getByText(/média: 14m 28s/)).toBeInTheDocument();
   });
 
-  it("renderiza badge 'Acima da média' quando trend = above", () => {
+  it("renderiza badge com percentual quando trend = above", () => {
     mockQueryResult = {
       ...mockQueryResult,
       data: {
@@ -107,10 +107,10 @@ describe("<AverageSessionCard />", () => {
       },
     };
     render(<AverageSessionCard systemName="SigPAE" />);
-    expect(screen.getByText("Acima da média")).toBeInTheDocument();
+    expect(screen.getByText("25% acima da média")).toBeInTheDocument();
   });
 
-  it("renderiza badge 'Abaixo da média' quando trend = below", () => {
+  it("renderiza badge com percentual quando trend = below", () => {
     mockQueryResult = {
       ...mockQueryResult,
       data: {
@@ -121,6 +121,6 @@ describe("<AverageSessionCard />", () => {
       },
     };
     render(<AverageSessionCard systemName="SigPAE" />);
-    expect(screen.getByText("Abaixo da média")).toBeInTheDocument();
+    expect(screen.getByText("38% abaixo da média")).toBeInTheDocument();
   });
 });

@@ -48,21 +48,21 @@ function DeviceRow({
         </span>
         <span className="text-sm">{label}</span>
       </div>
-      <div className="flex w-44 items-center gap-3">
+      <div
+        className="flex w-44 items-center gap-3"
+        aria-label={`${label}: ${safePercentage}% dos acessos`}
+      >
         <div
           className="h-2 flex-1 overflow-hidden rounded-full bg-[#E5E7EB]"
-          role="progressbar"
-          aria-label={`Acessos via ${label}`}
-          aria-valuenow={safePercentage}
-          aria-valuemin={0}
-          aria-valuemax={100}
+          aria-hidden="true"
         >
           <div
+            data-testid={`device-bar-fill-${device}`}
             className="h-full rounded-full"
             style={{ width: `${safePercentage}%`, backgroundColor: color }}
           />
         </div>
-        <span className="w-10 text-right text-sm font-bold">
+        <span className="w-10 text-right text-sm font-bold" aria-hidden="true">
           {safePercentage}%
         </span>
       </div>

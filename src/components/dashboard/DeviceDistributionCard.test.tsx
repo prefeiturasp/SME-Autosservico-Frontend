@@ -146,10 +146,14 @@ describe("<DeviceDistributionCard />", () => {
     };
     render(<DeviceDistributionCard systemName="SigPAE" />);
 
-    const desktopBar = screen.getByLabelText("Acessos via Desktop");
-    expect(desktopBar).toHaveAttribute("aria-valuenow", "100");
+    expect(screen.getByLabelText("Desktop: 100% dos acessos")).toBeInTheDocument();
+    expect(screen.getByTestId("device-bar-fill-desktop")).toHaveStyle({
+      width: "100%",
+    });
 
-    const mobileBar = screen.getByLabelText("Acessos via Mobile");
-    expect(mobileBar).toHaveAttribute("aria-valuenow", "0");
+    expect(screen.getByLabelText("Mobile: 0% dos acessos")).toBeInTheDocument();
+    expect(screen.getByTestId("device-bar-fill-mobile")).toHaveStyle({
+      width: "0%",
+    });
   });
 });

@@ -1,17 +1,28 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ActiveUsersResponse } from "@/types/activeUsers";
+import type { MetricTrend } from "@/types/metric";
 
 type Options = {
   systemName: string;
 };
 
-const MOCK_RESPONSE: ActiveUsersResponse = {
-  system: "mock",
-  activeCount: 8398,
-  averageCount: 7563,
-  differencePercentage: 18,
-  trend: "above",
+const AVERAGE_COUNT = 7563;
+
+const TREND_TO_VARIANT: Record<
+  MetricTrend,
+  { activeCount: number; differencePercentage: number }
+> = {
+  "on-average": { activeCount: 7589, differencePercentage: 0 },
+  above: { activeCount: 8929, differencePercentage: 18 },
+  below: { activeCount: 6580, differencePercentage: 13 },
 };
+
+function pickRandomTrend(): MetricTrend {
+  const trends: MetricTrend[] = ["on-average", "above", "below"];
+  const buffer = new Uint8Array(1);
+  crypto.getRandomValues(buffer);
+  return trends[buffer[0] % trends.length];
+}
 
 export function useActiveUsers({ systemName }: Options) {
   return useQuery<ActiveUsersResponse>({
@@ -20,7 +31,15 @@ export function useActiveUsers({ systemName }: Options) {
     refetchOnWindowFocus: false,
     queryFn: async () => {
       await new Promise((resolve) => setTimeout(resolve, 300));
-      return { ...MOCK_RESPONSE, system: systemName };
+      const trend = pickRandomTrend();
+      const variant = TREND_TO_VARIANT[trend];
+      return {
+        system: systemName,
+        activeCount: variant.activeCount,
+        averageCount: AVERAGE_COUNT,
+        differencePercentage: variant.differencePercentage,
+        trend,
+      };
     },
   });
 }

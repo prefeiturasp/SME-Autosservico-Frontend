@@ -41,7 +41,7 @@ function DeviceRow({
   const safePercentage = Math.max(0, Math.min(100, percentage));
 
   return (
-    <div className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+    <div className="flex items-center gap-4 py-3 first:pt-0">
       <div className="flex flex-1 items-center gap-3">
         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F3F4F6]">
           <Icon className="h-5 w-5 text-[#6B7280]" aria-hidden="true" />
@@ -127,7 +127,7 @@ export default function DeviceDistributionCard({
 
     return (
       <>
-        <div className="divide-y divide-[#E5E7EB]">
+        <div className="divide-y border-b divide-[#E5E7EB] border-[#E5E7EB]">
           {DEVICE_ORDER.map((device) => (
             <DeviceRow
               key={device}

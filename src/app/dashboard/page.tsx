@@ -7,6 +7,7 @@ import JenkinsJob from "@/components/dashboard/JenkinsJob";
 import AzureDevOpsBacklog from "@/components/dashboard/AzureDevOpsBacklog";
 import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import AverageSessionCard from "@/components/dashboard/AverageSessionCard";
+import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useDashboardStore from "@/states/dashboard";
 
@@ -145,6 +146,9 @@ export default function Dashboard() {
                 <TabsContent value="analytics">
                     <div className="grid grid-cols-4 gap-4 mb-4">
                         <AverageSessionCard systemName={projectName} className="max-w-sm" />
+                    </div>
+                    <div className="grid grid-cols-4 gap-4 mb-4">
+                        <DeviceDistributionCard systemName={projectName} className="col-span-2" />
                     </div>
                     <FullWidthSection
                         title="Horários de pico"

@@ -17,11 +17,11 @@ describe("<TrendBadge />", () => {
     expect(badge.className).toContain("#065F46");
   });
 
-  it("aplica estilo âmbar para trend = below", () => {
+  it("aplica estilo vermelho para trend = below", () => {
     render(<TrendBadge trend="below" label="12% abaixo da média" />);
     const badge = screen.getByText("12% abaixo da média");
-    expect(badge.className).toContain("#FEF3C7");
-    expect(badge.className).toContain("#92400E");
+    expect(badge.className).toContain("#FCE7E7");
+    expect(badge.className).toContain("#991B1B");
   });
 
   it("aplica estilo neutro para trend = on-average", () => {

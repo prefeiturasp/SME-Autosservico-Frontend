@@ -1,8 +1,8 @@
-export type AverageSessionTrend = "above" | "below" | "on-average";
+import type { MetricTrend } from "./metric";
 
 export type AverageSessionResponse = {
   system: string;
   currentSeconds: number;
   averageSeconds: number;
-  trend: AverageSessionTrend;
+  trend: MetricTrend;
 };

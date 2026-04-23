@@ -26,7 +26,7 @@ export default function ChartTooltip({ active, payload, peakHour }: Props) {
     <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-lg">
       <p className="text-sm text-gray-500">{title}</p>
       <p className="text-lg font-bold text-gray-900">
-        {entry.total.toLocaleString("pt-BR")} usuarios
+        {entry.total.toLocaleString("pt-BR")} usuários
       </p>
       <div className="mt-2 space-y-1">
         {DEVICE_KEYS.map((key) => (

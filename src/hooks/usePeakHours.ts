@@ -6,10 +6,9 @@ type Options = {
   systemName: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function fetchPeakHours(systemName: string): Promise<PeakHoursResponse> {
   await new Promise((resolve) => setTimeout(resolve, 600));
-  return PEAK_HOURS_MOCK;
+  return { ...PEAK_HOURS_MOCK, system: systemName };
 }
 
 export function usePeakHours({ systemName }: Options) {

@@ -315,7 +315,7 @@ describe("<UsersByPageCard />", () => {
     render(<UsersByPageCard systemName="SigPAE" />);
 
     const trigger = screen.getByTestId("users-by-page-sort-averageUsers");
-    const columnHeader = trigger.closest('[role="columnheader"]');
+    const columnHeader = trigger.closest("th");
     expect(columnHeader).toHaveAttribute("aria-sort", "none");
 
     await userEvent.click(trigger);

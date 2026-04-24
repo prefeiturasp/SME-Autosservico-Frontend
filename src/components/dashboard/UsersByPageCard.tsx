@@ -23,6 +23,7 @@ type Props = {
 
 type SortKey = "path" | "currentUsers" | "averageUsers";
 type SortDirection = "asc" | "desc";
+type AriaSort = "ascending" | "descending" | "none";
 type SortState = { key: SortKey; direction: SortDirection } | null;
 
 const ALL_PAGES_VALUE = "all";
@@ -50,6 +51,18 @@ function toggleSort(current: SortState, key: SortKey): SortState {
   return null;
 }
 
+function getSortIcon(direction: SortDirection | null) {
+  if (direction === "asc") return ArrowUp;
+  if (direction === "desc") return ArrowDown;
+  return ArrowUpDown;
+}
+
+function getAriaSort(direction: SortDirection | null): AriaSort {
+  if (direction === "asc") return "ascending";
+  if (direction === "desc") return "descending";
+  return "none";
+}
+
 type PageRowProps = {
   readonly index: number;
   readonly entry: UsersByPageEntry;
@@ -63,27 +76,31 @@ function PageRow({ index, entry, maxCurrent }: PageRowProps) {
       : 0;
 
   return (
-    <div
+    <tr
       data-testid={`users-by-page-row-${index}`}
-      className="grid grid-cols-[24px_1fr_120px_96px_96px] items-center gap-4 py-3 text-sm"
+      className="border-b border-[#E5E7EB] text-sm"
     >
-      <span className="text-[#111827]">{index}</span>
-      <span className="truncate">{entry.path}</span>
-      <div
-        className="h-2 overflow-hidden rounded-full bg-[#E5E7EB]"
-        aria-label={`Acesso: ${Math.round(fillPercentage)}%`}
-      >
+      <td className="py-3 pr-4 align-middle text-[#111827]">{index}</td>
+      <td className="py-3 pr-4 align-middle truncate">{entry.path}</td>
+      <td className="py-3 pr-4 align-middle">
         <div
-          data-testid={`users-by-page-bar-fill-${index}`}
-          className="h-full rounded-full"
-          style={{ width: `${fillPercentage}%`, backgroundColor: BAR_COLOR }}
-        />
-      </div>
-      <span className="font-semibold">{formatCount(entry.currentUsers)}</span>
-      <span className="text-muted-foreground">
+          className="h-2 overflow-hidden rounded-full bg-[#E5E7EB]"
+          aria-label={`Acesso: ${Math.round(fillPercentage)}%`}
+        >
+          <div
+            data-testid={`users-by-page-bar-fill-${index}`}
+            className="h-full rounded-full"
+            style={{ width: `${fillPercentage}%`, backgroundColor: BAR_COLOR }}
+          />
+        </div>
+      </td>
+      <td className="py-3 pr-4 align-middle font-semibold">
+        {formatCount(entry.currentUsers)}
+      </td>
+      <td className="py-3 align-middle text-muted-foreground">
         {formatCount(entry.averageUsers)}
-      </span>
-    </div>
+      </td>
+    </tr>
   );
 }
 
@@ -92,18 +109,26 @@ type SortableHeaderProps = {
   readonly sortKey: SortKey;
   readonly sort: SortState;
   readonly onSort: (key: SortKey) => void;
+  readonly width: string;
 };
 
-function SortableHeader({ label, sortKey, sort, onSort }: SortableHeaderProps) {
+function SortableHeader({
+  label,
+  sortKey,
+  sort,
+  onSort,
+  width,
+}: SortableHeaderProps) {
   const isActive = sort?.key === sortKey;
   const direction = isActive ? sort.direction : null;
-
-  const Icon = direction === "asc" ? ArrowUp : direction === "desc" ? ArrowDown : ArrowUpDown;
-  const ariaSort =
-    direction === "asc" ? "ascending" : direction === "desc" ? "descending" : "none";
+  const Icon = getSortIcon(direction);
 
   return (
-    <div role="columnheader" aria-sort={ariaSort}>
+    <th
+      scope="col"
+      aria-sort={getAriaSort(direction)}
+      className={cn("pb-2 pr-4 text-left", width)}
+    >
       <button
         type="button"
         data-testid={`users-by-page-sort-${sortKey}`}
@@ -119,7 +144,7 @@ function SortableHeader({ label, sortKey, sort, onSort }: SortableHeaderProps) {
           aria-hidden="true"
         />
       </button>
-    </div>
+    </th>
   );
 }
 
@@ -130,23 +155,35 @@ type TableHeaderProps = {
 
 function TableHeader({ sort, onSort }: TableHeaderProps) {
   return (
-    <div className="grid grid-cols-[24px_1fr_120px_96px_96px] items-center gap-4 border-b pb-2 text-sm text-[#111827]">
-      <span />
-      <SortableHeader label="Descrição" sortKey="path" sort={sort} onSort={onSort} />
-      <span>Acesso</span>
-      <SortableHeader
-        label="Agora"
-        sortKey="currentUsers"
-        sort={sort}
-        onSort={onSort}
-      />
-      <SortableHeader
-        label="Média"
-        sortKey="averageUsers"
-        sort={sort}
-        onSort={onSort}
-      />
-    </div>
+    <thead>
+      <tr className="border-b text-sm text-[#111827]">
+        <th scope="col" className="w-6 pb-2" />
+        <SortableHeader
+          label="Descrição"
+          sortKey="path"
+          sort={sort}
+          onSort={onSort}
+          width="w-auto"
+        />
+        <th scope="col" className="w-[120px] pb-2 pr-4 text-left">
+          Acesso
+        </th>
+        <SortableHeader
+          label="Agora"
+          sortKey="currentUsers"
+          sort={sort}
+          onSort={onSort}
+          width="w-24"
+        />
+        <SortableHeader
+          label="Média"
+          sortKey="averageUsers"
+          sort={sort}
+          onSort={onSort}
+          width="w-24"
+        />
+      </tr>
+    </thead>
   );
 }
 
@@ -234,17 +271,19 @@ export default function UsersByPageCard({ systemName, className }: Props) {
 
     return (
       <>
-        <TableHeader sort={sort} onSort={handleSort} />
-        <div className="divide-y divide-[#E5E7EB]">
-          {visiblePages.map((entry, idx) => (
-            <PageRow
-              key={entry.path}
-              index={idx + 1}
-              entry={entry}
-              maxCurrent={maxCurrent}
-            />
-          ))}
-        </div>
+        <table className="w-full table-fixed">
+          <TableHeader sort={sort} onSort={handleSort} />
+          <tbody>
+            {visiblePages.map((entry, idx) => (
+              <PageRow
+                key={entry.path}
+                index={idx + 1}
+                entry={entry}
+                maxCurrent={maxCurrent}
+              />
+            ))}
+          </tbody>
+        </table>
         {canExpand && (
           <div className="flex justify-center border-t pt-3">
             <button

@@ -235,4 +235,93 @@ describe("<UsersByPageCard />", () => {
     expect(scope.getByText("Agora")).toBeInTheDocument();
     expect(scope.getByText("Média")).toBeInTheDocument();
   });
+
+  it("ordena por 'Agora' em ordem ascendente no primeiro clique", async () => {
+    mockQueryResult = {
+      ...mockQueryResult,
+      data: {
+        system: "SigPAE",
+        pages: [
+          { path: "/a", currentUsers: 300, averageUsers: 100 },
+          { path: "/b", currentUsers: 100, averageUsers: 200 },
+          { path: "/c", currentUsers: 200, averageUsers: 300 },
+        ],
+      },
+    };
+    render(<UsersByPageCard systemName="SigPAE" />);
+
+    await userEvent.click(screen.getByTestId("users-by-page-sort-currentUsers"));
+
+    expect(screen.getByTestId("users-by-page-row-1")).toHaveTextContent("/b");
+    expect(screen.getByTestId("users-by-page-row-2")).toHaveTextContent("/c");
+    expect(screen.getByTestId("users-by-page-row-3")).toHaveTextContent("/a");
+  });
+
+  it("alterna para descendente no segundo clique e limpa no terceiro", async () => {
+    mockQueryResult = {
+      ...mockQueryResult,
+      data: {
+        system: "SigPAE",
+        pages: [
+          { path: "/a", currentUsers: 300, averageUsers: 100 },
+          { path: "/b", currentUsers: 100, averageUsers: 200 },
+          { path: "/c", currentUsers: 200, averageUsers: 300 },
+        ],
+      },
+    };
+    render(<UsersByPageCard systemName="SigPAE" />);
+
+    const trigger = screen.getByTestId("users-by-page-sort-currentUsers");
+
+    await userEvent.click(trigger);
+    await userEvent.click(trigger);
+    expect(screen.getByTestId("users-by-page-row-1")).toHaveTextContent("/a");
+    expect(screen.getByTestId("users-by-page-row-3")).toHaveTextContent("/b");
+
+    await userEvent.click(trigger);
+    expect(screen.getByTestId("users-by-page-row-1")).toHaveTextContent("/a");
+    expect(screen.getByTestId("users-by-page-row-2")).toHaveTextContent("/b");
+    expect(screen.getByTestId("users-by-page-row-3")).toHaveTextContent("/c");
+  });
+
+  it("reseta direção ao trocar de coluna", async () => {
+    mockQueryResult = {
+      ...mockQueryResult,
+      data: {
+        system: "SigPAE",
+        pages: [
+          { path: "/z", currentUsers: 100, averageUsers: 300 },
+          { path: "/a", currentUsers: 200, averageUsers: 100 },
+          { path: "/m", currentUsers: 300, averageUsers: 200 },
+        ],
+      },
+    };
+    render(<UsersByPageCard systemName="SigPAE" />);
+
+    await userEvent.click(screen.getByTestId("users-by-page-sort-currentUsers"));
+    await userEvent.click(screen.getByTestId("users-by-page-sort-currentUsers"));
+    await userEvent.click(screen.getByTestId("users-by-page-sort-path"));
+
+    expect(screen.getByTestId("users-by-page-row-1")).toHaveTextContent("/a");
+    expect(screen.getByTestId("users-by-page-row-2")).toHaveTextContent("/m");
+    expect(screen.getByTestId("users-by-page-row-3")).toHaveTextContent("/z");
+  });
+
+  it("indica coluna ativa via aria-sort", async () => {
+    mockQueryResult = {
+      ...mockQueryResult,
+      data: { system: "SigPAE", pages: buildPages(3) },
+    };
+    render(<UsersByPageCard systemName="SigPAE" />);
+
+    const trigger = screen.getByTestId("users-by-page-sort-averageUsers");
+    const columnHeader = trigger.closest('[role="columnheader"]');
+    expect(columnHeader).toHaveAttribute("aria-sort", "none");
+
+    await userEvent.click(trigger);
+    expect(columnHeader).toHaveAttribute("aria-sort", "ascending");
+
+    await userEvent.click(trigger);
+    expect(columnHeader).toHaveAttribute("aria-sort", "descending");
+  });
 });

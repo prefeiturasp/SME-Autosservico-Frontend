@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronDown, RotateCcw } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,10 @@ type Props = {
   readonly className?: string;
 };
 
+type SortKey = "path" | "currentUsers" | "averageUsers";
+type SortDirection = "asc" | "desc";
+type SortState = { key: SortKey; direction: SortDirection } | null;
+
 const ALL_PAGES_VALUE = "all";
 const INITIAL_VISIBLE_ROWS = 5;
 const BAR_COLOR = "#1F3D73";
@@ -29,6 +33,21 @@ const ptBrFormatter = new Intl.NumberFormat("pt-BR");
 
 function formatCount(value: number) {
   return ptBrFormatter.format(value);
+}
+
+function compareEntries(
+  a: UsersByPageEntry,
+  b: UsersByPageEntry,
+  key: SortKey
+): number {
+  if (key === "path") return a.path.localeCompare(b.path, "pt-BR");
+  return a[key] - b[key];
+}
+
+function toggleSort(current: SortState, key: SortKey): SortState {
+  if (!current || current.key !== key) return { key, direction: "asc" };
+  if (current.direction === "asc") return { key, direction: "desc" };
+  return null;
 }
 
 type PageRowProps = {
@@ -68,14 +87,65 @@ function PageRow({ index, entry, maxCurrent }: PageRowProps) {
   );
 }
 
-function TableHeader() {
+type SortableHeaderProps = {
+  readonly label: string;
+  readonly sortKey: SortKey;
+  readonly sort: SortState;
+  readonly onSort: (key: SortKey) => void;
+};
+
+function SortableHeader({ label, sortKey, sort, onSort }: SortableHeaderProps) {
+  const isActive = sort?.key === sortKey;
+  const direction = isActive ? sort.direction : null;
+
+  const Icon = direction === "asc" ? ArrowUp : direction === "desc" ? ArrowDown : ArrowUpDown;
+  const ariaSort =
+    direction === "asc" ? "ascending" : direction === "desc" ? "descending" : "none";
+
+  return (
+    <div role="columnheader" aria-sort={ariaSort}>
+      <button
+        type="button"
+        data-testid={`users-by-page-sort-${sortKey}`}
+        onClick={() => onSort(sortKey)}
+        className={cn(
+          "flex items-center gap-1 text-left transition-colors hover:text-[#1F3D73]",
+          isActive && "font-semibold"
+        )}
+      >
+        <span>{label}</span>
+        <Icon
+          className={cn("h-3.5 w-3.5", !isActive && "opacity-40")}
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  );
+}
+
+type TableHeaderProps = {
+  readonly sort: SortState;
+  readonly onSort: (key: SortKey) => void;
+};
+
+function TableHeader({ sort, onSort }: TableHeaderProps) {
   return (
     <div className="grid grid-cols-[24px_1fr_120px_96px_96px] items-center gap-4 border-b pb-2 text-sm text-[#111827]">
       <span />
-      <span>Descrição</span>
+      <SortableHeader label="Descrição" sortKey="path" sort={sort} onSort={onSort} />
       <span>Acesso</span>
-      <span>Agora</span>
-      <span>Média</span>
+      <SortableHeader
+        label="Agora"
+        sortKey="currentUsers"
+        sort={sort}
+        onSort={onSort}
+      />
+      <SortableHeader
+        label="Média"
+        sortKey="averageUsers"
+        sort={sort}
+        onSort={onSort}
+      />
     </div>
   );
 }
@@ -87,6 +157,7 @@ export default function UsersByPageCard({ systemName, className }: Props) {
 
   const [selectedPath, setSelectedPath] = useState<string>(ALL_PAGES_VALUE);
   const [expanded, setExpanded] = useState(false);
+  const [sort, setSort] = useState<SortState>(null);
 
   const filteredPages = useMemo(() => {
     if (!data) return [];
@@ -94,20 +165,34 @@ export default function UsersByPageCard({ systemName, className }: Props) {
     return data.pages.filter((entry) => entry.path === selectedPath);
   }, [data, selectedPath]);
 
-  const visiblePages = expanded
-    ? filteredPages
-    : filteredPages.slice(0, INITIAL_VISIBLE_ROWS);
+  const sortedPages = useMemo(() => {
+    if (!sort) return filteredPages;
+    const copy = [...filteredPages];
+    copy.sort((a, b) => {
+      const result = compareEntries(a, b, sort.key);
+      return sort.direction === "asc" ? result : -result;
+    });
+    return copy;
+  }, [filteredPages, sort]);
 
-  const canExpand = filteredPages.length > INITIAL_VISIBLE_ROWS;
+  const visiblePages = expanded
+    ? sortedPages
+    : sortedPages.slice(0, INITIAL_VISIBLE_ROWS);
+
+  const canExpand = sortedPages.length > INITIAL_VISIBLE_ROWS;
 
   const maxCurrent = useMemo(
     () =>
-      filteredPages.reduce(
+      sortedPages.reduce(
         (acc, entry) => (entry.currentUsers > acc ? entry.currentUsers : acc),
         0
       ),
-    [filteredPages]
+    [sortedPages]
   );
+
+  const handleSort = (key: SortKey) => {
+    setSort((current) => toggleSort(current, key));
+  };
 
   const content = () => {
     if (!systemName) {
@@ -149,7 +234,7 @@ export default function UsersByPageCard({ systemName, className }: Props) {
 
     return (
       <>
-        <TableHeader />
+        <TableHeader sort={sort} onSort={handleSort} />
         <div className="divide-y divide-[#E5E7EB]">
           {visiblePages.map((entry, idx) => (
             <PageRow

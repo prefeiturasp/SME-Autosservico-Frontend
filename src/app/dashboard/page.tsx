@@ -9,6 +9,7 @@ import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import AverageSessionCard from "@/components/dashboard/AverageSessionCard";
 import ActiveUsersCard from "@/components/dashboard/ActiveUsersCard";
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
+import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useDashboardStore from "@/states/dashboard";
 
@@ -150,6 +151,7 @@ export default function Dashboard() {
                         <AverageSessionCard systemName={projectName} />
                     </div>
                     <div className="grid grid-cols-4 gap-4 mb-4">
+                        <UsersByPageCard systemName={projectName} className="col-span-2" />
                         <DeviceDistributionCard systemName={projectName} className="col-span-2" />
                     </div>
                     <FullWidthSection

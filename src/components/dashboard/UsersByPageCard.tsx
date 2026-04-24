@@ -21,7 +21,7 @@ type Props = {
   readonly className?: string;
 };
 
-type SortKey = "path" | "currentUsers" | "averageUsers";
+type SortKey = "path" | "access" | "currentUsers" | "averageUsers";
 type SortDirection = "asc" | "desc";
 type AriaSort = "ascending" | "descending" | "none";
 type SortState = { key: SortKey; direction: SortDirection } | null;
@@ -42,6 +42,7 @@ function compareEntries(
   key: SortKey
 ): number {
   if (key === "path") return a.path.localeCompare(b.path, "pt-BR");
+  if (key === "access") return a.currentUsers - b.currentUsers;
   return a[key] - b[key];
 }
 
@@ -165,9 +166,13 @@ function TableHeader({ sort, onSort }: TableHeaderProps) {
           onSort={onSort}
           width="w-auto"
         />
-        <th scope="col" className="w-[120px] pb-2 pr-4 text-left">
-          Acesso
-        </th>
+        <SortableHeader
+          label="Acesso"
+          sortKey="access"
+          sort={sort}
+          onSort={onSort}
+          width="w-[120px]"
+        />
         <SortableHeader
           label="Agora"
           sortKey="currentUsers"

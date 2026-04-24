@@ -307,6 +307,27 @@ describe("<UsersByPageCard />", () => {
     expect(screen.getByTestId("users-by-page-row-3")).toHaveTextContent("/z");
   });
 
+  it("ordena pela coluna 'Acesso' usando o valor de usuários atuais", async () => {
+    mockQueryResult = {
+      ...mockQueryResult,
+      data: {
+        system: "SigPAE",
+        pages: [
+          { path: "/a", currentUsers: 300, averageUsers: 100 },
+          { path: "/b", currentUsers: 100, averageUsers: 200 },
+          { path: "/c", currentUsers: 200, averageUsers: 300 },
+        ],
+      },
+    };
+    render(<UsersByPageCard systemName="SigPAE" />);
+
+    await userEvent.click(screen.getByTestId("users-by-page-sort-access"));
+
+    expect(screen.getByTestId("users-by-page-row-1")).toHaveTextContent("/b");
+    expect(screen.getByTestId("users-by-page-row-2")).toHaveTextContent("/c");
+    expect(screen.getByTestId("users-by-page-row-3")).toHaveTextContent("/a");
+  });
+
   it("indica coluna ativa via aria-sort", async () => {
     mockQueryResult = {
       ...mockQueryResult,

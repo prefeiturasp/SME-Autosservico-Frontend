@@ -19,6 +19,7 @@ type Props = {
   readonly trend?: MetricTrend;
   readonly trendLabel?: string;
   readonly comparison?: string;
+  readonly badge?: React.ReactNode;
   readonly className?: string;
 };
 
@@ -33,6 +34,7 @@ export default function MetricCard({
   trend,
   trendLabel,
   comparison,
+  badge,
   className,
 }: Props) {
   const renderContent = () => {
@@ -72,7 +74,7 @@ export default function MetricCard({
       <>
         <div className="text-3xl font-bold text-[#2563EB]">{value}</div>
         <div className="mt-4 flex items-center gap-3">
-          {trend && trendLabel && <TrendBadge trend={trend} label={trendLabel} />}
+          {badge ?? (trend && trendLabel && <TrendBadge trend={trend} label={trendLabel} />)}
           {comparison && (
             <span className="text-sm text-muted-foreground">{comparison}</span>
           )}

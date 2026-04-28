@@ -20,6 +20,10 @@ module.exports = defineConfig({
     viewportWidth: 1600,
     viewportHeight: 1050,
     video: false,
+    env: {
+      TAGS: 'not @ignore'
+    },
+    
     retries: {
       runMode: 2,
       openMode: 0
@@ -46,6 +50,7 @@ module.exports = defineConfig({
       // Cypress Cloud
       // =====================
       const enhancedConfig = await cloudPlugin(on, config)
+
 
       // =====================
       // ENV (LOGIN)

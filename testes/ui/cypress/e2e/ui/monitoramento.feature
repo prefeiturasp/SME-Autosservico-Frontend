@@ -7,10 +7,6 @@ Funcionalidade: Monitoramento - SME AutoServiço
     E clico no botão de acessar
     Então o resultado esperado para o cenário "Login válido padrão" deve ser exibido
 
+
   Cenário: Acessar o dashboard com sucesso
     Então devo ter acesso ao dashboard
-
-  Cenário: Consultar sistema com possível incidente
-    Quando clico no menu "ASCOM"
-    E seleciono o sistema "Portal Educação"
-    Então devo ver se há algum incidente no sistema

@@ -29,7 +29,7 @@ vi.mock("next/image", () => ({
       typeof src === "object" && src !== null && "src" in src
         ? (src as { src: string }).src
         : src;
-    return <img src={resolvedSrc} alt={props.alt || ""} {...rest} />;
+    return <img src={resolvedSrc} alt={props.alt ?? ""} {...rest} />;
   },
 }));
 

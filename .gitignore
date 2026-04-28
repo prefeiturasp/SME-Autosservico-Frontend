@@ -20,6 +20,10 @@
 /coverage
 /.scannerwork
 
+# sonarqube
+.scannerwork/
+.sonar/
+
 # next.js
 /.next/
 /out/

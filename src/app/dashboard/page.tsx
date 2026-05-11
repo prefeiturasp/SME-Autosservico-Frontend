@@ -11,6 +11,7 @@ import ActiveUsersCard from "@/components/dashboard/ActiveUsersCard";
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
+import EnvironmentHeader from "@/components/dashboard/DeployHealth/EnvironmentHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useDashboardStore from "@/states/dashboard";
 
@@ -45,11 +46,12 @@ export default function Dashboard() {
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
 
     return (
-        <div className="border-b bg-background px-6 py-4">
+        <div className="bg-background px-6 py-4">
             <Tabs defaultValue="operacional">
                 <TabsList className="mb-6 px-1">
                     <TabsTrigger value="operacional">Operacional</TabsTrigger>
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                    <TabsTrigger value="saude-deploy">Saúde do deploy</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="operacional">
@@ -167,6 +169,10 @@ export default function Dashboard() {
                     >
                         <PeakHoursChart systemName={projectName} className="p-[2px]" />
                     </FullWidthSection>
+                </TabsContent>
+
+                <TabsContent value="saude-deploy">
+                    <EnvironmentHeader />
                 </TabsContent>
             </Tabs>
         </div>

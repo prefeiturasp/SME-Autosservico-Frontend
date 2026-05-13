@@ -33,15 +33,17 @@ type Props = {
   readonly duplicationMaximum?: number;
 };
 
+type MetricsGridProps = Readonly<{
+  metrics: SonarQualityMetrics["measures"];
+  coverageMinimum: number;
+  duplicationMaximum: number;
+}>;
+
 function MetricsGrid({
   metrics,
   coverageMinimum,
   duplicationMaximum,
-}: {
-  metrics: SonarQualityMetrics["measures"];
-  coverageMinimum: number;
-  duplicationMaximum: number;
-}) {
+}: MetricsGridProps) {
   const coverageRating = ratingFromCoverage(metrics.coverage, coverageMinimum);
   const duplicationRating = ratingFromDuplication(metrics.duplicatedLinesDensity, duplicationMaximum);
 

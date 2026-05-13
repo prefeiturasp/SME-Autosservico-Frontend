@@ -11,11 +11,19 @@ type Props = {
   readonly className?: string;
 };
 
-function CriteriaBadge({ approved, failedCount }: { approved: boolean; failedCount: number }) {
+function buildFailedLabel(failedCount: number): string {
+  const noun = failedCount === 1 ? "critério com falha" : "critérios com falhas";
+  return `${failedCount} ${noun}`;
+}
+
+type CriteriaBadgeProps = Readonly<{
+  approved: boolean;
+  failedCount: number;
+}>;
+
+function CriteriaBadge({ approved, failedCount }: CriteriaBadgeProps) {
   const Icon = approved ? Check : X;
-  const label = approved
-    ? "Critérios sem falhas"
-    : `${failedCount} ${failedCount === 1 ? "critério com falha" : "critérios com falhas"}`;
+  const label = approved ? "Critérios sem falhas" : buildFailedLabel(failedCount);
   const tone = approved
     ? "bg-emerald-100 text-emerald-800"
     : "bg-red-100 text-red-800";

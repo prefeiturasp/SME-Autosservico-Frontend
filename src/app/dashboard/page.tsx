@@ -12,8 +12,11 @@ import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCar
 import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
 import EnvironmentHeader from "@/components/dashboard/DeployHealth/EnvironmentHeader";
+import SonarQualityIndicatorsCard from "@/components/dashboard/DeployHealth/SonarQuality/SonarQualityIndicatorsCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useDashboardStore from "@/states/dashboard";
+import { useState } from "react";
+import type { DeployEnvironment } from "@/types/deployEnvironment";
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -44,6 +47,7 @@ export default function Dashboard() {
     const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim() ?? "";
     const projectNameFilasRabbitMQ = activeProject?.zabbixQueryFilasRabbitMQ?.trim() ?? "";
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
+    const [deployEnvironment, setDeployEnvironment] = useState<DeployEnvironment>("producao");
 
     return (
         <div className="bg-background px-6 py-4">
@@ -172,7 +176,14 @@ export default function Dashboard() {
                 </TabsContent>
 
                 <TabsContent value="saude-deploy">
-                    <EnvironmentHeader />
+                    <EnvironmentHeader value={deployEnvironment} onChange={setDeployEnvironment} />
+                    <SonarQualityIndicatorsCard
+                        projectName={projectName}
+                        sonarProjectKey={activeProject?.sonarProjectKey}
+                        zabbixQueryJenkinsJob={activeProject?.zabbixQueryJenkinsJob}
+                        environment={deployEnvironment}
+                        className="mt-4"
+                    />
                 </TabsContent>
             </Tabs>
         </div>

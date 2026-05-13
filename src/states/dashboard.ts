@@ -18,6 +18,7 @@ export interface ProjectItem {
     zabbixQueryJenkinsJob: string;
     jenkinsSubprojects?: JenkinsSubproject[];
     azureDevopsProjectName?: string;
+    sonarProjectKey?: string;
 }
 
 type State = {

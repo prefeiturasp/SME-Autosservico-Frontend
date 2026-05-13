@@ -10,6 +10,7 @@ export interface Sistema {
   zabbixQueryJenkinsJob: string;
   jenkinsSubprojects?: JenkinsSubproject[];
   azureDevopsProjectName?: string;
+  sonarProjectKey?: string;
 }
 
 const JenkinsSubprojectSchema = z.object({
@@ -26,6 +27,7 @@ export const SistemaSchema = z.object({
   zabbixQueryJenkinsJob: z.string(),
   jenkinsSubprojects: z.array(JenkinsSubprojectSchema).optional(),
   azureDevopsProjectName: z.string().optional(),
+  sonarProjectKey: z.string().optional(),
 });
 
 export const SelectedSistemaSchema = z

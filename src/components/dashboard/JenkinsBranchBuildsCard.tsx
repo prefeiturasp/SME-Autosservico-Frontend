@@ -96,8 +96,12 @@ function MetricRow({
 function JenkinsBranchBuildsContent({ metrics }: { readonly metrics: JenkinsBranchBuildMetrics }) {
   const status = statusLabel(metrics);
   const currentBuild = metrics.lastBuild;
-  const currentBuildState =
-    currentBuild?.status === "IN_PROGRESS" ? "em andamento" : currentBuild ? "concluído" : "-";
+  let currentBuildState = "-";
+  if (currentBuild?.status === "IN_PROGRESS") {
+    currentBuildState = "em andamento";
+  } else if (currentBuild) {
+    currentBuildState = "concluído";
+  }
 
   return (
     <>

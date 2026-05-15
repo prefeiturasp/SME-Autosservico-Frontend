@@ -180,7 +180,11 @@ export default function Dashboard() {
                     <EnvironmentHeader value={deployEnvironment} onChange={setDeployEnvironment} />
                     <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
                         <div id="onboarding-lancamentos" className="lg:col-span-1">
-                            <JenkinsJob project={projectName} subprojects={jenkinsSubprojects} />
+                            <JenkinsJob
+                                project={projectName}
+                                subprojects={jenkinsSubprojects}
+                                environment={deployEnvironment}
+                            />
                         </div>
                         <SonarQualityIndicatorsCard
                             projectName={projectName}

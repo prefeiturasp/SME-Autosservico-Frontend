@@ -50,13 +50,9 @@ describe("<JenkinsJob />", () => {
     vi.restoreAllMocks();
   });
 
-  it("com múltiplos subprojetos: mostra select e atualiza automaticamente ao trocar", async () => {
+  it("com múltiplos subprojetos: mostra select de projeto e atualiza automaticamente ao trocar", async () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
       const url = fetchUrl(input);
-
-      if (url.startsWith("/api/jenkins/metrics?project=PTRF-FrontEnd&env=homolog")) {
-        return metricsResponse(99);
-      }
 
       if (url.startsWith("/api/jenkins/metrics?project=PTRF-BackEnd")) {
         return metricsResponse(1);
@@ -82,7 +78,7 @@ describe("<JenkinsJob />", () => {
     );
 
     expect(await screen.findByText("Projeto")).toBeInTheDocument();
-    expect(await screen.findByLabelText("Selecionar ambiente")).toHaveTextContent("Produção");
+    expect(screen.queryByLabelText("Selecionar ambiente")).not.toBeInTheDocument();
 
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(
@@ -101,19 +97,64 @@ describe("<JenkinsJob />", () => {
         expect.any(Object)
       );
     });
+  });
 
-    const envTrigger = screen.getByLabelText("Selecionar ambiente");
-    fireEvent.click(envTrigger);
-    fireEvent.click(screen.getByText("Homologação"));
+  it("respeita o ambiente recebido via prop (homologacao → env=homolog)", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
+      const url = fetchUrl(input);
+
+      if (url.startsWith("/api/jenkins/metrics?project=PTRF-BackEnd&env=homolog")) {
+        return metricsResponse(1);
+      }
+
+      throw new Error(`fetch inesperado: ${url}`);
+    });
+
+    render(
+      withClient(
+        <JenkinsJob
+          project="SigEscola"
+          environment="homologacao"
+          subprojects={[{ label: "Backend", key: "PTRF-BackEnd" }]}
+        />
+      )
+    );
 
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(
-        "/api/jenkins/metrics?project=PTRF-FrontEnd&env=homolog",
+        "/api/jenkins/metrics?project=PTRF-BackEnd&env=homolog",
         expect.any(Object)
       );
     });
+  });
 
-    expect(screen.getByLabelText("Selecionar ambiente")).toHaveTextContent("Homologação");
+  it("respeita o ambiente recebido via prop (qa → env=test)", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
+      const url = fetchUrl(input);
+
+      if (url.startsWith("/api/jenkins/metrics?project=PTRF-BackEnd&env=test")) {
+        return metricsResponse(1);
+      }
+
+      throw new Error(`fetch inesperado: ${url}`);
+    });
+
+    render(
+      withClient(
+        <JenkinsJob
+          project="SigEscola"
+          environment="qa"
+          subprojects={[{ label: "Backend", key: "PTRF-BackEnd" }]}
+        />
+      )
+    );
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalledWith(
+        "/api/jenkins/metrics?project=PTRF-BackEnd&env=test",
+        expect.any(Object)
+      );
+    });
   });
 
   it("com apenas 1 subprojeto: não exige seleção adicional", async () => {

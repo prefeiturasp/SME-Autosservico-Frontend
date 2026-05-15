@@ -43,6 +43,26 @@ describe("jenkins metrics action", () => {
     }
   });
 
+  it("cai no job no root quando candidatos /master e /main retornam 404", async () => {
+    const { getJenkinsBranchBuildMetrics } = await import("./jenkins-metrics");
+    fetchJenkinsJobMock
+      .mockRejectedValueOnce({ response: { status: 404 } })
+      .mockRejectedValueOnce({ response: { status: 404 } })
+      .mockResolvedValueOnce({
+        name: "ROLE-AGROECOLOGICO",
+        url: "https://jenkins.example/job/ROLE-AGROECOLOGICO/",
+        healthReport: [{ score: 90 }],
+        lastBuild: { number: 5, result: "SUCCESS", duration: 1000, timestamp: 1711814400000 },
+      });
+
+    const result = await getJenkinsBranchBuildMetrics("ROLE-AGROECOLOGICO");
+
+    expect(fetchJenkinsJobMock).toHaveBeenNthCalledWith(1, "ROLE-AGROECOLOGICO/master");
+    expect(fetchJenkinsJobMock).toHaveBeenNthCalledWith(2, "ROLE-AGROECOLOGICO/main");
+    expect(fetchJenkinsJobMock).toHaveBeenNthCalledWith(3, "ROLE-AGROECOLOGICO");
+    expect(result.found).toBe(true);
+  });
+
   it("tenta branches de homologação quando ambiente é homolog", async () => {
     const { getJenkinsBranchBuildMetrics } = await import("./jenkins-metrics");
     fetchJenkinsJobMock
@@ -72,7 +92,8 @@ describe("jenkins metrics action", () => {
 
     expect(result).toEqual({
       found: false,
-      message: "Job não encontrado no Jenkins (tentado: SME-NovoSGP/master, SME-NovoSGP/main)",
+      message:
+        "Job não encontrado no Jenkins (tentado: SME-NovoSGP/master, SME-NovoSGP/main, SME-NovoSGP)",
     });
   });
 });

@@ -15,8 +15,11 @@ export async function GET(req: NextRequest) {
 
   if (!project) return NextResponse.json({ error: "project é obrigatório" }, { status: 400 });
 
+  const resolvedEnv =
+    env === "homolog" ? "homolog" : env === "test" ? "test" : "prod";
+
   try {
-    const metrics = await getJenkinsBranchBuildMetrics(project, env === "homolog" ? "homolog" : "prod");
+    const metrics = await getJenkinsBranchBuildMetrics(project, resolvedEnv);
     return NextResponse.json(metrics);
   } catch (e: unknown) {
     const errorMessage =

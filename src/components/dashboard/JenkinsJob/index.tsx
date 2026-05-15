@@ -12,12 +12,17 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import type { JenkinsSubproject } from "@/types/jenkinsSubproject";
+import {
+    getJenkinsEnvironmentForDeploy,
+    type DeployEnvironment,
+} from "@/types/deployEnvironment";
 
 const EMPTY_SUBPROJECTS: JenkinsSubproject[] = [];
 
 type Props = {
     readonly project: string;
     readonly subprojects?: JenkinsSubproject[];
+    readonly environment?: DeployEnvironment;
     readonly title?: string;
     readonly className?: string;
 };
@@ -27,6 +32,7 @@ export default function JenkinsJob({
     className,
     project,
     subprojects: subprojectsProp,
+    environment = "producao",
 }: Props) {
     const subprojects = useMemo(
         () => subprojectsProp ?? EMPTY_SUBPROJECTS,
@@ -35,7 +41,7 @@ export default function JenkinsJob({
     const hasMultipleSubprojects = subprojects.length > 1;
 
     const [selectedKey, setSelectedKey] = useState("");
-    const [environment, setEnvironment] = useState<"prod" | "homolog">("prod");
+    const jenkinsEnvironment = getJenkinsEnvironmentForDeploy(environment);
 
     useEffect(() => {
         if (!project || subprojects.length === 0) {
@@ -55,15 +61,15 @@ export default function JenkinsJob({
 
     const query = useJenkinsMetrics({
         projectName: selectedKey,
-        environment,
+        environment: jenkinsEnvironment,
     });
 
     if (!project) {
         return (
-            <JenkinsBranchBuildsCard 
-                title={title} 
-                className={className} 
-                projectName="" 
+            <JenkinsBranchBuildsCard
+                title={title}
+                className={className}
+                projectName=""
                 query={query}
             />
         );
@@ -83,29 +89,7 @@ export default function JenkinsJob({
     if (hasMultipleSubprojects) {
         return (
             <div className={cn("bg-white rounded-[5px] shadow-[3px_4px_6px_0px_rgba(0,0,0,0.1)] p-5", className)}>
-                <div className="flex items-center justify-between mb-4">
-                    <span className="font-bold text-[14px] text-[#111827]">{title}</span>
-                    <Select
-                        value={environment}
-                        onValueChange={(v) => setEnvironment(v === "homolog" ? "homolog" : "prod")}
-                    >
-                        <SelectTrigger
-                            size="sm"
-                            className="w-auto rounded-full border-transparent bg-slate-100 px-3 text-xs font-medium text-slate-700 shadow-none hover:bg-slate-200 gap-1"
-                            aria-label="Selecionar ambiente"
-                        >
-                            <SelectValue placeholder="Ambiente" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="prod" className="focus:bg-[#3b82f6] focus:text-white">
-                                Produção
-                            </SelectItem>
-                            <SelectItem value="homolog" className="focus:bg-[#3b82f6] focus:text-white">
-                                Homologação
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+                <div className="font-bold text-[14px] text-[#111827] mb-4">{title}</div>
 
                 <div className="mb-4">
                     <div className="text-sm font-semibold text-[#111827] mb-2">Projeto</div>

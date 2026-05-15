@@ -11,6 +11,34 @@ function okJson(data: unknown) {
   } as unknown as Response;
 }
 
+function metricsResponse(number: number, status = "SUCCESS") {
+  return okJson({
+    found: true,
+    data: {
+      jobName: "job",
+      jobUrl: "https://jenkins.example/job/job",
+      status,
+      stabilityPercent: 100,
+      lastBuild: {
+        number,
+        status,
+        timestampMs: Date.now(),
+        timestamp: "01/01/2024 00:00",
+        durationMs: 48000,
+        duration: "48s",
+      },
+      lastSuccessfulBuild: {
+        number,
+        status: "SUCCESS",
+        timestampMs: Date.now(),
+        timestamp: "01/01/2024 00:00",
+        durationMs: 48000,
+        duration: "48s",
+      },
+    },
+  });
+}
+
 function fetchUrl(input: RequestInfo | URL): string {
   if (typeof input === "string") return input;
   if (input instanceof URL) return input.toString();
@@ -26,43 +54,16 @@ describe("<JenkinsJob />", () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
       const url = fetchUrl(input);
 
-      if (url.startsWith("/api/zabbix/jenkins/job?project=PTRF-FrontEnd&env=homolog")) {
-        return okJson({
-          lastBuild: {
-            number: 99,
-            status: "SUCCESS",
-            timestampMs: 99,
-            timestamp: "03/01/2024 00:00",
-            durationMs: 99000,
-            duration: "99s",
-          },
-        });
+      if (url.startsWith("/api/jenkins/metrics?project=PTRF-FrontEnd&env=homolog")) {
+        return metricsResponse(99);
       }
 
-      if (url.startsWith("/api/zabbix/jenkins/job?project=PTRF-BackEnd")) {
-        return okJson({
-          lastBuild: {
-            number: 1,
-            status: "SUCCESS",
-            timestampMs: 1,
-            timestamp: "01/01/2024 00:00",
-            durationMs: 1000,
-            duration: "1s",
-          },
-        });
+      if (url.startsWith("/api/jenkins/metrics?project=PTRF-BackEnd")) {
+        return metricsResponse(1);
       }
 
-      if (url.startsWith("/api/zabbix/jenkins/job?project=PTRF-FrontEnd")) {
-        return okJson({
-          lastBuild: {
-            number: 2,
-            status: "FAILURE",
-            timestampMs: 2,
-            timestamp: "02/01/2024 00:00",
-            durationMs: 2000,
-            duration: "2s",
-          },
-        });
+      if (url.startsWith("/api/jenkins/metrics?project=PTRF-FrontEnd")) {
+        return metricsResponse(2, "FAILURE");
       }
 
       throw new Error(`fetch inesperado: ${url}`);
@@ -85,7 +86,7 @@ describe("<JenkinsJob />", () => {
 
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(
-        "/api/zabbix/jenkins/job?project=PTRF-BackEnd",
+        "/api/jenkins/metrics?project=PTRF-BackEnd",
         expect.any(Object)
       );
     });
@@ -96,7 +97,7 @@ describe("<JenkinsJob />", () => {
 
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(
-        "/api/zabbix/jenkins/job?project=PTRF-FrontEnd",
+        "/api/jenkins/metrics?project=PTRF-FrontEnd",
         expect.any(Object)
       );
     });
@@ -107,7 +108,7 @@ describe("<JenkinsJob />", () => {
 
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(
-        "/api/zabbix/jenkins/job?project=PTRF-FrontEnd&env=homolog",
+        "/api/jenkins/metrics?project=PTRF-FrontEnd&env=homolog",
         expect.any(Object)
       );
     });
@@ -119,17 +120,8 @@ describe("<JenkinsJob />", () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
       const url = fetchUrl(input);
 
-      if (url.startsWith("/api/zabbix/jenkins/job?project=SME-NovoSGP")) {
-        return okJson({
-          lastBuild: {
-            number: 1,
-            status: "SUCCESS",
-            timestampMs: 1,
-            timestamp: "01/01/2024 00:00",
-            durationMs: 1000,
-            duration: "1s",
-          },
-        });
+      if (url.startsWith("/api/jenkins/metrics?project=SME-NovoSGP")) {
+        return metricsResponse(1);
       }
 
       throw new Error(`fetch inesperado: ${url}`);
@@ -142,11 +134,9 @@ describe("<JenkinsJob />", () => {
     );
 
     expect(screen.queryByText("Projeto")).not.toBeInTheDocument();
-    expect(await screen.findByLabelText("Selecionar ambiente")).toHaveTextContent("Produção");
-
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledWith(
-        "/api/zabbix/jenkins/job?project=SME-NovoSGP",
+        "/api/jenkins/metrics?project=SME-NovoSGP",
         expect.any(Object)
       );
     });
@@ -156,7 +146,7 @@ describe("<JenkinsJob />", () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
       const url = fetchUrl(input);
 
-      if (url.startsWith("/api/zabbix/jenkins/job?")) {
+      if (url.startsWith("/api/jenkins/metrics?")) {
         throw new Error("Não deveria chamar endpoint de job");
       }
 

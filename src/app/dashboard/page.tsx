@@ -60,11 +60,6 @@ export default function Dashboard() {
 
                 <TabsContent value="operacional">
                     <div className="grid grid-cols-4 gap-4 mb-4">
-                        <div id="onboarding-lancamentos" className="col-span-2">
-                            <JenkinsJob project={projectName} subprojects={jenkinsSubprojects} />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-4 gap-4 mb-4">
                         <CardWrapperInfoAmbientes
                             id="onboarding-disponibilidade"
                             title="Disponibilidade do ambiente"
@@ -177,13 +172,18 @@ export default function Dashboard() {
 
                 <TabsContent value="saude-deploy">
                     <EnvironmentHeader value={deployEnvironment} onChange={setDeployEnvironment} />
-                    <SonarQualityIndicatorsCard
-                        projectName={projectName}
-                        sonarProjectKey={activeProject?.sonarProjectKey}
-                        zabbixQueryJenkinsJob={activeProject?.zabbixQueryJenkinsJob}
-                        environment={deployEnvironment}
-                        className="mt-4"
-                    />
+                    <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
+                        <div id="onboarding-lancamentos" className="lg:col-span-1">
+                            <JenkinsJob project={projectName} subprojects={jenkinsSubprojects} />
+                        </div>
+                        <SonarQualityIndicatorsCard
+                            projectName={projectName}
+                            sonarProjectKey={activeProject?.sonarProjectKey}
+                            zabbixQueryJenkinsJob={activeProject?.zabbixQueryJenkinsJob}
+                            environment={deployEnvironment}
+                            className="lg:col-span-3"
+                        />
+                    </div>
                 </TabsContent>
             </Tabs>
         </div>

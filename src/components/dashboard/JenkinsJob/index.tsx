@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import JenkinsJobCard from "@/components/dashboard/JenkinsJobCard";
-import { useJenkinsJob } from "@/hooks/useJenkinsJob";
+import JenkinsBranchBuildsCard from "@/components/dashboard/JenkinsBranchBuildsCard";
+import { useJenkinsMetrics } from "@/hooks/useJenkinsMetrics";
 import { cn } from "@/lib/utils";
 import {
     Select,
@@ -23,7 +23,7 @@ type Props = {
 };
 
 export default function JenkinsJob({
-    title = "Lançamentos",
+    title = "Jenkins - Branches e Builds",
     className,
     project,
     subprojects: subprojectsProp,
@@ -53,23 +53,18 @@ export default function JenkinsJob({
         );
     }, [project, subprojects]);
 
-    const query = useJenkinsJob({
-        endpoint: "/api/zabbix/jenkins/job",
-        keyPrefix: "zabbix-jenkins-job",
+    const query = useJenkinsMetrics({
         projectName: selectedKey,
         environment,
     });
 
     if (!project) {
         return (
-            <JenkinsJobCard 
+            <JenkinsBranchBuildsCard 
                 title={title} 
                 className={className} 
                 projectName="" 
                 query={query}
-                showEnvironmentSelect
-                environment={environment}
-                onEnvironmentChange={setEnvironment}
             />
         );
     }
@@ -139,7 +134,7 @@ export default function JenkinsJob({
                     </Select>
                 </div>
 
-                <JenkinsJobCard
+                <JenkinsBranchBuildsCard
                     title=""
                     projectName={selectedKey}
                     query={query}
@@ -151,15 +146,12 @@ export default function JenkinsJob({
     }
 
     return (
-        <JenkinsJobCard
+        <JenkinsBranchBuildsCard
             title={title}
             className={className}
             projectName={selectedKey}
             query={query}
             emptyProjectHint="Selecione um projeto"
-            showEnvironmentSelect
-            environment={environment}
-            onEnvironmentChange={setEnvironment}
         />
     );
 }

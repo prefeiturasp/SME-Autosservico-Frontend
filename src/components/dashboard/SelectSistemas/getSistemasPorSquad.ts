@@ -135,10 +135,53 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
     },
 };
 
+// Chave principal usada pelo card "SonarQube - Indicadores de qualidade".
+// Quando há múltiplos componentes no SonarQube, priorizamos o frontend/interface principal.
+const SONAR_PROJECT_KEY_BY_SQUAD_PROJECT: Record<string, Record<string, string>> = {
+    ASCOM: {
+        "PORTAL EDUCACAO": "SME-EDUCACAO",
+        "PORTAL CEU": "SME-CEU",
+        PLATEIA: "SME-Plateia-API",
+        "PLATEIA APP": "SME-Plateia-App",
+        INTRANET: "SME-INTRANET",
+    },
+    CODAE: {
+        SIGPAE: "SME-SIGPAE-FrontEnd",
+        "ROLE AGROECOLOGICO": "SME-ROLE-AGROECOLOGICO",
+    },
+    COGEP: {
+        SIGLA: "SME-SIGLA-Frontend",
+    },
+    COPED: {
+        CDEP: "SME-CDEP-FRONTEND",
+        "CONECTA FORMACAO": "SME-CONECTAFORMACAO-FRONTEND",
+        "CURRICULO DA CIDADE": "SME-plataforma-curriculo-interface",
+        IDEP: "SME-Indice_IDEP-Front",
+        "NOVO SGP": "SME-NovoSGP-WebClient",
+        SERAP: "SME-Serap-main",
+        "SERAP ESTUDANTES": "SME-prova-serap-front",
+    },
+    COPLAN: {
+        SIGESCOLA: "SME-PTRF-FrontEnd",
+    },
+    COTIC: {
+        AUTOSSERVICO: "SME-Autosservico-Frontend",
+    },
+    GIPE: {
+        GIPE: "SME-GIPE-FRONTEND",
+    },
+};
+
 function getJenkinsSubprojectsForProject(squadName: string, projectName: string): JenkinsSubproject[] {
     const squadKey = normalizeName(squadName);
     const projectKey = normalizeName(projectName);
     return [...(JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT[squadKey]?.[projectKey] ?? [])];
+}
+
+function getSonarProjectKeyForProject(squadName: string, projectName: string): string | undefined {
+    const squadKey = normalizeName(squadName);
+    const projectKey = normalizeName(projectName);
+    return SONAR_PROJECT_KEY_BY_SQUAD_PROJECT[squadKey]?.[projectKey];
 }
 
 export function getSistemasPorSquad(squadName: string): Sistema[] {
@@ -146,5 +189,6 @@ export function getSistemasPorSquad(squadName: string): Sistema[] {
     return sistemas.map((sistema) => ({
         ...sistema,
         jenkinsSubprojects: getJenkinsSubprojectsForProject(squadName, sistema.nome),
+        sonarProjectKey: getSonarProjectKeyForProject(squadName, sistema.nome),
     }));
 }

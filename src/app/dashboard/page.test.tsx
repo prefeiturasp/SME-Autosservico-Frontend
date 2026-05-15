@@ -1,6 +1,6 @@
 // src/app/dashboard/page.test.tsx
 /* @vitest-environment jsdom */
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { vi, describe, test, beforeEach } from "vitest";
 import Dashboard from "./page";
 import { withClient } from "@/__mocks__/renderWithClient";
@@ -15,6 +15,9 @@ type StoreState = {
     zabbixQueryFrontend?: string;
     zabbixQueryBackend?: string;
     zabbixQueryFilasRabbitMQ?: string;
+    sonarProjectKey?: string;
+    zabbixQueryJenkinsJob?: string;
+    jenkinsSubprojects?: unknown[];
   };
 };
 let mockStoreState: StoreState = {
@@ -57,8 +60,22 @@ vi.mock("@/components/dashboard/SaudeDosServidores/Filas", () => ({
 vi.mock("@/components/dashboard/JenkinsJob", () => ({
   __esModule: true,
   default: ({ title, project, subprojects }: { title?: string; project: string; subprojects?: unknown[] }) => (
-    <div data-testid={`jenkins-${title ?? "Lançamento de Versões"}`}>
+    <div data-testid={`jenkins-${title ?? "Jenkins - Branches e Builds"}`}>
       {project}::{Array.isArray(subprojects) ? subprojects.length : 0}
+    </div>
+  ),
+}));
+
+vi.mock("@/components/dashboard/DeployHealth/EnvironmentHeader", () => ({
+  __esModule: true,
+  default: () => <div data-testid="environment-header">Ambiente</div>,
+}));
+
+vi.mock("@/components/dashboard/DeployHealth/SonarQuality/SonarQualityIndicatorsCard", () => ({
+  __esModule: true,
+  default: ({ projectName, className }: { projectName: string; className?: string }) => (
+    <div data-testid="sonar-quality" className={className}>
+      {projectName}
     </div>
   ),
 }));
@@ -98,11 +115,32 @@ describe("Dashboard page", () => {
     // Filas
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent("Filas RabbitMQ");
 
-    // Jenkins (não está envolto em CardWrapperInfoAmbientes)
-    expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("Novo SGP::0");
-
     // Banco de dados
     expect(screen.getByTestId("database-status-card")).toHaveTextContent("Novo SGP");
+  });
+
+  test("renderiza Jenkins - Branches e Builds na aba Saúde do deploy à esquerda do Sonar", () => {
+    mockStoreState = {
+      activeItem: { title: "COPED" },
+      activeProject: {
+        nome: "Novo SGP",
+        zabbixQueryFrontend: "Portal SME",
+        zabbixQueryBackend: "API SME",
+        zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
+        jenkinsSubprojects: [{ label: "Backend", key: "SME-NovoSGP/master" }],
+      },
+    };
+
+    render(withClient(<Dashboard />));
+
+    fireEvent.click(screen.getByRole("tab", { name: "Saúde do deploy" }));
+
+    const jenkins = screen.getByTestId("jenkins-Jenkins - Branches e Builds");
+    const sonar = screen.getByTestId("sonar-quality");
+
+    expect(jenkins).toHaveTextContent("Novo SGP::1");
+    expect(jenkins.parentElement).toHaveClass("lg:col-span-1");
+    expect(sonar).toHaveClass("lg:col-span-3");
   });
 
   test("quando não há projeto ativo, passa strings vazias para os filhos (ramo do ??)", () => {
@@ -113,7 +151,6 @@ describe("Dashboard page", () => {
     expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("");
     expect(screen.getByTestId("producao-API Service")).toHaveTextContent("");
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent("");
-    expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("::0");
     expect(screen.getByTestId("database-status-card")).toHaveTextContent("");
   });
 
@@ -133,7 +170,6 @@ describe("Dashboard page", () => {
     expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("Portal SME");
     expect(screen.getByTestId("producao-API Service")).toHaveTextContent("API SME");
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent("Filas RabbitMQ");
-    expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("Novo SGP::0");
   });
 
   test("quando um campo específico está undefined, cai no fallback vazio para aquele filho", () => {
@@ -152,6 +188,5 @@ describe("Dashboard page", () => {
     expect(screen.getByTestId("producao-Frontend")).toHaveTextContent("Portal SME");
     expect(screen.getByTestId("producao-API Service")).toHaveTextContent("API SME");
     expect(screen.getByTestId("filas-Fila")).toHaveTextContent(""); // fallback
-    expect(screen.getByTestId("jenkins-Lançamento de Versões")).toHaveTextContent("Novo SGP::0");
   });
 });

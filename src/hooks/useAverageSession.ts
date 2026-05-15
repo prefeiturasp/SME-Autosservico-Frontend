@@ -1,9 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import type { AverageSessionResponse } from "@/types/averageSession";
 import type { MetricTrend } from "@/types/metric";
+import {
+  DEFAULT_ANALYTICS_PERIOD,
+  type AnalyticsPeriod,
+} from "@/types/analyticsPeriod";
 
 type Options = {
   systemName: string;
+  period?: AnalyticsPeriod;
 };
 
 const AVERAGE_SECONDS = 868;
@@ -21,9 +26,12 @@ function pickRandomTrend(): MetricTrend {
   return trends[buffer[0] % trends.length];
 }
 
-export function useAverageSession({ systemName }: Options) {
+export function useAverageSession({
+  systemName,
+  period = DEFAULT_ANALYTICS_PERIOD,
+}: Options) {
   return useQuery<AverageSessionResponse>({
-    queryKey: ["average-session", systemName],
+    queryKey: ["average-session", systemName, period],
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {

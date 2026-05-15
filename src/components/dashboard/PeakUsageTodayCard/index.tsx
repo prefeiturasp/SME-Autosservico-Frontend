@@ -2,10 +2,16 @@
 
 import MetricCard from "@/components/dashboard/MetricCard";
 import { usePeakUsageToday } from "@/hooks/usePeakUsageToday";
+import {
+  DEFAULT_ANALYTICS_PERIOD,
+  getPeakCardTitle,
+  type AnalyticsPeriod,
+} from "@/types/analyticsPeriod";
 import { PeakStatusBadge } from "./PeakStatusBadge";
 
 type Props = {
   readonly systemName?: string;
+  readonly period?: AnalyticsPeriod;
   readonly className?: string;
 };
 
@@ -13,14 +19,19 @@ function formatPeakHour(hour: number) {
   return `${hour}h`;
 }
 
-export default function PeakUsageTodayCard({ systemName, className }: Props) {
+export default function PeakUsageTodayCard({
+  systemName,
+  period = DEFAULT_ANALYTICS_PERIOD,
+  className,
+}: Props) {
   const { data, isLoading, isFetching, isError, refetch } = usePeakUsageToday({
     systemName: systemName ?? "",
+    period,
   });
 
   return (
     <MetricCard
-      title="Pico de uso hoje"
+      title={getPeakCardTitle(period)}
       systemName={systemName}
       isLoading={isLoading || isFetching}
       isError={isError}

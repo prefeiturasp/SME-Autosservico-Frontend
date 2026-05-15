@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useDashboardStore from "@/states/dashboard";
 import { useState } from "react";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
+import type { DashboardTab } from "@/types/analyticsPeriod";
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -42,6 +43,8 @@ function FullWidthSection({ id, title, tooltip, children }: FullWidthSectionProp
 
 export default function Dashboard() {
     const activeProject = useDashboardStore((state) => state.activeProject);
+    const setActiveTab = useDashboardStore((state) => state.setActiveTab);
+    const activePeriod = useDashboardStore((state) => state.activePeriod);
     const projectName = activeProject?.nome?.trim() ?? "";
     const projectNameFrontEnd = activeProject?.zabbixQueryFrontend?.trim() ?? "";
     const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim() ?? "";
@@ -51,7 +54,10 @@ export default function Dashboard() {
 
     return (
         <div className="bg-background px-6 py-4">
-            <Tabs defaultValue="operacional">
+            <Tabs
+                defaultValue="operacional"
+                onValueChange={(value) => setActiveTab(value as DashboardTab)}
+            >
                 <TabsList className="mb-6 px-1">
                     <TabsTrigger value="operacional">Operacional</TabsTrigger>
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -149,13 +155,13 @@ export default function Dashboard() {
 
                 <TabsContent value="analytics">
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                        <ActiveUsersCard systemName={projectName} />
-                        <AverageSessionCard systemName={projectName} />
-                        <PeakUsageTodayCard systemName={projectName} />
+                        <ActiveUsersCard systemName={projectName} period={activePeriod} />
+                        <AverageSessionCard systemName={projectName} period={activePeriod} />
+                        <PeakUsageTodayCard systemName={projectName} period={activePeriod} />
                     </div>
                     <div className="grid grid-cols-4 gap-4 mb-4">
-                        <UsersByPageCard systemName={projectName} className="col-span-2" />
-                        <DeviceDistributionCard systemName={projectName} className="col-span-2" />
+                        <UsersByPageCard systemName={projectName} period={activePeriod} className="col-span-2" />
+                        <DeviceDistributionCard systemName={projectName} period={activePeriod} className="col-span-2" />
                     </div>
                     <FullWidthSection
                         title="Horários de pico"
@@ -166,7 +172,7 @@ export default function Dashboard() {
                             </p>
                         }
                     >
-                        <PeakHoursChart systemName={projectName} className="p-[2px]" />
+                        <PeakHoursChart systemName={projectName} period={activePeriod} className="p-[2px]" />
                     </FullWidthSection>
                 </TabsContent>
 

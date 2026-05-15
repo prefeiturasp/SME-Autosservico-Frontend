@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getJenkinsBranchBuildMetrics } from "@/actions/jenkins-metrics";
+import type { JenkinsEnvironment } from "@/types/deployEnvironment";
 
 export const runtime = "nodejs";
 export const revalidate = 0;
+
+function resolveJenkinsEnvironment(env: string): JenkinsEnvironment {
+  if (env === "homolog") return "homolog";
+  if (env === "test") return "test";
+  return "prod";
+}
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -15,8 +22,7 @@ export async function GET(req: NextRequest) {
 
   if (!project) return NextResponse.json({ error: "project é obrigatório" }, { status: 400 });
 
-  const resolvedEnv =
-    env === "homolog" ? "homolog" : env === "test" ? "test" : "prod";
+  const resolvedEnv = resolveJenkinsEnvironment(env);
 
   try {
     const metrics = await getJenkinsBranchBuildMetrics(project, resolvedEnv);

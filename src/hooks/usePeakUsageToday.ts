@@ -3,9 +3,14 @@ import type {
   PeakUsageStatus,
   PeakUsageTodayResponse,
 } from "@/types/peakUsageToday";
+import {
+  DEFAULT_ANALYTICS_PERIOD,
+  type AnalyticsPeriod,
+} from "@/types/analyticsPeriod";
 
 type Options = {
   systemName: string;
+  period?: AnalyticsPeriod;
 };
 
 const MOCK_PEAK_HOUR = 15;
@@ -17,9 +22,12 @@ function pickRandomStatus(): PeakUsageStatus {
   return statuses[buffer[0] % statuses.length];
 }
 
-export function usePeakUsageToday({ systemName }: Options) {
+export function usePeakUsageToday({
+  systemName,
+  period = DEFAULT_ANALYTICS_PERIOD,
+}: Options) {
   return useQuery<PeakUsageTodayResponse>({
-    queryKey: ["peak-usage-today", systemName],
+    queryKey: ["peak-usage-today", systemName, period],
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {

@@ -5,10 +5,12 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { usePeakHours } from "@/hooks/usePeakHours";
+import type { AnalyticsPeriod } from "@/types/analyticsPeriod";
 import Chart from "./Chart";
 
 type Props = {
   readonly systemName: string;
+  readonly period?: AnalyticsPeriod;
   readonly className?: string;
 };
 
@@ -37,9 +39,10 @@ function LoadingSkeleton({ className }: { readonly className?: string }) {
   );
 }
 
-export default function PeakHoursChart({ systemName, className }: Props) {
+export default function PeakHoursChart({ systemName, period, className }: Props) {
   const { data, isLoading, isFetching, isError, refetch } = usePeakHours({
     systemName,
+    period,
   });
 
   if (!systemName) {

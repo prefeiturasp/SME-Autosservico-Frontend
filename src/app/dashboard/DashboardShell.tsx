@@ -10,6 +10,7 @@ import {
 import { AppSidebar } from "@/components/dashboard/Sidebar/app-sidebar";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { SelectSistemas } from "@/components/dashboard/SelectSistemas";
+import AnalyticsFilters from "@/components/dashboard/Analytics/AnalyticsFilters";
 import { WelcomeModal } from "@/components/dashboard/Onboarding/WelcomeModal";
 import { TourOverlay } from "@/components/dashboard/Onboarding/TourOverlay";
 import { SessionGuard } from "@/components/dashboard/SessionGuard";
@@ -34,7 +35,7 @@ export function DashboardShell({ children, session }: DashboardShellProps) {
                         <SidebarTrigger className="md:hidden" />
                         <div id="onboarding-header-section">
                             <PageHeader />
-                            <SelectSistemas />
+                            <SelectSistemas rightSlot={<AnalyticsFilters />} />
                         </div>
                         {children}
                     </SidebarInset>

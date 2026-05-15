@@ -15,9 +15,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useUsersByPage } from "@/hooks/useUsersByPage";
 import type { UsersByPageEntry } from "@/types/usersByPage";
+import type { AnalyticsPeriod } from "@/types/analyticsPeriod";
 
 type Props = {
   readonly systemName?: string;
+  readonly period?: AnalyticsPeriod;
   readonly className?: string;
 };
 
@@ -192,9 +194,10 @@ function TableHeader({ sort, onSort }: TableHeaderProps) {
   );
 }
 
-export default function UsersByPageCard({ systemName, className }: Props) {
+export default function UsersByPageCard({ systemName, period, className }: Props) {
   const { data, isLoading, isFetching, isError, refetch } = useUsersByPage({
     systemName: systemName ?? "",
+    period,
   });
 
   const [selectedPath, setSelectedPath] = useState<string>(ALL_PAGES_VALUE);

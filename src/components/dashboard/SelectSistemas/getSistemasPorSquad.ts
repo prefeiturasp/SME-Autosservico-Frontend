@@ -50,7 +50,7 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
         "PLATEIA APP": [{ label: "SME-Plateia-App", key: "SME-Plateia-App" }],
     },
     CODAE: {
-        "ROLE AGROECOLOGICO": [{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO/main" }],
+        "ROLE AGROECOLOGICO": [{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO" }],
         SIGPAE: [
             { label: "Frontend", key: "Sigpae-Frontend-branchs" },
             { label: "Backend", key: "Sigpae-Backend" },

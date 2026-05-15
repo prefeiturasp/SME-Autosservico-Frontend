@@ -19,6 +19,10 @@ type StoreState = {
     zabbixQueryJenkinsJob?: string;
     jenkinsSubprojects?: unknown[];
   };
+  activeTab?: string;
+  activePeriod?: string;
+  setActiveTab?: (tab: string) => void;
+  setActivePeriod?: (period: string) => void;
 };
 let mockStoreState: StoreState = {
   activeItem: { title: "COPED" },
@@ -27,6 +31,14 @@ let mockStoreState: StoreState = {
     zabbixQueryFrontend: "Portal SME",
     zabbixQueryBackend: "API SME",
     zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
+  },
+  activeTab: "operacional",
+  activePeriod: "hoje",
+  setActiveTab: (tab) => {
+    mockStoreState = { ...mockStoreState, activeTab: tab };
+  },
+  setActivePeriod: (period) => {
+    mockStoreState = { ...mockStoreState, activePeriod: period };
   },
 };
 
@@ -98,6 +110,14 @@ describe("Dashboard page", () => {
         zabbixQueryBackend: "API SME",
         zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
       },
+      activeTab: "operacional",
+      activePeriod: "hoje",
+      setActiveTab: (tab) => {
+        mockStoreState = { ...mockStoreState, activeTab: tab };
+      },
+      setActivePeriod: (period) => {
+        mockStoreState = { ...mockStoreState, activePeriod: period };
+      },
     };
   });
 
@@ -121,6 +141,7 @@ describe("Dashboard page", () => {
 
   test("renderiza Jenkins - Branches e Builds na aba Saúde do deploy à esquerda do Sonar", () => {
     mockStoreState = {
+      ...mockStoreState,
       activeItem: { title: "COPED" },
       activeProject: {
         nome: "Novo SGP",
@@ -144,7 +165,7 @@ describe("Dashboard page", () => {
   });
 
   test("quando não há projeto ativo, passa strings vazias para os filhos (ramo do ??)", () => {
-    mockStoreState = { activeProject: null };
+    mockStoreState = { ...mockStoreState, activeProject: null };
 
     render(withClient(<Dashboard />));
 
@@ -156,6 +177,7 @@ describe("Dashboard page", () => {
 
   test("trima os nomes antes de passar (ramo do ?.trim())", () => {
     mockStoreState = {
+      ...mockStoreState,
       activeItem: { title: "COPED" },
       activeProject: {
         nome: "   Novo SGP   ",
@@ -174,6 +196,7 @@ describe("Dashboard page", () => {
 
   test("quando um campo específico está undefined, cai no fallback vazio para aquele filho", () => {
     mockStoreState = {
+      ...mockStoreState,
       activeItem: { title: "COPED" },
       activeProject: {
         nome: "Novo SGP",

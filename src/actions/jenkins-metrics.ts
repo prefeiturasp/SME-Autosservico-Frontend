@@ -9,7 +9,7 @@ import type {
   JenkinsMetricsApiResponse,
 } from "@/types/jenkins-metrics";
 
-type JenkinsEnvironment = "prod" | "homolog";
+import type { JenkinsEnvironment } from "@/types/deployEnvironment";
 
 function normalizeProjectFullName(projectFullName: string): string | null {
   const normalized = projectFullName.trim();
@@ -48,7 +48,25 @@ function buildCandidateFullNames(project: string, environment: JenkinsEnvironmen
     return [...new Set(homologCandidates.map((env) => `${base}/${env}`))];
   }
 
-  return project.includes("/") ? [project] : [`${project}/master`, `${project}/main`];
+  if (environment === "test") {
+    const testCandidates = [
+      ...(currentEnv && /prod/i.test(currentEnv)
+        ? [currentEnv.replaceAll(/prod/gi, "test")]
+        : []),
+      "test",
+      "teste",
+      "testes",
+      "qa",
+      "develop",
+      "dev",
+    ];
+
+    return [...new Set(testCandidates.map((env) => `${base}/${env}`))];
+  }
+
+  return project.includes("/")
+    ? [project]
+    : [`${project}/master`, `${project}/main`, project];
 }
 
 function normalizeStatus(build: JenkinsJobApiBuild | null | undefined): JenkinsBuildStatus {

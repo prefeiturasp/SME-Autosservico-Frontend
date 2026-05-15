@@ -95,10 +95,10 @@ describe("getSistemasPorSquad", () => {
         expect(portal?.jenkinsSubprojects).toEqual([{ label: "CEU", key: "CEU/php-fpm-prod" }]);
     });
 
-    it("inclui subprojeto para Rolê Agroecológico (main)", () => {
+    it("inclui subprojeto para Rolê Agroecológico (job no root)", () => {
         const sistemas = getSistemasPorSquad("CODAE");
         const role = sistemas.find((s) => s.nome === "Rolê Agroecológico");
-        expect(role?.jenkinsSubprojects).toEqual([{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO/main" }]);
+        expect(role?.jenkinsSubprojects).toEqual([{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO" }]);
     });
 
     it("inclui subprojeto para Autosserviço", () => {

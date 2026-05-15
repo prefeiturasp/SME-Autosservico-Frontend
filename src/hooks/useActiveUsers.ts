@@ -1,9 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ActiveUsersResponse } from "@/types/activeUsers";
 import type { MetricTrend } from "@/types/metric";
+import {
+  DEFAULT_ANALYTICS_PERIOD,
+  type AnalyticsPeriod,
+} from "@/types/analyticsPeriod";
 
 type Options = {
   systemName: string;
+  period?: AnalyticsPeriod;
 };
 
 const AVERAGE_COUNT = 7563;
@@ -24,9 +29,12 @@ function pickRandomTrend(): MetricTrend {
   return trends[buffer[0] % trends.length];
 }
 
-export function useActiveUsers({ systemName }: Options) {
+export function useActiveUsers({
+  systemName,
+  period = DEFAULT_ANALYTICS_PERIOD,
+}: Options) {
   return useQuery<ActiveUsersResponse>({
-    queryKey: ["active-users", systemName],
+    queryKey: ["active-users", systemName, period],
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {

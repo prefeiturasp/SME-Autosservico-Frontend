@@ -1,10 +1,10 @@
 "use client";
-import { useEffect } from "react";
 import {
-    useOnboardingStore,
     ONBOARDING_STORAGE_KEY,
     TOUR_STEPS,
+    useOnboardingStore,
 } from "@/states/onboarding";
+import { useEffect } from "react";
 
 export function useOnboarding() {
     const {
@@ -22,8 +22,6 @@ export function useOnboarding() {
     } = useOnboardingStore();
 
     useEffect(() => {
-        if (typeof window === "undefined") return;
-
         const hasCompleted = localStorage.getItem(ONBOARDING_STORAGE_KEY);
 
         if (!hasCompleted) {

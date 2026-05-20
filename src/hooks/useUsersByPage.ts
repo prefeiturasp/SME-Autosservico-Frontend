@@ -1,8 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import type { UsersByPageResponse } from "@/types/usersByPage";
+import {
+  DEFAULT_ANALYTICS_PERIOD,
+  type AnalyticsPeriod,
+} from "@/types/analyticsPeriod";
 
 type Options = {
   systemName: string;
+  period?: AnalyticsPeriod;
 };
 
 const MOCK_PAGES: UsersByPageResponse["pages"] = [
@@ -18,9 +23,12 @@ const MOCK_PAGES: UsersByPageResponse["pages"] = [
   { path: "/Ajuda", currentUsers: 513, averageUsers: 1305 },
 ];
 
-export function useUsersByPage({ systemName }: Options) {
+export function useUsersByPage({
+  systemName,
+  period = DEFAULT_ANALYTICS_PERIOD,
+}: Options) {
   return useQuery<UsersByPageResponse>({
-    queryKey: ["users-by-page", systemName],
+    queryKey: ["users-by-page", systemName, period],
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {

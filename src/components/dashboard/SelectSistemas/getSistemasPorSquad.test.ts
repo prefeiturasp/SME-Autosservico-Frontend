@@ -60,6 +60,21 @@ describe("getSistemasPorSquad", () => {
         const sistemas = getSistemasPorSquad("COGEP");
         const escolhas = sistemas.find((s) => s.nome === "Escolhas");
         expect(escolhas?.jenkinsSubprojects).toEqual([]);
+        expect(escolhas?.sonarProjectKey).toBeUndefined();
+    });
+
+    it("inclui chaves explícitas do SonarQube para projetos mapeados", () => {
+        const coped = getSistemasPorSquad("COPED");
+        const ascom = getSistemasPorSquad("ASCOM");
+        const coplan = getSistemasPorSquad("COPLAN");
+
+        expect(coped.find((s) => s.nome === "Novo SGP")?.sonarProjectKey).toBe("SME-NovoSGP-WebClient");
+        expect(coped.find((s) => s.nome === "Cdep")?.sonarProjectKey).toBe("SME-CDEP-FRONTEND");
+        expect(coped.find((s) => s.nome === "Curriculo da Cidade")?.sonarProjectKey).toBe(
+            "SME-plataforma-curriculo-interface"
+        );
+        expect(ascom.find((s) => s.nome === "Portal Educação")?.sonarProjectKey).toBe("SME-EDUCACAO");
+        expect(coplan.find((s) => s.nome === "SigEscola")?.sonarProjectKey).toBe("SME-PTRF-FrontEnd");
     });
 
     it("inclui subprojeto para Portal Educação (php-fpm-prod)", () => {
@@ -80,10 +95,10 @@ describe("getSistemasPorSquad", () => {
         expect(portal?.jenkinsSubprojects).toEqual([{ label: "CEU", key: "CEU/php-fpm-prod" }]);
     });
 
-    it("inclui subprojeto para Rolê Agroecológico (main)", () => {
+    it("inclui subprojeto para Rolê Agroecológico (job no root)", () => {
         const sistemas = getSistemasPorSquad("CODAE");
         const role = sistemas.find((s) => s.nome === "Rolê Agroecológico");
-        expect(role?.jenkinsSubprojects).toEqual([{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO/main" }]);
+        expect(role?.jenkinsSubprojects).toEqual([{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO" }]);
     });
 
     it("inclui subprojeto para Autosserviço", () => {

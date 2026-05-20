@@ -10,6 +10,34 @@ function okJson(data: unknown) {
     } as unknown as Response;
 }
 
+function metricsResponse(number: number, status = "SUCCESS") {
+    return okJson({
+        found: true,
+        data: {
+            jobName: "job",
+            jobUrl: "https://jenkins.example/job/job",
+            status,
+            stabilityPercent: 100,
+            lastBuild: {
+                number,
+                status,
+                timestampMs: Date.now(),
+                timestamp: "01/01/2024 00:00",
+                durationMs: 48000,
+                duration: "48s",
+            },
+            lastSuccessfulBuild: {
+                number,
+                status: "SUCCESS",
+                timestampMs: Date.now(),
+                timestamp: "01/01/2024 00:00",
+                durationMs: 48000,
+                duration: "48s",
+            },
+        },
+    });
+}
+
 function fetchUrl(input: RequestInfo | URL): string {
     if (typeof input === "string") return input;
     if (input instanceof URL) return input.toString();
@@ -21,61 +49,22 @@ describe("<JenkinsJob />", () => {
         vi.restoreAllMocks();
     });
 
-    it("com múltiplos subprojetos: mostra select e atualiza automaticamente ao trocar", async () => {
+    it("com múltiplos subprojetos: mostra select de projeto e atualiza automaticamente ao trocar", async () => {
         const fetchSpy = vi
-            .spyOn(globalThis, "fetch")
+            .spyOn(global, "fetch")
             .mockImplementation(async (input) => {
                 const url = fetchUrl(input);
 
                 if (
-                    url.startsWith(
-                        "/api/zabbix/jenkins/job?project=PTRF-FrontEnd&env=homolog",
-                    )
+                    url.startsWith("/api/jenkins/metrics?project=PTRF-BackEnd")
                 ) {
-                    return okJson({
-                        lastBuild: {
-                            number: 99,
-                            status: "SUCCESS",
-                            timestampMs: 99,
-                            timestamp: "03/01/2024 00:00",
-                            durationMs: 99000,
-                            duration: "99s",
-                        },
-                    });
+                    return metricsResponse(1);
                 }
 
                 if (
-                    url.startsWith(
-                        "/api/zabbix/jenkins/job?project=PTRF-BackEnd",
-                    )
+                    url.startsWith("/api/jenkins/metrics?project=PTRF-FrontEnd")
                 ) {
-                    return okJson({
-                        lastBuild: {
-                            number: 1,
-                            status: "SUCCESS",
-                            timestampMs: 1,
-                            timestamp: "01/01/2024 00:00",
-                            durationMs: 1000,
-                            duration: "1s",
-                        },
-                    });
-                }
-
-                if (
-                    url.startsWith(
-                        "/api/zabbix/jenkins/job?project=PTRF-FrontEnd",
-                    )
-                ) {
-                    return okJson({
-                        lastBuild: {
-                            number: 2,
-                            status: "FAILURE",
-                            timestampMs: 2,
-                            timestamp: "02/01/2024 00:00",
-                            durationMs: 2000,
-                            duration: "2s",
-                        },
-                    });
+                    return metricsResponse(2, "FAILURE");
                 }
 
                 throw new Error(`fetch inesperado: ${url}`);
@@ -95,12 +84,12 @@ describe("<JenkinsJob />", () => {
 
         expect(await screen.findByText("Projeto")).toBeInTheDocument();
         expect(
-            await screen.findByLabelText("Selecionar ambiente"),
-        ).toHaveTextContent("Produção");
+            screen.queryByLabelText("Selecionar ambiente"),
+        ).not.toBeInTheDocument();
 
         await waitFor(() => {
             expect(fetchSpy).toHaveBeenCalledWith(
-                "/api/zabbix/jenkins/job?project=PTRF-BackEnd",
+                "/api/jenkins/metrics?project=PTRF-BackEnd",
                 expect.any(Object),
             );
         });
@@ -111,48 +100,92 @@ describe("<JenkinsJob />", () => {
 
         await waitFor(() => {
             expect(fetchSpy).toHaveBeenCalledWith(
-                "/api/zabbix/jenkins/job?project=PTRF-FrontEnd",
+                "/api/jenkins/metrics?project=PTRF-FrontEnd",
                 expect.any(Object),
             );
         });
-
-        const envTrigger = screen.getByLabelText("Selecionar ambiente");
-        fireEvent.click(envTrigger);
-        fireEvent.click(screen.getByText("Homologação"));
-
-        await waitFor(() => {
-            expect(fetchSpy).toHaveBeenCalledWith(
-                "/api/zabbix/jenkins/job?project=PTRF-FrontEnd&env=homolog",
-                expect.any(Object),
-            );
-        });
-
-        expect(screen.getByLabelText("Selecionar ambiente")).toHaveTextContent(
-            "Homologação",
-        );
     });
 
-    it("com apenas 1 subprojeto: não exige seleção adicional", async () => {
+    it("respeita o ambiente recebido via prop (homologacao → env=homolog)", async () => {
         const fetchSpy = vi
-            .spyOn(globalThis, "fetch")
+            .spyOn(global, "fetch")
             .mockImplementation(async (input) => {
                 const url = fetchUrl(input);
 
                 if (
                     url.startsWith(
-                        "/api/zabbix/jenkins/job?project=SME-NovoSGP",
+                        "/api/jenkins/metrics?project=PTRF-BackEnd&env=homolog",
                     )
                 ) {
-                    return okJson({
-                        lastBuild: {
-                            number: 1,
-                            status: "SUCCESS",
-                            timestampMs: 1,
-                            timestamp: "01/01/2024 00:00",
-                            durationMs: 1000,
-                            duration: "1s",
-                        },
-                    });
+                    return metricsResponse(1);
+                }
+
+                throw new Error(`fetch inesperado: ${url}`);
+            });
+
+        render(
+            withClient(
+                <JenkinsJob
+                    project="SigEscola"
+                    environment="homologacao"
+                    subprojects={[{ label: "Backend", key: "PTRF-BackEnd" }]}
+                />,
+            ),
+        );
+
+        await waitFor(() => {
+            expect(fetchSpy).toHaveBeenCalledWith(
+                "/api/jenkins/metrics?project=PTRF-BackEnd&env=homolog",
+                expect.any(Object),
+            );
+        });
+    });
+
+    it("respeita o ambiente recebido via prop (qa → env=test)", async () => {
+        const fetchSpy = vi
+            .spyOn(global, "fetch")
+            .mockImplementation(async (input) => {
+                const url = fetchUrl(input);
+
+                if (
+                    url.startsWith(
+                        "/api/jenkins/metrics?project=PTRF-BackEnd&env=test",
+                    )
+                ) {
+                    return metricsResponse(1);
+                }
+
+                throw new Error(`fetch inesperado: ${url}`);
+            });
+
+        render(
+            withClient(
+                <JenkinsJob
+                    project="SigEscola"
+                    environment="qa"
+                    subprojects={[{ label: "Backend", key: "PTRF-BackEnd" }]}
+                />,
+            ),
+        );
+
+        await waitFor(() => {
+            expect(fetchSpy).toHaveBeenCalledWith(
+                "/api/jenkins/metrics?project=PTRF-BackEnd&env=test",
+                expect.any(Object),
+            );
+        });
+    });
+
+    it("com apenas 1 subprojeto: não exige seleção adicional", async () => {
+        const fetchSpy = vi
+            .spyOn(global, "fetch")
+            .mockImplementation(async (input) => {
+                const url = fetchUrl(input);
+
+                if (
+                    url.startsWith("/api/jenkins/metrics?project=SME-NovoSGP")
+                ) {
+                    return metricsResponse(1);
                 }
 
                 throw new Error(`fetch inesperado: ${url}`);
@@ -168,13 +201,9 @@ describe("<JenkinsJob />", () => {
         );
 
         expect(screen.queryByText("Projeto")).not.toBeInTheDocument();
-        expect(
-            await screen.findByLabelText("Selecionar ambiente"),
-        ).toHaveTextContent("Produção");
-
         await waitFor(() => {
             expect(fetchSpy).toHaveBeenCalledWith(
-                "/api/zabbix/jenkins/job?project=SME-NovoSGP",
+                "/api/jenkins/metrics?project=SME-NovoSGP",
                 expect.any(Object),
             );
         });
@@ -182,11 +211,11 @@ describe("<JenkinsJob />", () => {
 
     it("projeto N/E (ou sem chaves): não busca releases e mostra mensagem", async () => {
         const fetchSpy = vi
-            .spyOn(globalThis, "fetch")
+            .spyOn(global, "fetch")
             .mockImplementation(async (input) => {
                 const url = fetchUrl(input);
 
-                if (url.startsWith("/api/zabbix/jenkins/job?")) {
+                if (url.startsWith("/api/jenkins/metrics?")) {
                     throw new Error("Não deveria chamar endpoint de job");
                 }
 
@@ -206,89 +235,5 @@ describe("<JenkinsJob />", () => {
         ).toBeInTheDocument();
 
         expect(fetchSpy).not.toHaveBeenCalled();
-    });
-
-    it("sem project (string vazia): renderiza JenkinsJobCard com projectName vazio", async () => {
-        vi.spyOn(globalThis, "fetch").mockResolvedValue({
-            ok: true,
-            json: async () => ({}),
-        } as unknown as Response);
-
-        render(withClient(<JenkinsJob project="" />));
-
-        expect(
-            await screen.findByLabelText("Selecionar ambiente"),
-        ).toBeInTheDocument();
-    });
-
-    it("mantém subprojeto selecionado quando lista é ampliada e chave atual permanece válida (ramo prev do useEffect)", async () => {
-        vi.spyOn(globalThis, "fetch").mockResolvedValue({
-            ok: true,
-            json: async () => ({}),
-        } as unknown as Response);
-
-        const subA = { key: "KEY-A", label: "Projeto A" };
-        const subB = { key: "KEY-B", label: "Projeto B" };
-        const subC = { key: "KEY-C", label: "Projeto C" };
-
-        const { rerender } = render(
-            withClient(<JenkinsJob project="P" subprojects={[subA, subB]} />),
-        );
-
-        await waitFor(() => {
-            expect(globalThis.fetch).toHaveBeenCalledWith(
-                expect.stringContaining("project=KEY-A"),
-                expect.any(Object),
-            );
-        });
-
-        rerender(
-            withClient(
-                <JenkinsJob project="P" subprojects={[subA, subB, subC]} />,
-            ),
-        );
-
-        await waitFor(() => {
-            expect(
-                screen.getByLabelText("Selecionar projeto"),
-            ).toBeInTheDocument();
-        });
-    });
-
-    it("com múltiplos subprojetos: alterna ambiente de homolog de volta para prod (ramo 'prod' do onValueChange)", async () => {
-        vi.spyOn(globalThis, "fetch").mockResolvedValue({
-            ok: true,
-            json: async () => ({}),
-        } as unknown as Response);
-
-        render(
-            withClient(
-                <JenkinsJob
-                    project="P"
-                    subprojects={[
-                        { key: "KEY-A", label: "A" },
-                        { key: "KEY-B", label: "B" },
-                    ]}
-                />,
-            ),
-        );
-
-        const envTrigger = await screen.findByLabelText("Selecionar ambiente");
-
-        fireEvent.click(envTrigger);
-        fireEvent.click(screen.getByText("Homologação"));
-        await waitFor(() =>
-            expect(
-                screen.getByLabelText("Selecionar ambiente"),
-            ).toHaveTextContent("Homologação"),
-        );
-
-        fireEvent.click(screen.getByLabelText("Selecionar ambiente"));
-        fireEvent.click(screen.getByText("Produção"));
-        await waitFor(() =>
-            expect(
-                screen.getByLabelText("Selecionar ambiente"),
-            ).toHaveTextContent("Produção"),
-        );
     });
 });

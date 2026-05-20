@@ -11,8 +11,13 @@ import ActiveUsersCard from "@/components/dashboard/ActiveUsersCard";
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
+import EnvironmentHeader from "@/components/dashboard/DeployHealth/EnvironmentHeader";
+import SonarQualityIndicatorsCard from "@/components/dashboard/DeployHealth/SonarQuality/SonarQualityIndicatorsCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useDashboardStore from "@/states/dashboard";
+import { useState } from "react";
+import type { DeployEnvironment } from "@/types/deployEnvironment";
+import type { DashboardTab } from "@/types/analyticsPeriod";
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -38,26 +43,28 @@ function FullWidthSection({ id, title, tooltip, children }: FullWidthSectionProp
 
 export default function Dashboard() {
     const activeProject = useDashboardStore((state) => state.activeProject);
+    const setActiveTab = useDashboardStore((state) => state.setActiveTab);
+    const activePeriod = useDashboardStore((state) => state.activePeriod);
     const projectName = activeProject?.nome?.trim() ?? "";
     const projectNameFrontEnd = activeProject?.zabbixQueryFrontend?.trim() ?? "";
     const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim() ?? "";
     const projectNameFilasRabbitMQ = activeProject?.zabbixQueryFilasRabbitMQ?.trim() ?? "";
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
+    const [deployEnvironment, setDeployEnvironment] = useState<DeployEnvironment>("producao");
 
     return (
-        <div className="border-b bg-background px-6 py-4">
-            <Tabs defaultValue="operacional">
+        <div className="bg-background px-6 py-4">
+            <Tabs
+                defaultValue="operacional"
+                onValueChange={(value) => setActiveTab(value as DashboardTab)}
+            >
                 <TabsList className="mb-6 px-1">
                     <TabsTrigger value="operacional">Operacional</TabsTrigger>
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                    <TabsTrigger value="saude-deploy">Saúde do deploy</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="operacional">
-                    <div className="grid grid-cols-4 gap-4 mb-4">
-                        <div id="onboarding-lancamentos" className="col-span-2">
-                            <JenkinsJob project={projectName} subprojects={jenkinsSubprojects} />
-                        </div>
-                    </div>
                     <div className="grid grid-cols-4 gap-4 mb-4">
                         <CardWrapperInfoAmbientes
                             id="onboarding-disponibilidade"
@@ -148,13 +155,13 @@ export default function Dashboard() {
 
                 <TabsContent value="analytics">
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                        <ActiveUsersCard systemName={projectName} />
-                        <AverageSessionCard systemName={projectName} />
-                        <PeakUsageTodayCard systemName={projectName} />
+                        <ActiveUsersCard systemName={projectName} period={activePeriod} />
+                        <AverageSessionCard systemName={projectName} period={activePeriod} />
+                        <PeakUsageTodayCard systemName={projectName} period={activePeriod} />
                     </div>
                     <div className="grid grid-cols-4 gap-4 mb-4">
-                        <UsersByPageCard systemName={projectName} className="col-span-2" />
-                        <DeviceDistributionCard systemName={projectName} className="col-span-2" />
+                        <UsersByPageCard systemName={projectName} period={activePeriod} className="col-span-2" />
+                        <DeviceDistributionCard systemName={projectName} period={activePeriod} className="col-span-2" />
                     </div>
                     <FullWidthSection
                         title="Horários de pico"
@@ -165,8 +172,28 @@ export default function Dashboard() {
                             </p>
                         }
                     >
-                        <PeakHoursChart systemName={projectName} className="p-[2px]" />
+                        <PeakHoursChart systemName={projectName} period={activePeriod} className="p-[2px]" />
                     </FullWidthSection>
+                </TabsContent>
+
+                <TabsContent value="saude-deploy">
+                    <EnvironmentHeader value={deployEnvironment} onChange={setDeployEnvironment} />
+                    <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
+                        <div id="onboarding-lancamentos" className="lg:col-span-1">
+                            <JenkinsJob
+                                project={projectName}
+                                subprojects={jenkinsSubprojects}
+                                environment={deployEnvironment}
+                            />
+                        </div>
+                        <SonarQualityIndicatorsCard
+                            projectName={projectName}
+                            sonarProjectKey={activeProject?.sonarProjectKey}
+                            zabbixQueryJenkinsJob={activeProject?.zabbixQueryJenkinsJob}
+                            environment={deployEnvironment}
+                            className="lg:col-span-3"
+                        />
+                    </div>
                 </TabsContent>
             </Tabs>
         </div>

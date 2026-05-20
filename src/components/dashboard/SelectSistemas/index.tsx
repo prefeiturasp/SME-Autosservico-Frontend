@@ -13,7 +13,11 @@ import {
 import { Sistema } from "./schema";
 import { getSistemasPorSquad } from "./getSistemasPorSquad";
 
-export function SelectSistemas() {
+type Props = Readonly<{
+    rightSlot?: React.ReactNode;
+}>;
+
+export function SelectSistemas({ rightSlot }: Props = {}) {
     const activeItem = useDashboardStore((state) => state.activeItem);
     const setActiveProject = useDashboardStore(
         (state) => state.setActiveProject
@@ -64,29 +68,36 @@ export function SelectSistemas() {
                     <p className="pb-2">
                         Selecione um sistema para visualizar as informações
                     </p>
-                    <div id="onboarding-select-sistema" className="w-full pb-3">
-                        <Select
-                            value={selectedValue}
-                            onValueChange={(value) => {
-                                setSelectedValue(value);
-                                handleSelectChange(value);
-                            }}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Selecione" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {sistemas.map((sistema) => (
-                                    <SelectItem
-                                        key={sistema.id}
-                                        value={sistema.id}
-                                        className="focus:bg-[#3b82f6] focus:text-white !focus:ring-0 !focus-visible:ring-0 focus:outline-none"
-                                    >
-                                        {sistema.nome}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                    <div className="flex flex-col gap-3 pb-3 lg:flex-row lg:items-center">
+                        <div id="onboarding-select-sistema" className="w-full flex-1 min-w-0">
+                            <Select
+                                value={selectedValue}
+                                onValueChange={(value) => {
+                                    setSelectedValue(value);
+                                    handleSelectChange(value);
+                                }}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Selecione" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {sistemas.map((sistema) => (
+                                        <SelectItem
+                                            key={sistema.id}
+                                            value={sistema.id}
+                                            className="focus:bg-[#3b82f6] focus:text-white !focus:ring-0 !focus-visible:ring-0 focus:outline-none"
+                                        >
+                                            {sistema.nome}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        {rightSlot && (
+                            <div className="flex shrink-0 items-center lg:justify-end">
+                                {rightSlot}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

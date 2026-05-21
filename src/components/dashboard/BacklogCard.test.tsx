@@ -1,9 +1,9 @@
-import React from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { BacklogResponse } from "@/types/backlog";
+import type { UseQueryResult } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { UseQueryResult } from "@tanstack/react-query";
-import type { BacklogResponse } from "@/types/backlog";
+import React from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import BacklogCard from "./BacklogCard";
 
 vi.mock("@/components/ui/skeleton", () => ({
@@ -55,11 +55,13 @@ describe("<BacklogCard /> - Bugs", () => {
                 title="Bugs"
                 query={makeQuery()}
                 emptyProjectHint="Selecione um projeto por favor"
-            />
+            />,
         );
 
         expect(screen.getByText("Bugs")).toBeInTheDocument();
-        expect(screen.getByText("Selecione um projeto por favor")).toBeInTheDocument();
+        expect(
+            screen.getByText("Selecione um projeto por favor"),
+        ).toBeInTheDocument();
     });
 
     it("renderiza estado de loading", () => {
@@ -68,11 +70,13 @@ describe("<BacklogCard /> - Bugs", () => {
                 title="Bugs"
                 projectName="Projeto X"
                 query={makeQuery({ isLoading: true })}
-            />
+            />,
         );
 
         expect(screen.getByText("Bugs")).toBeInTheDocument();
-        expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(
+            1,
+        );
     });
 
     it("renderiza erro e chama refetch ao clicar", async () => {
@@ -82,10 +86,12 @@ describe("<BacklogCard /> - Bugs", () => {
                 title="Bugs"
                 projectName="Projeto X"
                 query={makeQuery({ isError: true, refetch })}
-            />
+            />,
         );
 
-        expect(screen.getByText("Não foi possível carregar os dados.")).toBeInTheDocument();
+        expect(
+            screen.getByText("Não foi possível carregar os dados."),
+        ).toBeInTheDocument();
 
         await userEvent.click(screen.getByTestId("retry-button"));
         expect(refetch).toHaveBeenCalledTimes(1);
@@ -104,11 +110,13 @@ describe("<BacklogCard /> - Bugs", () => {
                         metadata: {},
                     },
                 })}
-            />
+            />,
         );
 
         expect(screen.getByText("Bugs")).toBeInTheDocument();
-        expect(screen.getByText("Nenhum item encontrado para este projeto.")).toBeInTheDocument();
+        expect(
+            screen.getByText("Nenhum item encontrado para este projeto."),
+        ).toBeInTheDocument();
     });
 
     it("exibe tabela com itens corretamente", () => {
@@ -137,7 +145,7 @@ describe("<BacklogCard /> - Bugs", () => {
                         metadata: {},
                     },
                 })}
-            />
+            />,
         );
 
         expect(screen.getByText("Bugs")).toBeInTheDocument();
@@ -147,7 +155,9 @@ describe("<BacklogCard /> - Bugs", () => {
         expect(screen.getByText("Classificação")).toBeInTheDocument();
 
         expect(screen.getByText("234232")).toBeInTheDocument();
-        expect(screen.getByText("[SGP] Indisponibilidade do Login")).toBeInTheDocument();
+        expect(
+            screen.getByText("[SGP] Indisponibilidade do Login"),
+        ).toBeInTheDocument();
         expect(screen.getByText("Aberto")).toBeInTheDocument();
         expect(screen.getByText("Bug")).toBeInTheDocument();
 
@@ -178,7 +188,7 @@ describe("<BacklogCard /> - Bugs", () => {
                         metadata: {},
                     },
                 })}
-            />
+            />,
         );
 
         expect(screen.getByText("Em andamento")).toBeInTheDocument();
@@ -205,7 +215,7 @@ describe("<BacklogCard /> - Bugs", () => {
                         metadata: {},
                     },
                 })}
-            />
+            />,
         );
 
         expect(screen.getByText("Exibir mais")).toBeInTheDocument();
@@ -251,7 +261,7 @@ describe("<BacklogCard /> - Bugs", () => {
                         metadata: {},
                     },
                 })}
-            />
+            />,
         );
 
         expect(screen.getByText("Bug")).toBeInTheDocument();
@@ -278,7 +288,7 @@ describe("<BacklogCard /> - Bugs", () => {
                         metadata: {},
                     },
                 })}
-            />
+            />,
         );
 
         expect(screen.getByText("HotFix")).toBeInTheDocument();
@@ -304,7 +314,7 @@ describe("<BacklogCard /> - Bugs", () => {
                         metadata: {},
                     },
                 })}
-            />
+            />,
         );
 
         expect(screen.getByText("BugFix")).toBeInTheDocument();
@@ -342,10 +352,210 @@ describe("<BacklogCard /> - Bugs", () => {
                         metadata: {},
                     },
                 })}
-            />
+            />,
         );
 
         expect(screen.getByText("HotFix")).toBeInTheDocument();
         expect(screen.getAllByText("BugFix")).toHaveLength(2);
+    });
+
+    it("exibe 'Não Impeditivo' com label correto", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [
+                            {
+                                id: 141010,
+                                title: "Item não impeditivo",
+                                work_item_type: "Não Impeditivo",
+                                state: "New",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText("Não Impeditivo")).toBeInTheDocument();
+    });
+
+    it("exibe 'Item do Backlog' para Product Backlog Item", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [
+                            {
+                                id: 141011,
+                                title: "Novo item de backlog",
+                                work_item_type: "Product Backlog Item",
+                                state: "New",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText("Item do Backlog")).toBeInTheDocument();
+    });
+
+    it("exibe 'História' para User Story", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [
+                            {
+                                id: 141012,
+                                title: "Nova história de usuário",
+                                work_item_type: "User Story",
+                                state: "New",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText("História")).toBeInTheDocument();
+    });
+
+    it("exibe 'Funcionalidade' para Feature", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [
+                            {
+                                id: 141013,
+                                title: "Nova feature",
+                                work_item_type: "Feature",
+                                state: "New",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText("Funcionalidade")).toBeInTheDocument();
+    });
+
+    it("exibe 'Épico' para Epic", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [
+                            {
+                                id: 141014,
+                                title: "Novo épico",
+                                work_item_type: "Epic",
+                                state: "New",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText("Épico")).toBeInTheDocument();
+    });
+
+    it("exibe o tipo original para work_item_type desconhecido", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [
+                            {
+                                id: 141015,
+                                title: "Tipo desconhecido",
+                                work_item_type: "TipoDesconhecido",
+                                state: "New",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText("TipoDesconhecido")).toBeInTheDocument();
+    });
+
+    it("exibe status 'Aberto' quando state é undefined (linha 14)", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [
+                            {
+                                id: 999001,
+                                title: "Item sem state",
+                                work_item_type: "Bug",
+                            },
+                        ],
+                        metadata: {},
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText("Aberto")).toBeInTheDocument();
+    });
+
+    it("exibe label 'Item' quando work_item_type é undefined (linha 59)", () => {
+        render(
+            <BacklogCard
+                title="Bugs"
+                projectName="Projeto X"
+                query={makeQuery({
+                    data: {
+                        total_items: 1,
+                        parents: [],
+                        children: [{ id: 999002, title: "Item sem tipo" }],
+                        metadata: {},
+                    },
+                })}
+            />,
+        );
+
+        expect(screen.getByText("Item")).toBeInTheDocument();
     });
 });

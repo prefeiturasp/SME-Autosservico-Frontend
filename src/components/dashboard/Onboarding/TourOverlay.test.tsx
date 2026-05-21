@@ -1,12 +1,13 @@
 /* @vitest-environment jsdom */
-import React from "react";
-import { render, screen, fireEvent, act } from "@testing-library/react";
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import * as useOnboardingHook from "@/hooks/useOnboarding";
+import { TOUR_STEPS, useOnboardingStore } from "@/states/onboarding";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { TourOverlay } from "./TourOverlay";
-import { useOnboardingStore, TOUR_STEPS } from "@/states/onboarding";
 
 describe("<TourOverlay />", () => {
     beforeEach(() => {
+        vi.restoreAllMocks();
         // Reseta o estado do store antes de cada teste
         useOnboardingStore.setState({
             isWelcomeModalOpen: false,
@@ -48,7 +49,10 @@ describe("<TourOverlay />", () => {
     });
 
     it("deve renderizar quando isTourActive é true", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         render(<TourOverlay />);
 
@@ -56,7 +60,10 @@ describe("<TourOverlay />", () => {
     });
 
     it("deve exibir o título do step atual", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         render(<TourOverlay />);
 
@@ -64,7 +71,10 @@ describe("<TourOverlay />", () => {
     });
 
     it("deve exibir a descrição do step atual", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         render(<TourOverlay />);
 
@@ -72,7 +82,10 @@ describe("<TourOverlay />", () => {
     });
 
     it("deve exibir o contador de steps", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         render(<TourOverlay />);
 
@@ -80,34 +93,49 @@ describe("<TourOverlay />", () => {
     });
 
     it("deve exibir o botão Fechar", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         render(<TourOverlay />);
 
-        expect(screen.getByRole("button", { name: "Fechar" })).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: "Fechar" }),
+        ).toBeInTheDocument();
     });
 
     it("deve exibir o botão Próximo quando não é o último step", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         render(<TourOverlay />);
 
-        expect(screen.getByRole("button", { name: /próximo/i })).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /próximo/i }),
+        ).toBeInTheDocument();
     });
 
     it("deve exibir o botão Concluir no último step", () => {
         useOnboardingStore.setState({
             isTourActive: true,
-            currentStepIndex: TOUR_STEPS.length - 1
+            currentStepIndex: TOUR_STEPS.length - 1,
         });
 
         render(<TourOverlay />);
 
-        expect(screen.getByRole("button", { name: /concluir/i })).toBeInTheDocument();
+        expect(
+            screen.getByRole("button", { name: /concluir/i }),
+        ).toBeInTheDocument();
     });
 
     it("deve avançar para o próximo step ao clicar em Próximo", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         render(<TourOverlay />);
 
@@ -118,7 +146,10 @@ describe("<TourOverlay />", () => {
     });
 
     it("deve fechar o tour ao clicar em Fechar", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         render(<TourOverlay />);
 
@@ -130,7 +161,10 @@ describe("<TourOverlay />", () => {
     });
 
     it("deve fechar o tour ao clicar no ícone X", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         render(<TourOverlay />);
 
@@ -143,12 +177,14 @@ describe("<TourOverlay />", () => {
     it("deve completar o onboarding ao clicar em Concluir no último step", () => {
         useOnboardingStore.setState({
             isTourActive: true,
-            currentStepIndex: TOUR_STEPS.length - 1
+            currentStepIndex: TOUR_STEPS.length - 1,
         });
 
         render(<TourOverlay />);
 
-        const concludeButton = screen.getByRole("button", { name: /concluir/i });
+        const concludeButton = screen.getByRole("button", {
+            name: /concluir/i,
+        });
         fireEvent.click(concludeButton);
 
         expect(useOnboardingStore.getState().hasCompletedOnboarding).toBe(true);
@@ -156,7 +192,10 @@ describe("<TourOverlay />", () => {
     });
 
     it("deve atualizar o contador ao mudar de step", () => {
-        useOnboardingStore.setState({ isTourActive: true, currentStepIndex: 0 });
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
 
         const { rerender } = render(<TourOverlay />);
         expect(screen.getByText(`1/${TOUR_STEPS.length}`)).toBeInTheDocument();
@@ -167,5 +206,98 @@ describe("<TourOverlay />", () => {
         rerender(<TourOverlay />);
 
         expect(screen.getByText(`2/${TOUR_STEPS.length}`)).toBeInTheDocument();
+    });
+
+    it("renderiza corretamente no step 3 (placement right + centered)", () => {
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 3,
+        });
+
+        render(<TourOverlay />);
+
+        expect(screen.getByText(TOUR_STEPS[3].title)).toBeInTheDocument();
+        expect(screen.getByText(TOUR_STEPS[3].description)).toBeInTheDocument();
+        expect(screen.getByText(`4/${TOUR_STEPS.length}`)).toBeInTheDocument();
+    });
+
+    it("updateTargetPosition retorna cedo quando currentStep é undefined — cobre L31", () => {
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: TOUR_STEPS.length,
+        });
+
+        render(<TourOverlay />);
+
+        expect(screen.queryByText(TOUR_STEPS[0].title)).not.toBeInTheDocument();
+    });
+
+    it("renderiza seta esquerda com placement='left' e centered=true", () => {
+        vi.spyOn(useOnboardingHook, "useOnboarding").mockReturnValue({
+            isTourActive: true,
+            currentStep: {
+                id: "test-left",
+                targetId: "onboarding-page-title",
+                title: "Step Esquerda",
+                description: "Tooltip posicionado à esquerda",
+                placement: "left",
+                centered: true,
+            },
+            currentStepIndex: 0,
+            totalSteps: TOUR_STEPS.length,
+            nextStep: vi.fn(),
+            closeTour: vi.fn(),
+        } as unknown as ReturnType<typeof useOnboardingHook.useOnboarding>);
+
+        render(<TourOverlay />);
+
+        expect(screen.getByText("Step Esquerda")).toBeInTheDocument();
+    });
+
+    it("renderiza seta esquerda sem centralização quando centered é false", () => {
+        vi.spyOn(useOnboardingHook, "useOnboarding").mockReturnValue({
+            isTourActive: true,
+            currentStep: {
+                id: "test-left-no-centered",
+                targetId: "onboarding-page-title",
+                title: "Step Esquerda Sem Centered",
+                description: "Tooltip à esquerda sem centralização",
+                placement: "left",
+            },
+            currentStepIndex: 0,
+            totalSteps: TOUR_STEPS.length,
+            nextStep: vi.fn(),
+            closeTour: vi.fn(),
+        } as unknown as ReturnType<typeof useOnboardingHook.useOnboarding>);
+
+        render(<TourOverlay />);
+
+        expect(
+            screen.getByText("Step Esquerda Sem Centered"),
+        ).toBeInTheDocument();
+    });
+
+    it("clamp o tooltip à borda direita quando a posição excede a largura da viewport", () => {
+        useOnboardingStore.setState({
+            isTourActive: true,
+            currentStepIndex: 0,
+        });
+
+        const target = document.getElementById(TOUR_STEPS[0].targetId)!;
+        target.getBoundingClientRect = () => ({
+            top: 0,
+            left: 700,
+            width: 200,
+            height: 50,
+            right: 900,
+            bottom: 50,
+            x: 700,
+            y: 0,
+            toJSON: () => {},
+        });
+
+        render(<TourOverlay />);
+
+        expect(screen.getByText(TOUR_STEPS[0].title)).toBeInTheDocument();
     });
 });

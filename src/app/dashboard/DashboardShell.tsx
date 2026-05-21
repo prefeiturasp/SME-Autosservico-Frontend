@@ -1,19 +1,20 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
-import type { Session } from "next-auth";
+import AnalyticsFilters from "@/components/dashboard/Analytics/AnalyticsFilters";
+import { DeployHealthTourOverlay } from "@/components/dashboard/Onboarding/DeployHealthTourOverlay";
+import { TourOverlay } from "@/components/dashboard/Onboarding/TourOverlay";
+import { WelcomeModal } from "@/components/dashboard/Onboarding/WelcomeModal";
+import { PageHeader } from "@/components/dashboard/page-header";
+import { SelectSistemas } from "@/components/dashboard/SelectSistemas";
+import { SessionGuard } from "@/components/dashboard/SessionGuard";
+import { AppSidebar } from "@/components/dashboard/Sidebar/app-sidebar";
 import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/dashboard/Sidebar/app-sidebar";
-import { PageHeader } from "@/components/dashboard/page-header";
-import { SelectSistemas } from "@/components/dashboard/SelectSistemas";
-import AnalyticsFilters from "@/components/dashboard/Analytics/AnalyticsFilters";
-import { WelcomeModal } from "@/components/dashboard/Onboarding/WelcomeModal";
-import { TourOverlay } from "@/components/dashboard/Onboarding/TourOverlay";
-import { SessionGuard } from "@/components/dashboard/SessionGuard";
+import type { Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
 
 type DashboardShellProps = Readonly<{
     children: React.ReactNode;
@@ -41,6 +42,7 @@ export function DashboardShell({ children, session }: DashboardShellProps) {
                     </SidebarInset>
                     <WelcomeModal />
                     <TourOverlay />
+                    <DeployHealthTourOverlay />
                 </SidebarProvider>
             </SessionGuard>
         </SessionProvider>

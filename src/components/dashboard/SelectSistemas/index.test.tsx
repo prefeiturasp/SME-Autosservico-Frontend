@@ -1,16 +1,15 @@
-import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import {
-    describe,
-    it,
-    expect,
     beforeEach,
+    describe,
+    expect,
+    it,
     vi,
     type Mock as ViMock,
 } from "vitest";
 
-import { SelectSistemas } from "./index";
 import useDashboardStore from "@/states/dashboard";
+import { SelectSistemas } from "./index";
 
 import { getSistemasPorSquad } from "./getSistemasPorSquad";
 
@@ -53,7 +52,7 @@ describe("<SelectSistemas />", () => {
                 selector({
                     activeItem: null,
                     setActiveProject: setActiveProjectMock,
-                })
+                }),
         );
 
         const { container } = render(<SelectSistemas />);
@@ -71,7 +70,7 @@ describe("<SelectSistemas />", () => {
                         url: "#",
                     },
                     setActiveProject: setActiveProjectMock,
-                })
+                }),
         );
 
         (getSistemasPorSquad as unknown as ViMock).mockReturnValue([
@@ -99,8 +98,8 @@ describe("<SelectSistemas />", () => {
         expect(screen.getByText("Sistema")).toBeInTheDocument();
         expect(
             screen.getByText(
-                "Selecione um sistema para visualizar as informações"
-            )
+                "Selecione um sistema para visualizar as informações",
+            ),
         ).toBeInTheDocument();
 
         // ✅ Renderiza os sistemas
@@ -128,7 +127,7 @@ describe("<SelectSistemas />", () => {
                         url: "#",
                     },
                     setActiveProject: setActiveProjectMock,
-                })
+                }),
         );
 
         (getSistemasPorSquad as unknown as ViMock).mockReturnValue([
@@ -181,7 +180,7 @@ describe("<SelectSistemas />", () => {
                         url: "#",
                     },
                     setActiveProject: setActiveProjectMock,
-                })
+                }),
         );
 
         (getSistemasPorSquad as unknown as ViMock).mockReturnValue([]);
@@ -191,5 +190,37 @@ describe("<SelectSistemas />", () => {
         expect(setActiveProjectMock).not.toHaveBeenCalled();
         expect(screen.queryByRole("combobox")).toBeInTheDocument();
         expect(screen.queryByText("Nenhum sistema")).not.toBeInTheDocument();
+    });
+
+    it("deve renderizar o rightSlot quando fornecido", () => {
+        const setActiveProjectMock = vi.fn();
+        (useDashboardStore as unknown as ViMock).mockImplementation(
+            (selector) =>
+                selector({
+                    activeItem: {
+                        title: "COPED",
+                        subTitle: "Coordenadoria pedagógica",
+                        url: "#",
+                    },
+                    setActiveProject: setActiveProjectMock,
+                }),
+        );
+
+        (getSistemasPorSquad as unknown as ViMock).mockReturnValue([
+            {
+                id: "10",
+                nome: "Novo SGP",
+                zabbixQueryFrontend: "PRD - Novo SGP",
+                zabbixQueryBackend: "PRD - Novo SGP - API",
+                zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ",
+                zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master",
+            },
+        ]);
+
+        render(<SelectSistemas rightSlot={<button>Ação extra</button>} />);
+
+        expect(
+            screen.getByRole("button", { name: "Ação extra" }),
+        ).toBeInTheDocument();
     });
 });

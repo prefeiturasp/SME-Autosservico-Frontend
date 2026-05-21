@@ -1,4 +1,5 @@
 import { withClient } from "@/__mocks__/renderWithClient";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import JenkinsJob from "./index";
@@ -51,7 +52,7 @@ describe("<JenkinsJob />", () => {
 
     it("com múltiplos subprojetos: mostra select de projeto e atualiza automaticamente ao trocar", async () => {
         const fetchSpy = vi
-            .spyOn(global, "fetch")
+            .spyOn(globalThis, "fetch")
             .mockImplementation(async (input) => {
                 const url = fetchUrl(input);
 
@@ -108,7 +109,7 @@ describe("<JenkinsJob />", () => {
 
     it("respeita o ambiente recebido via prop (homologacao → env=homolog)", async () => {
         const fetchSpy = vi
-            .spyOn(global, "fetch")
+            .spyOn(globalThis, "fetch")
             .mockImplementation(async (input) => {
                 const url = fetchUrl(input);
 
@@ -143,7 +144,7 @@ describe("<JenkinsJob />", () => {
 
     it("respeita o ambiente recebido via prop (qa → env=test)", async () => {
         const fetchSpy = vi
-            .spyOn(global, "fetch")
+            .spyOn(globalThis, "fetch")
             .mockImplementation(async (input) => {
                 const url = fetchUrl(input);
 
@@ -178,7 +179,7 @@ describe("<JenkinsJob />", () => {
 
     it("com apenas 1 subprojeto: não exige seleção adicional", async () => {
         const fetchSpy = vi
-            .spyOn(global, "fetch")
+            .spyOn(globalThis, "fetch")
             .mockImplementation(async (input) => {
                 const url = fetchUrl(input);
 
@@ -209,9 +210,72 @@ describe("<JenkinsJob />", () => {
         });
     });
 
+    it("mantém seleção quando subprojetos mudam mas a chave atual permanece válida", async () => {
+        vi.spyOn(global, "fetch").mockResolvedValue(
+            okJson({
+                found: false,
+                message: "Not found",
+            }) as unknown as Response,
+        );
+
+        const client = new QueryClient({
+            defaultOptions: { queries: { retry: false } },
+        });
+
+        const { rerender } = render(
+            <JenkinsJob
+                project="SigEscola"
+                subprojects={[
+                    { label: "Backend", key: "PTRF-BackEnd" },
+                    { label: "Frontend", key: "PTRF-FrontEnd" },
+                ]}
+            />,
+            {
+                wrapper: ({ children }) => (
+                    <QueryClientProvider client={client}>
+                        {children}
+                    </QueryClientProvider>
+                ),
+            },
+        );
+
+        await waitFor(() =>
+            expect(
+                screen.getByLabelText("Selecionar projeto"),
+            ).toBeInTheDocument(),
+        );
+
+        rerender(
+            <JenkinsJob
+                project="SigEscola"
+                subprojects={[
+                    { label: "Backend atualizado", key: "PTRF-BackEnd" },
+                    { label: "Mobile", key: "PTRF-Mobile" },
+                ]}
+            />,
+        );
+
+        await waitFor(() =>
+            expect(
+                screen.getByLabelText("Selecionar projeto"),
+            ).toBeInTheDocument(),
+        );
+    });
+
+    it("project vazio: renderiza card vazio sem buscar métricas", async () => {
+        const fetchSpy = vi.spyOn(globalThis, "fetch");
+
+        render(withClient(<JenkinsJob project="" />));
+
+        expect(
+            await screen.findByText("Jenkins - Branches e Builds"),
+        ).toBeInTheDocument();
+        expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
     it("projeto N/E (ou sem chaves): não busca releases e mostra mensagem", async () => {
         const fetchSpy = vi
-            .spyOn(global, "fetch")
+            .spyOn(globalThis, "fetch")
             .mockImplementation(async (input) => {
                 const url = fetchUrl(input);
 

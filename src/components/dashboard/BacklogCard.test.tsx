@@ -515,7 +515,7 @@ describe("<BacklogCard /> - Bugs", () => {
         expect(screen.getByText("TipoDesconhecido")).toBeInTheDocument();
     });
 
-    it("exibe status 'Aberto' quando state é undefined (linha 14)", () => {
+    it("exibe status 'Aberto' quando state é undefined", () => {
         render(
             <BacklogCard
                 title="Bugs"
@@ -540,7 +540,7 @@ describe("<BacklogCard /> - Bugs", () => {
         expect(screen.getByText("Aberto")).toBeInTheDocument();
     });
 
-    it("exibe label 'Item' quando work_item_type é undefined (linha 59)", () => {
+    it("exibe label 'Item' quando work_item_type é undefined)", () => {
         render(
             <BacklogCard
                 title="Bugs"

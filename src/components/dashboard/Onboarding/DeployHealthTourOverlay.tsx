@@ -261,15 +261,15 @@ export function DeployHealthTourOverlay() {
                         >
                             Fechar
                         </Button>
-                        <Button
-                            size="sm"
-                            onClick={nextDeployStep}
-                            className="px-4 bg-[#1E3A8A] hover:bg-[#1E3A8A]/90"
-                        >
-                            {deployTourStepIndex === totalSteps - 1
-                                ? "Concluir"
-                                : "Próximo"}
-                        </Button>
+                        {deployTourStepIndex < totalSteps - 1 && (
+                            <Button
+                                size="sm"
+                                onClick={nextDeployStep}
+                                className="px-4 bg-[#1E3A8A] hover:bg-[#1E3A8A]/90"
+                            >
+                                Próximo
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>

@@ -134,15 +134,18 @@ describe("<DeployHealthTourOverlay />", () => {
         ).toBeInTheDocument();
     });
 
-    it("deve exibir 'Concluir' no último step", () => {
+    it("deve exibir apenas o botão 'Fechar' no último step", () => {
         useOnboardingStore.setState({
             isDeployTourActive: true,
             deployTourStepIndex: DEPLOY_HEALTH_TOUR_STEPS.length - 1,
         });
         render(<DeployHealthTourOverlay />);
         expect(
-            screen.getByRole("button", { name: /concluir/i }),
+            screen.getByRole("button", { name: "Fechar" }),
         ).toBeInTheDocument();
+        expect(
+            screen.queryByRole("button", { name: /próximo/i }),
+        ).not.toBeInTheDocument();
     });
 
     it("atualiza o contador ao mudar de step", () => {

@@ -240,10 +240,10 @@ export function DeployHealthTourOverlay() {
                 </button>
 
                 {/* Content */}
-                <h3 className="text-lg font-semibold text-[#1E3A8A] pr-6">
+                <h3 className="text-sm font-bold text-[#111827] pr-6">
                     {currentStep.title}
                 </h3>
-                <p className="mt-2 text-sm text-[#111827]">
+                <p className="mt-2 text-sm font-normal text-[#111827]">
                     {currentStep.description}
                 </p>
 

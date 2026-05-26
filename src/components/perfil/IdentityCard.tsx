@@ -18,7 +18,7 @@ export function IdentityCard({
     tempoSessao,
 }: IdentityCardProps) {
     return (
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="rounded-lg bg-white p-6 shadow-lg">
             <div className="flex flex-col items-center text-center">
                 <h2 className="text-xl font-bold text-foreground">{nomeCompleto}</h2>
                 <p className="mt-2 text-sm text-muted-foreground">{cargo}</p>

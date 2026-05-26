@@ -13,7 +13,7 @@ export function AccountActionsCard({ onAlterarSenha }: AccountActionsCardProps) 
     };
 
     return (
-        <div className="flex flex-col items-center gap-4 rounded-2xl bg-white p-6 shadow-sm">
+        <div className="flex flex-col items-center gap-4 rounded-lg bg-white p-6 shadow-lg">
             <button
                 type="button"
                 onClick={onAlterarSenha}

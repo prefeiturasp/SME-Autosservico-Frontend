@@ -32,7 +32,7 @@ export function DadosPessoaisCard({
     onEditar,
 }: DadosPessoaisCardProps) {
     return (
-        <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <section className="rounded-lg bg-white p-6 shadow-lg">
             <header className="mb-6 flex items-start justify-between">
                 <h2 className="text-base font-bold text-foreground">Dados pessoais</h2>
                 <button

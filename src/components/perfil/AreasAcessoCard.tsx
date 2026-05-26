@@ -33,7 +33,7 @@ function CoordenadoriaIcon({ sigla }: { readonly sigla: string }) {
 export function AreasAcessoCard({ coordenadorias }: AreasAcessoCardProps) {
     if (coordenadorias.length === 0) {
         return (
-            <section className="rounded-2xl bg-white p-6 shadow-sm">
+            <section className="rounded-lg bg-white p-6 shadow-lg">
                 <h2 className="mb-4 text-base font-bold text-foreground">Áreas de acesso</h2>
                 <p className="text-sm text-muted-foreground">Nenhuma área de acesso disponível.</p>
             </section>
@@ -41,14 +41,14 @@ export function AreasAcessoCard({ coordenadorias }: AreasAcessoCardProps) {
     }
 
     return (
-        <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <section className="rounded-lg bg-white p-6 shadow-lg">
             <h2 className="mb-4 text-base font-bold text-foreground">Áreas de acesso</h2>
 
             <ul className="flex flex-col gap-3">
                 {coordenadorias.map((coord) => (
                     <li
                         key={coord.sigla}
-                        className="flex flex-col gap-3 rounded-lg bg-zinc-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                        className="flex flex-col gap-3 rounded-lg bg-[#F5F5F5] px-4 py-3 sm:flex-row sm:items-center sm:justify-between border-[#E5E7EB]"
                     >
                         <div className="flex items-center gap-3">
                             <div className="flex size-10 items-center justify-center rounded-lg bg-indigo-100">
@@ -64,7 +64,7 @@ export function AreasAcessoCard({ coordenadorias }: AreasAcessoCardProps) {
                             {coord.areas.map((area) => (
                                 <span
                                     key={`${coord.sigla}-${area}`}
-                                    className="inline-flex items-center rounded-md bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700"
+                                    className="inline-flex items-center rounded-md bg-[#E6EDFF] px-3 py-1 text-xs font-semibold text-[#1E3A8A]"
                                 >
                                     {area}
                                 </span>

@@ -85,6 +85,8 @@ type OnboardingState = {
     currentStepIndex: number;
     isDeployTourActive: boolean;
     deployTourStepIndex: number;
+    isAnalyticsTourActive: boolean;
+    analyticsTourStepIndex: number;
 };
 
 type OnboardingActions = {
@@ -98,11 +100,64 @@ type OnboardingActions = {
     startDeployTour: () => void;
     nextDeployStep: () => void;
     closeDeployTour: () => void;
+    startAnalyticsTour: () => void;
+    nextAnalyticsStep: () => void;
+    closeAnalyticsTour: () => void;
 };
 
 export const ONBOARDING_STORAGE_KEY = "autosservico-onboarding-completed";
 export const DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY =
     "autosservico-deploy-onboarding-completed";
+export const ANALYTICS_ONBOARDING_STORAGE_KEY =
+    "autosservico-analytics-onboarding-completed";
+
+export const ANALYTICS_TOUR_STEPS: TourStep[] = [
+    {
+        id: "analytics-period-switcher",
+        targetId: "onboarding-analytics-period",
+        title: "Seletor de período",
+        description:
+            "No seletor você pode escolher o período de análise: Hoje, 7 dias ou 30 dias. Todos os dados da tela respondem a esses filtros.",
+        placement: "bottom",
+        spotlightPadding: 4,
+        spotlightPaddingY: 8,
+        spotlightBorderRadius: 8,
+    },
+    {
+        id: "analytics-kpis",
+        targetId: "onboarding-analytics-kpis",
+        title: "Principais KPIs",
+        description:
+            "Nesses cards você vai ver os números mais importantes: usuários ativos, média de duração de sessão e horário de pico do dia.",
+        placement: "bottom",
+    },
+    {
+        id: "analytics-users-by-page",
+        targetId: "onboarding-analytics-users-by-page",
+        title: "Usuários por página",
+        description:
+            "Veja a quantidade de usuários que acessam as páginas do sistema e compare com a média histórica.",
+        placement: "right",
+        centered: true,
+    },
+    {
+        id: "analytics-device-distribution",
+        targetId: "onboarding-analytics-device-distribution",
+        title: "Tipo de dispositivo",
+        description:
+            "Veja a distribuição de acessos por desktop, mobile e tablet. O alerta aparece quando identificamos uma possível melhoria.",
+        placement: "left",
+        centered: true,
+    },
+    {
+        id: "analytics-peak-hours",
+        targetId: "onboarding-analytics-peak-hours",
+        title: "Horários de pico",
+        description:
+            "Gráfico de barras com a distribuição de acessos ao longo do dia.",
+        placement: "top",
+    },
+];
 
 export const DEPLOY_HEALTH_TOUR_STEPS: TourStep[] = [
     {
@@ -144,6 +199,8 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
         currentStepIndex: 0,
         isDeployTourActive: false,
         deployTourStepIndex: 0,
+        isAnalyticsTourActive: false,
+        analyticsTourStepIndex: 0,
 
         openWelcomeModal: () => set({ isWelcomeModalOpen: true }),
         closeWelcomeModal: () => set({ isWelcomeModalOpen: false }),
@@ -215,6 +272,35 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
                 );
             }
             set({ isDeployTourActive: false, deployTourStepIndex: 0 });
+        },
+
+        startAnalyticsTour: () => {
+            set({ isAnalyticsTourActive: true, analyticsTourStepIndex: 0 });
+        },
+
+        nextAnalyticsStep: () => {
+            const { analyticsTourStepIndex } = get();
+            if (analyticsTourStepIndex < ANALYTICS_TOUR_STEPS.length - 1) {
+                set({ analyticsTourStepIndex: analyticsTourStepIndex + 1 });
+            } else {
+                if (globalThis.window !== undefined) {
+                    localStorage.setItem(
+                        ANALYTICS_ONBOARDING_STORAGE_KEY,
+                        "true",
+                    );
+                }
+                set({
+                    isAnalyticsTourActive: false,
+                    analyticsTourStepIndex: 0,
+                });
+            }
+        },
+
+        closeAnalyticsTour: () => {
+            if (globalThis.window !== undefined) {
+                localStorage.setItem(ANALYTICS_ONBOARDING_STORAGE_KEY, "true");
+            }
+            set({ isAnalyticsTourActive: false, analyticsTourStepIndex: 0 });
         },
     }),
 );

@@ -14,6 +14,7 @@ import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
 import Filas from "@/components/dashboard/SaudeDosServidores/Filas";
 import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
 import { useDeployHealthOnboarding } from "@/hooks/useDeployHealthOnboarding";
 import useDashboardStore from "@/states/dashboard";
 import type { DashboardTab } from "@/types/analyticsPeriod";
@@ -61,6 +62,7 @@ export default function Dashboard() {
     const [deployEnvironment, setDeployEnvironment] =
         useState<DeployEnvironment>("producao");
     const { triggerDeployTour } = useDeployHealthOnboarding();
+    const { triggerAnalyticsTour } = useAnalyticsOnboarding();
 
     return (
         <div className="bg-background px-6 py-4">
@@ -69,6 +71,7 @@ export default function Dashboard() {
                 onValueChange={(value) => {
                     setActiveTab(value as DashboardTab);
                     if (value === "saude-deploy") triggerDeployTour();
+                    if (value === "analytics") triggerAnalyticsTour();
                 }}
             >
                 <TabsList className="mb-6 px-1">
@@ -187,7 +190,10 @@ export default function Dashboard() {
                 </TabsContent>
 
                 <TabsContent value="analytics">
-                    <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div
+                        id="onboarding-analytics-kpis"
+                        className="grid grid-cols-3 gap-4 mb-4"
+                    >
                         <ActiveUsersCard
                             systemName={projectName}
                             period={activePeriod}
@@ -202,18 +208,27 @@ export default function Dashboard() {
                         />
                     </div>
                     <div className="grid grid-cols-4 gap-4 mb-4">
-                        <UsersByPageCard
-                            systemName={projectName}
-                            period={activePeriod}
+                        <div
+                            id="onboarding-analytics-users-by-page"
                             className="col-span-2"
-                        />
-                        <DeviceDistributionCard
-                            systemName={projectName}
-                            period={activePeriod}
+                        >
+                            <UsersByPageCard
+                                systemName={projectName}
+                                period={activePeriod}
+                            />
+                        </div>
+                        <div
+                            id="onboarding-analytics-device-distribution"
                             className="col-span-2"
-                        />
+                        >
+                            <DeviceDistributionCard
+                                systemName={projectName}
+                                period={activePeriod}
+                            />
+                        </div>
                     </div>
                     <FullWidthSection
+                        id="onboarding-analytics-peak-hours"
                         title="Horários de pico"
                         tooltip={
                             <p>

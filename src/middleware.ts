@@ -10,7 +10,7 @@ function isSessionExpired(expiresAt: number | undefined): boolean {
 export default auth((req) => {
     const { pathname } = req.nextUrl;
 
-    const protectedRoutes = ["/dashboard"];
+    const protectedRoutes = ["/dashboard", "/perfil"];
 
     const isProtectedRoute = protectedRoutes.some((route) =>
         pathname.startsWith(route)

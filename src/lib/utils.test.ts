@@ -5,6 +5,8 @@ import {
     formatDDMMYYYY_HHMM_FromMillis,
     formatDurationMs,
     numberToBRL,
+    formatCpfMasked,
+    formatUltimoAcesso,
 } from "./utils";
 
 describe("Função cn (clsx + tailwind-merge)", () => {
@@ -135,4 +137,46 @@ describe("formatDDMMYYYY_HHMM_FromMillis", () => {
             formatDDMMYYYY_HHMM_FromMillis(Number.MAX_VALUE),
         ).toBeUndefined();
     });
+});
+
+describe("formatCpfMasked", () => {
+  it("retorna undefined quando o CPF é vazio ou ausente", () => {
+    expect(formatCpfMasked(undefined)).toBeUndefined();
+    expect(formatCpfMasked("")).toBeUndefined();
+  });
+
+  it("mascara os últimos cinco dígitos do CPF", () => {
+    expect(formatCpfMasked("12345678901")).toBe("123.456.xxx-xx");
+  });
+
+  it("remove caracteres não numéricos antes de mascarar", () => {
+    expect(formatCpfMasked("123.456.789-01")).toBe("123.456.xxx-xx");
+  });
+
+  it("retorna undefined quando o CPF tem mais de 11 dígitos", () => {
+    expect(formatCpfMasked("123456789012")).toBeUndefined();
+  });
+
+  it("normaliza com padStart quando o CPF tem menos de 11 dígitos", () => {
+    expect(formatCpfMasked("4567890123")).toBe("045.678.xxx-xx");
+  });
+});
+
+describe("formatUltimoAcesso", () => {
+  it("retorna undefined quando o valor é vazio ou ausente", () => {
+    expect(formatUltimoAcesso(undefined)).toBeUndefined();
+    expect(formatUltimoAcesso("")).toBeUndefined();
+  });
+
+  it("converte o formato 'YYYY-MM-DD HH:MM' para 'DD/MM/YYYY HH:MM'", () => {
+    expect(formatUltimoAcesso("2026-05-25 14:37")).toBe("25/05/2026 14:37");
+  });
+
+  it("aceita também o separador 'T' entre data e hora", () => {
+    expect(formatUltimoAcesso("2026-05-25T09:05")).toBe("25/05/2026 09:05");
+  });
+
+  it("retorna o valor original quando não corresponde ao padrão esperado", () => {
+    expect(formatUltimoAcesso("data-invalida")).toBe("data-invalida");
+  });
 });

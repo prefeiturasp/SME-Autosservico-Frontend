@@ -12,6 +12,11 @@ vi.mock("@/lib/auth", () => ({
     auth: vi.fn(async () => mockSession),
 }));
 
+vi.mock("next/navigation", () => ({
+    useRouter: () => ({ push: vi.fn() }),
+    usePathname: () => "/dashboard",
+}));
+
 vi.mock("next-auth/react", () => ({
     __esModule: true,
     useSession: vi.fn(() => ({

@@ -16,6 +16,10 @@ declare module "next-auth" {
         groups?: string[];
         given_name?: string;
         family_name?: string;
+        cargo?: string;
+        coordenadoria?: string;
+        ultimo_acesso?: string;
+        tempo_sessao?: string;
     }
 
     interface Session extends DefaultSession {
@@ -32,6 +36,10 @@ declare module "next-auth" {
             groups?: string[];
             given_name?: string;
             family_name?: string;
+            cargo?: string;
+            coordenadoria?: string;
+            ultimo_acesso?: string;
+            tempo_sessao?: string;
         } & DefaultSession["user"];
         expires_at?: number;
     }
@@ -51,6 +59,10 @@ declare module "next-auth/jwt" {
         groups?: string[];
         given_name?: string;
         family_name?: string;
+        cargo?: string;
+        coordenadoria?: string;
+        ultimo_acesso?: string;
+        tempo_sessao?: string;
         exp?: number;
     }
 }

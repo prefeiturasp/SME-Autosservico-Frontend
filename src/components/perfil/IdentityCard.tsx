@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 type IdentityCardProps = Readonly<{
     nomeCompleto: string;
@@ -23,11 +23,16 @@ export function IdentityCard({
                 <h2 className="text-xl font-bold text-foreground">{nomeCompleto}</h2>
                 <p className="mt-2 text-sm text-muted-foreground">{cargo}</p>
                 <p className="text-sm text-muted-foreground">{coordenadoria}</p>
-
-                {contaAtiva && (
-                    <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-700">
-                        <Check className="size-4" aria-hidden="true" />
+                
+                {contaAtiva ? (
+                    <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#e6fbf2] px-4 py-1.5 text-sm font-medium text-[#096643]">
+                        <Check className="size-4 stroke-[2.5]" aria-hidden="true" />
                         Conta ativa
+                    </span>
+                ) : (
+                    <span className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#fff0f0] px-4 py-1.5 text-sm font-medium text-[#c92a2a]">
+                        <X className="size-4 stroke-[2.5]" aria-hidden="true" />
+                        Conta inativa
                     </span>
                 )}
             </div>

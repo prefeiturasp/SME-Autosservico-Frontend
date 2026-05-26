@@ -15,8 +15,10 @@ export default function PerfilPage() {
     const { data: session } = useSession();
     const coordenadoriasAcesso = useAreasAcesso();
 
+    const AUTH_VERSION = process.env.NEXT_PUBLIC_AUTH_VERSION ?? "v1";
+
     const nomeCompleto = session?.user?.name ?? EMPTY_FIELD;
-    const contaAtiva = session?.user?.situacaoUsuario === SITUACAO_USUARIO_ATIVO;
+    const contaAtiva = AUTH_VERSION === "v2" || session?.user?.situacaoUsuario === SITUACAO_USUARIO_ATIVO;
     const cpf = formatCpfMasked(session?.user?.cpf) ?? EMPTY_FIELD;
     const email = session?.user?.email ?? EMPTY_FIELD;
     const cargo = session?.user?.cargo ?? EMPTY_FIELD;

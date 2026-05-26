@@ -6,10 +6,6 @@ Funcionalidade: Dashboard
     Quando eu informo o RF do tipo "rf_valido" e a senha do tipo "senha_valida"
     E clico no botão de acessar
     Então o resultado esperado para o cenário "Login válido padrão" deve ser exibido
-@ignore
-  Cenário: Validar card de Lançamentos
-    Então o card de "Lançamentos" deve estar visível
-    E deve exibir a versão e data de realização
 
   Cenário: Validar disponibilidade do ambiente
     Então o card de "Disponibilidade do ambiente" deve estar visível

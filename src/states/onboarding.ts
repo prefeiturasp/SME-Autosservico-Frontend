@@ -8,6 +8,9 @@ export type TourStep = {
     placement: "top" | "bottom" | "left" | "right";
     spotlightWidth?: number;
     spotlightHeight?: number;
+    spotlightPadding?: number;
+    spotlightPaddingY?: number;
+    spotlightBorderRadius?: number;
     centered?: boolean;
 };
 
@@ -80,6 +83,8 @@ type OnboardingState = {
     hasCompletedOnboarding: boolean;
     isTourActive: boolean;
     currentStepIndex: number;
+    isDeployTourActive: boolean;
+    deployTourStepIndex: number;
 };
 
 type OnboardingActions = {
@@ -90,9 +95,46 @@ type OnboardingActions = {
     prevStep: () => void;
     closeTour: () => void;
     completeOnboarding: () => void;
+    startDeployTour: () => void;
+    nextDeployStep: () => void;
+    closeDeployTour: () => void;
 };
 
 export const ONBOARDING_STORAGE_KEY = "autosservico-onboarding-completed";
+export const DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY =
+    "autosservico-deploy-onboarding-completed";
+
+export const DEPLOY_HEALTH_TOUR_STEPS: TourStep[] = [
+    {
+        id: "deploy-environment-switcher",
+        targetId: "onboarding-environment-switcher",
+        title: "Seletor de ambiente",
+        description:
+            "Aqui você alterna entre os ambientes de Produção, Homologação e QA. Todos os dados correspondem ao ambiente selecionado.",
+        placement: "bottom",
+        spotlightPadding: 4,
+        spotlightPaddingY: 8,
+        spotlightBorderRadius: 8,
+    },
+    {
+        id: "deploy-jenkins",
+        targetId: "onboarding-lancamentos",
+        title: "Jenkins",
+        description:
+            "Nessa sessão, você vai acompanhar a saúde da esteira de desenvolvimento.",
+        placement: "right",
+        spotlightBorderRadius: 5,
+    },
+    {
+        id: "deploy-sonar-quality",
+        targetId: "onboarding-sonar-quality",
+        title: "Qualidade do código",
+        description:
+            "Visão geral da qualidade do código com métricas detalhadas e ratings de confiabilidade, segurança e manutenção.",
+        placement: "top",
+        spotlightBorderRadius: 6,
+    },
+];
 
 export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
     (set, get) => ({
@@ -100,12 +142,18 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
         hasCompletedOnboarding: false,
         isTourActive: false,
         currentStepIndex: 0,
+        isDeployTourActive: false,
+        deployTourStepIndex: 0,
 
         openWelcomeModal: () => set({ isWelcomeModalOpen: true }),
         closeWelcomeModal: () => set({ isWelcomeModalOpen: false }),
 
         startTour: () => {
-            set({ isWelcomeModalOpen: false, isTourActive: true, currentStepIndex: 0 });
+            set({
+                isWelcomeModalOpen: false,
+                isTourActive: true,
+                currentStepIndex: 0,
+            });
         },
 
         nextStep: () => {
@@ -130,7 +178,7 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
         },
 
         completeOnboarding: () => {
-            if (typeof window !== "undefined") {
+            if (globalThis.window !== undefined) {
                 localStorage.setItem(ONBOARDING_STORAGE_KEY, "true");
             }
             set({
@@ -139,5 +187,34 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
                 isTourActive: false,
             });
         },
-    })
+
+        startDeployTour: () => {
+            set({ isDeployTourActive: true, deployTourStepIndex: 0 });
+        },
+
+        nextDeployStep: () => {
+            const { deployTourStepIndex } = get();
+            if (deployTourStepIndex < DEPLOY_HEALTH_TOUR_STEPS.length - 1) {
+                set({ deployTourStepIndex: deployTourStepIndex + 1 });
+            } else {
+                if (globalThis.window !== undefined) {
+                    localStorage.setItem(
+                        DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY,
+                        "true",
+                    );
+                }
+                set({ isDeployTourActive: false, deployTourStepIndex: 0 });
+            }
+        },
+
+        closeDeployTour: () => {
+            if (globalThis.window !== undefined) {
+                localStorage.setItem(
+                    DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY,
+                    "true",
+                );
+            }
+            set({ isDeployTourActive: false, deployTourStepIndex: 0 });
+        },
+    }),
 );

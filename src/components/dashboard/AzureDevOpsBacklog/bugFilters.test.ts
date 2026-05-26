@@ -1,14 +1,14 @@
-import { describe, it, expect } from "vitest";
+import type { WorkItem } from "@/types/backlog";
+import { describe, expect, it } from "vitest";
 import {
-    normalizeText,
-    getProjectIdentifiers,
-    parseTags,
     extractTitleIdentifiers,
+    getProjectIdentifiers,
     identifiersMatch,
     matchesBugToProject,
+    normalizeText,
+    parseTags,
     PROJECT_IDENTIFIERS,
 } from "./bugFilters";
-import type { WorkItem } from "@/types/backlog";
 
 describe("bugFilters", () => {
     describe("normalizeText", () => {
@@ -18,7 +18,9 @@ describe("bugFilters", () => {
 
         it("remove acentos", () => {
             expect(normalizeText("Conexão")).toBe("CONEXAO");
-            expect(normalizeText("Rolê Agroecológico")).toBe("ROLE AGROECOLOGICO");
+            expect(normalizeText("Rolê Agroecológico")).toBe(
+                "ROLE AGROECOLOGICO",
+            );
         });
 
         it("remove espaços extras", () => {
@@ -92,23 +94,31 @@ describe("bugFilters", () => {
         });
 
         it("extrai identificadores entre colchetes", () => {
-            const identifiers = extractTitleIdentifiers("[SGP] Não aparece os semestres");
+            const identifiers = extractTitleIdentifiers(
+                "[SGP] Não aparece os semestres",
+            );
             expect(identifiers).toContain("SGP");
         });
 
         it("extrai múltiplos identificadores entre colchetes", () => {
-            const identifiers = extractTitleIdentifiers("[SGP] [Frontend] Erro no login");
+            const identifiers = extractTitleIdentifiers(
+                "[SGP] [Frontend] Erro no login",
+            );
             expect(identifiers).toContain("SGP");
             expect(identifiers).toContain("FRONTEND");
         });
 
         it("extrai identificador antes de hífen", () => {
-            const identifiers = extractTitleIdentifiers("SGP - Erro no cadastro");
+            const identifiers = extractTitleIdentifiers(
+                "SGP - Erro no cadastro",
+            );
             expect(identifiers).toContain("SGP");
         });
 
         it("extrai identificador antes de dois pontos", () => {
-            const identifiers = extractTitleIdentifiers("SIGPAE: Problema no relatório");
+            const identifiers = extractTitleIdentifiers(
+                "SIGPAE: Problema no relatório",
+            );
             expect(identifiers).toContain("SIGPAE");
         });
 
@@ -139,6 +149,10 @@ describe("bugFilters", () => {
         it("retorna false para identificadores diferentes", () => {
             expect(identifiersMatch("SGP", "SIGPAE")).toBe(false);
         });
+
+        it("faz match quando versão limpa (sem hífens) de um contém o outro", () => {
+            expect(identifiersMatch("NOVO-SGP", "NOVOSGP-EXTRA")).toBe(true);
+        });
     });
 
     describe("matchesBugToProject", () => {
@@ -149,7 +163,10 @@ describe("bugFilters", () => {
         });
 
         it("retorna true para bug sem tags e sem identificador no título (aparece em todos os projetos)", () => {
-            const bug = createBug({ title: "Bug genérico sem identificador", tags: undefined });
+            const bug = createBug({
+                title: "Bug genérico sem identificador",
+                tags: undefined,
+            });
             const identifiers = getProjectIdentifiers("Novo SGP");
             expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
@@ -161,31 +178,46 @@ describe("bugFilters", () => {
         });
 
         it("faz match por título com colchetes", () => {
-            const bug = createBug({ title: "[SGP] Não aparece os semestres", tags: undefined });
+            const bug = createBug({
+                title: "[SGP] Não aparece os semestres",
+                tags: undefined,
+            });
             const identifiers = getProjectIdentifiers("Novo SGP");
             expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
 
         it("faz match por título com hífen", () => {
-            const bug = createBug({ title: "SGP - Erro no calendário", tags: undefined });
+            const bug = createBug({
+                title: "SGP - Erro no calendário",
+                tags: undefined,
+            });
             const identifiers = getProjectIdentifiers("Novo SGP");
             expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
 
         it("faz match com tags separadas por ponto e vírgula", () => {
-            const bug = createBug({ title: "Erro qualquer", tags: "Frontend; SGP; Backend" });
+            const bug = createBug({
+                title: "Erro qualquer",
+                tags: "Frontend; SGP; Backend",
+            });
             const identifiers = getProjectIdentifiers("Novo SGP");
             expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
 
         it("faz match com tags separadas por vírgula", () => {
-            const bug = createBug({ title: "Erro qualquer", tags: "Frontend, SGP, Backend" });
+            const bug = createBug({
+                title: "Erro qualquer",
+                tags: "Frontend, SGP, Backend",
+            });
             const identifiers = getProjectIdentifiers("Novo SGP");
             expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
 
         it("não faz match quando projeto é diferente", () => {
-            const bug = createBug({ title: "[SIGPAE] Erro no relatório", tags: "SIGPAE" });
+            const bug = createBug({
+                title: "[SIGPAE] Erro no relatório",
+                tags: "SIGPAE",
+            });
             const identifiers = getProjectIdentifiers("Novo SGP");
             expect(matchesBugToProject(bug, identifiers)).toBe(false);
         });
@@ -201,20 +233,26 @@ describe("bugFilters", () => {
                 assigned_to: "Max Fernandes de Souza",
                 area_path: "SME - Sustentação",
                 team_project: "SME - Sustentação",
-                iteration_path: "SME - Sustentação\\Ciclo 006 - Sustentação -",
+                iteration_path: String.raw`SME - Sustentação\Ciclo 006 - Sustentação -`,
             };
             const identifiers = getProjectIdentifiers("Novo SGP");
             expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
 
         it("faz match para SigPAE", () => {
-            const bug = createBug({ title: "[SIGPAE] Erro no cadastro", tags: "SIGPAE" });
+            const bug = createBug({
+                title: "[SIGPAE] Erro no cadastro",
+                tags: "SIGPAE",
+            });
             const identifiers = getProjectIdentifiers("SigPAE");
             expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
 
         it("faz match para Conecta Formação com variações", () => {
-            const bug1 = createBug({ title: "[CONECTA FORMACAO] Erro", tags: undefined });
+            const bug1 = createBug({
+                title: "[CONECTA FORMACAO] Erro",
+                tags: undefined,
+            });
             const bug2 = createBug({ title: "Erro", tags: "CONECTAFORMACAO" });
             const identifiers = getProjectIdentifiers("Conecta Formação");
             expect(matchesBugToProject(bug1, identifiers)).toBe(true);
@@ -222,8 +260,23 @@ describe("bugFilters", () => {
         });
 
         it("faz match para projeto não mapeado usando fallback", () => {
-            const bug = createBug({ title: "[NOVO PROJETO] Erro", tags: undefined });
+            const bug = createBug({
+                title: "[NOVO PROJETO] Erro",
+                tags: undefined,
+            });
             const identifiers = getProjectIdentifiers("Novo Projeto");
+            expect(matchesBugToProject(bug, identifiers)).toBe(true);
+        });
+
+        it("faz match via versão limpa (sem hífens/espaços) do identificador e do texto", () => {
+            const bug = createBug({ title: "PortalCEU bug", tags: undefined });
+            const identifiers = getProjectIdentifiers("Portal CEU");
+            expect(matchesBugToProject(bug, identifiers)).toBe(true);
+        });
+
+        it("retorna true para bug sem título e sem tags", () => {
+            const bug = { id: 1 } as WorkItem;
+            const identifiers = getProjectIdentifiers("Novo SGP");
             expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
     });

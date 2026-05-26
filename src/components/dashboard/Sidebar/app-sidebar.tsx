@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 import {
     Sidebar,
@@ -21,10 +22,13 @@ import { COORDENADORIAS } from "./coordenadorias";
 
 import LogoutIcon from "@/assets/icons/Logout";
 import SignOutButton from "@/components/login/SignOutButton";
+import ProfileLink from "@/components/perfil/ProfileLink";
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { open } = useSidebar();
+    const router = useRouter();
+    const pathname = usePathname();
 
     const activeItem = useDashboardStore((state) => state.activeItem);
     const setActiveItem = useDashboardStore((state) => state.setActiveItem);
@@ -49,7 +53,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: item.url,
             icon: item.icon
         });
-    }, [setActiveItem]);
+        if (!pathname?.startsWith("/dashboard")) {
+            router.push("/dashboard");
+        }
+    }, [setActiveItem, pathname, router]);
 
     if (allowedItems.length === 0) {
         return (
@@ -60,6 +67,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </div>
                 </SidebarContent>
                 <SidebarFooter>
+                    <ProfileLink className="justify-end" />
                     <SignOutButton
                         variant="link"
                         className="[&_svg]:size-7 text-white no-underline hover:no-underline justify-end"
@@ -127,6 +135,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
+                <ProfileLink
+                    className={open ? "justify-end" : "justify-center"}
+                    showLabel={open}
+                />
                 <SignOutButton
                     variant="link"
                     className={`${

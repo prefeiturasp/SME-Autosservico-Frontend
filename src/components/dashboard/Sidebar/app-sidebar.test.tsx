@@ -77,6 +77,14 @@ vi.mock("@/assets/icons/SidebarCotic", () => ({
 }));
 
 
+// ✅ Mock do next/navigation (App Router)
+const mockRouterPush = vi.fn();
+let mockPathname = "/dashboard";
+vi.mock("next/navigation", () => ({
+    useRouter: () => ({ push: mockRouterPush }),
+    usePathname: () => mockPathname,
+}));
+
 // ✅ Mock do NextAuth/useSession com perfis válidos
 vi.mock("next-auth/react", () => {
     return {
@@ -113,6 +121,7 @@ const mockSetActiveItem = vi.fn();
 describe("<AppSidebar />", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockPathname = "/dashboard";
         (useDashboardStore as unknown as ViMock).mockImplementation(
             (selector) => {
                 return selector({
@@ -149,6 +158,20 @@ describe("<AppSidebar />", () => {
                 url: "#",
             })
         );
+    });
+
+    it("não navega ao clicar em um item quando já está no dashboard", () => {
+        mockPathname = "/dashboard";
+        renderWithSidebarProvider(<AppSidebar />);
+        fireEvent.click(screen.getByText("COPED"));
+        expect(mockRouterPush).not.toHaveBeenCalled();
+    });
+
+    it("navega para /dashboard ao clicar em um item fora do dashboard", () => {
+        mockPathname = "/perfil";
+        renderWithSidebarProvider(<AppSidebar />);
+        fireEvent.click(screen.getByText("COPED"));
+        expect(mockRouterPush).toHaveBeenCalledWith("/dashboard");
     });
 
     it("deve marcar o item como ativo quando activeItem.title corresponder", () => {

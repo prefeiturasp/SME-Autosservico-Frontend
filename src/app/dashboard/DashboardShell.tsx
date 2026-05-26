@@ -1,6 +1,7 @@
 "use client";
 
 import AnalyticsFilters from "@/components/dashboard/Analytics/AnalyticsFilters";
+import { AnalyticsTourOverlay } from "@/components/dashboard/Onboarding/AnalyticsTourOverlay";
 import { DeployHealthTourOverlay } from "@/components/dashboard/Onboarding/DeployHealthTourOverlay";
 import { TourOverlay } from "@/components/dashboard/Onboarding/TourOverlay";
 import { WelcomeModal } from "@/components/dashboard/Onboarding/WelcomeModal";
@@ -43,6 +44,7 @@ export function DashboardShell({ children, session }: DashboardShellProps) {
                     <WelcomeModal />
                     <TourOverlay />
                     <DeployHealthTourOverlay />
+                    <AnalyticsTourOverlay />
                 </SidebarProvider>
             </SessionGuard>
         </SessionProvider>

@@ -1,9 +1,11 @@
 /* @vitest-environment jsdom */
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
-    useOnboardingStore,
+    ANALYTICS_ONBOARDING_STORAGE_KEY,
+    ANALYTICS_TOUR_STEPS,
     ONBOARDING_STORAGE_KEY,
     TOUR_STEPS,
+    useOnboardingStore,
 } from "./onboarding";
 
 describe("useOnboardingStore (Zustand)", () => {
@@ -54,7 +56,8 @@ describe("useOnboardingStore (Zustand)", () => {
     });
 
     it("deve fechar o modal de boas-vindas com closeWelcomeModal", () => {
-        const { openWelcomeModal, closeWelcomeModal } = useOnboardingStore.getState();
+        const { openWelcomeModal, closeWelcomeModal } =
+            useOnboardingStore.getState();
         openWelcomeModal();
         expect(useOnboardingStore.getState().isWelcomeModalOpen).toBe(true);
         closeWelcomeModal();
@@ -136,7 +139,8 @@ describe("useOnboardingStore (Zustand)", () => {
     });
 
     it("deve atualizar todos os estados ao completar o onboarding", () => {
-        const { openWelcomeModal, startTour, completeOnboarding } = useOnboardingStore.getState();
+        const { openWelcomeModal, startTour, completeOnboarding } =
+            useOnboardingStore.getState();
         openWelcomeModal();
         startTour();
         completeOnboarding();
@@ -169,6 +173,75 @@ describe("useOnboardingStore (Zustand)", () => {
         const validPlacements = ["top", "bottom", "left", "right"];
         TOUR_STEPS.forEach((step) => {
             expect(validPlacements).toContain(step.placement);
+        });
+    });
+});
+
+// ----------------------------
+// Analytics Tour
+// ----------------------------
+
+describe("useOnboardingStore — analytics tour", () => {
+    beforeEach(() => {
+        useOnboardingStore.setState({
+            isAnalyticsTourActive: false,
+            analyticsTourStepIndex: 0,
+        });
+        localStorage.clear();
+    });
+
+    it("deve iniciar o tour analytics com startAnalyticsTour", () => {
+        useOnboardingStore.getState().startAnalyticsTour();
+        const state = useOnboardingStore.getState();
+        expect(state.isAnalyticsTourActive).toBe(true);
+        expect(state.analyticsTourStepIndex).toBe(0);
+    });
+
+    it("deve avançar para o próximo step com nextAnalyticsStep", () => {
+        useOnboardingStore.setState({
+            isAnalyticsTourActive: true,
+            analyticsTourStepIndex: 0,
+        });
+        useOnboardingStore.getState().nextAnalyticsStep();
+        expect(useOnboardingStore.getState().analyticsTourStepIndex).toBe(1);
+    });
+
+    it("deve fechar o tour e salvar localStorage ao chegar no último step com nextAnalyticsStep", () => {
+        useOnboardingStore.setState({
+            isAnalyticsTourActive: true,
+            analyticsTourStepIndex: ANALYTICS_TOUR_STEPS.length - 1,
+        });
+        useOnboardingStore.getState().nextAnalyticsStep();
+        const state = useOnboardingStore.getState();
+        expect(state.isAnalyticsTourActive).toBe(false);
+        expect(state.analyticsTourStepIndex).toBe(0);
+        expect(localStorage.getItem(ANALYTICS_ONBOARDING_STORAGE_KEY)).toBe(
+            "true",
+        );
+    });
+
+    it("deve fechar o tour e salvar localStorage com closeAnalyticsTour", () => {
+        useOnboardingStore.setState({
+            isAnalyticsTourActive: true,
+            analyticsTourStepIndex: 2,
+        });
+        useOnboardingStore.getState().closeAnalyticsTour();
+        const state = useOnboardingStore.getState();
+        expect(state.isAnalyticsTourActive).toBe(false);
+        expect(state.analyticsTourStepIndex).toBe(0);
+        expect(localStorage.getItem(ANALYTICS_ONBOARDING_STORAGE_KEY)).toBe(
+            "true",
+        );
+    });
+
+    it("ANALYTICS_TOUR_STEPS deve ter 5 steps com propriedades obrigatórias", () => {
+        expect(ANALYTICS_TOUR_STEPS).toHaveLength(5);
+        ANALYTICS_TOUR_STEPS.forEach((step) => {
+            expect(step).toHaveProperty("id");
+            expect(step).toHaveProperty("targetId");
+            expect(step).toHaveProperty("title");
+            expect(step).toHaveProperty("description");
+            expect(step).toHaveProperty("placement");
         });
     });
 });

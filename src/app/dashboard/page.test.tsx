@@ -123,6 +123,48 @@ vi.mock(
     }),
 );
 
+vi.mock("@/components/dashboard/ActiveUsersCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="active-users-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/AverageSessionCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="average-session-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/PeakUsageTodayCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="peak-usage-today-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/UsersByPageCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="users-by-page-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/DeviceDistributionCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="device-distribution-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/PeakHoursChart", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="peak-hours-chart">{systemName ?? ""}</div>
+    ),
+}));
+
 vi.mock("@/components/dashboard/DatabaseStatusCard", () => ({
     __esModule: true,
     default: ({ systemName }: { systemName?: string }) => (
@@ -248,6 +290,31 @@ describe("Dashboard page", () => {
         );
         expect(screen.getByTestId("filas-Fila")).toHaveTextContent(
             "Filas RabbitMQ",
+        );
+    });
+
+    test("deve renderizar os cards analytics ao clicar na aba Analytics", () => {
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Analytics" }));
+
+        expect(screen.getByTestId("active-users-card")).toHaveTextContent(
+            "Novo SGP",
+        );
+        expect(screen.getByTestId("average-session-card")).toHaveTextContent(
+            "Novo SGP",
+        );
+        expect(screen.getByTestId("peak-usage-today-card")).toHaveTextContent(
+            "Novo SGP",
+        );
+        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
+            "Novo SGP",
+        );
+        expect(
+            screen.getByTestId("device-distribution-card"),
+        ).toHaveTextContent("Novo SGP");
+        expect(screen.getByTestId("peak-hours-chart")).toHaveTextContent(
+            "Novo SGP",
         );
     });
 

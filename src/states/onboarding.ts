@@ -191,6 +191,12 @@ export const DEPLOY_HEALTH_TOUR_STEPS: TourStep[] = [
     },
 ];
 
+function saveTourCompletion(storageKey: string) {
+    if (globalThis.window !== undefined) {
+        localStorage.setItem(storageKey, "true");
+    }
+}
+
 export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
     (set, get) => ({
         isWelcomeModalOpen: false,
@@ -235,9 +241,7 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
         },
 
         completeOnboarding: () => {
-            if (globalThis.window !== undefined) {
-                localStorage.setItem(ONBOARDING_STORAGE_KEY, "true");
-            }
+            saveTourCompletion(ONBOARDING_STORAGE_KEY);
             set({
                 hasCompletedOnboarding: true,
                 isWelcomeModalOpen: false,
@@ -254,23 +258,13 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
             if (deployTourStepIndex < DEPLOY_HEALTH_TOUR_STEPS.length - 1) {
                 set({ deployTourStepIndex: deployTourStepIndex + 1 });
             } else {
-                if (globalThis.window !== undefined) {
-                    localStorage.setItem(
-                        DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY,
-                        "true",
-                    );
-                }
+                saveTourCompletion(DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY);
                 set({ isDeployTourActive: false, deployTourStepIndex: 0 });
             }
         },
 
         closeDeployTour: () => {
-            if (globalThis.window !== undefined) {
-                localStorage.setItem(
-                    DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY,
-                    "true",
-                );
-            }
+            saveTourCompletion(DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY);
             set({ isDeployTourActive: false, deployTourStepIndex: 0 });
         },
 
@@ -283,12 +277,7 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
             if (analyticsTourStepIndex < ANALYTICS_TOUR_STEPS.length - 1) {
                 set({ analyticsTourStepIndex: analyticsTourStepIndex + 1 });
             } else {
-                if (globalThis.window !== undefined) {
-                    localStorage.setItem(
-                        ANALYTICS_ONBOARDING_STORAGE_KEY,
-                        "true",
-                    );
-                }
+                saveTourCompletion(ANALYTICS_ONBOARDING_STORAGE_KEY);
                 set({
                     isAnalyticsTourActive: false,
                     analyticsTourStepIndex: 0,
@@ -297,9 +286,7 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
         },
 
         closeAnalyticsTour: () => {
-            if (globalThis.window !== undefined) {
-                localStorage.setItem(ANALYTICS_ONBOARDING_STORAGE_KEY, "true");
-            }
+            saveTourCompletion(ANALYTICS_ONBOARDING_STORAGE_KEY);
             set({ isAnalyticsTourActive: false, analyticsTourStepIndex: 0 });
         },
     }),

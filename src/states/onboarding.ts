@@ -197,6 +197,31 @@ function saveTourCompletion(storageKey: string) {
     }
 }
 
+function makeNextTourStep(
+    tourSteps: TourStep[],
+    storageKey: string,
+    getIndex: () => number,
+    advance: (next: number) => void,
+    complete: () => void,
+): () => void {
+    return () => {
+        const idx = getIndex();
+        if (idx < tourSteps.length - 1) {
+            advance(idx + 1);
+        } else {
+            saveTourCompletion(storageKey);
+            complete();
+        }
+    };
+}
+
+function makeCloseTour(storageKey: string, close: () => void): () => void {
+    return () => {
+        saveTourCompletion(storageKey);
+        close();
+    };
+}
+
 export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
     (set, get) => ({
         isWelcomeModalOpen: false,
@@ -253,41 +278,42 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
             set({ isDeployTourActive: true, deployTourStepIndex: 0 });
         },
 
-        nextDeployStep: () => {
-            const { deployTourStepIndex } = get();
-            if (deployTourStepIndex < DEPLOY_HEALTH_TOUR_STEPS.length - 1) {
-                set({ deployTourStepIndex: deployTourStepIndex + 1 });
-            } else {
-                saveTourCompletion(DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY);
-                set({ isDeployTourActive: false, deployTourStepIndex: 0 });
-            }
-        },
+        nextDeployStep: makeNextTourStep(
+            DEPLOY_HEALTH_TOUR_STEPS,
+            DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY,
+            () => get().deployTourStepIndex,
+            (i) => set({ deployTourStepIndex: i }),
+            () => set({ isDeployTourActive: false, deployTourStepIndex: 0 }),
+        ),
 
-        closeDeployTour: () => {
-            saveTourCompletion(DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY);
-            set({ isDeployTourActive: false, deployTourStepIndex: 0 });
-        },
+        closeDeployTour: makeCloseTour(
+            DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY,
+            () => set({ isDeployTourActive: false, deployTourStepIndex: 0 }),
+        ),
 
         startAnalyticsTour: () => {
             set({ isAnalyticsTourActive: true, analyticsTourStepIndex: 0 });
         },
 
-        nextAnalyticsStep: () => {
-            const { analyticsTourStepIndex } = get();
-            if (analyticsTourStepIndex < ANALYTICS_TOUR_STEPS.length - 1) {
-                set({ analyticsTourStepIndex: analyticsTourStepIndex + 1 });
-            } else {
-                saveTourCompletion(ANALYTICS_ONBOARDING_STORAGE_KEY);
+        nextAnalyticsStep: makeNextTourStep(
+            ANALYTICS_TOUR_STEPS,
+            ANALYTICS_ONBOARDING_STORAGE_KEY,
+            () => get().analyticsTourStepIndex,
+            (i) => set({ analyticsTourStepIndex: i }),
+            () =>
                 set({
                     isAnalyticsTourActive: false,
                     analyticsTourStepIndex: 0,
-                });
-            }
-        },
+                }),
+        ),
 
-        closeAnalyticsTour: () => {
-            saveTourCompletion(ANALYTICS_ONBOARDING_STORAGE_KEY);
-            set({ isAnalyticsTourActive: false, analyticsTourStepIndex: 0 });
-        },
+        closeAnalyticsTour: makeCloseTour(
+            ANALYTICS_ONBOARDING_STORAGE_KEY,
+            () =>
+                set({
+                    isAnalyticsTourActive: false,
+                    analyticsTourStepIndex: 0,
+                }),
+        ),
     }),
 );

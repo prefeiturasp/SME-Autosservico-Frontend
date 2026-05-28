@@ -3,31 +3,28 @@ import axios, { AxiosInstance } from "axios";
 
 let cachedClient: AxiosInstance | null = null;
 
-// TEMPORÁRIO: defaults hardcoded para teste em homolog. Reverter na PR de retorno.
-const DEFAULT_JENKINS_URL = "https://jenkins2.sme.prefeitura.sp.gov.br";
-const DEFAULT_JENKINS_USERNAME = "luis_dourado";
-const DEFAULT_JENKINS_API_TOKEN = "11bc982264a24499ca2eea10e804685047";
-const DEFAULT_JENKINS_TIMEOUT_MS = 10000;
-
 function getJenkinsBaseUrl(): string {
-  const url = process.env.JENKINS_URL ?? DEFAULT_JENKINS_URL;
+  const url = process.env.JENKINS_URL;
+  if (!url) throw new Error("JENKINS_URL não configurada");
   return url.replace(/\/$/, "");
 }
 
 function getJenkinsUsername(): string {
-  return process.env.JENKINS_USERNAME ?? DEFAULT_JENKINS_USERNAME;
+  const username = process.env.JENKINS_USERNAME;
+  if (!username) throw new Error("JENKINS_USERNAME não configurada");
+  return username;
 }
 
 function getJenkinsApiToken(): string {
-  return process.env.JENKINS_API_TOKEN ?? DEFAULT_JENKINS_API_TOKEN;
+  const token = process.env.JENKINS_API_TOKEN;
+  if (!token) throw new Error("JENKINS_API_TOKEN não configurada");
+  return token;
 }
 
 function getTimeout(): number {
   const raw = process.env.JENKINS_TIMEOUT_MS;
-  const parsed = raw ? Number(raw) : DEFAULT_JENKINS_TIMEOUT_MS;
-  return Number.isFinite(parsed) && parsed > 0
-    ? parsed
-    : DEFAULT_JENKINS_TIMEOUT_MS;
+  const parsed = raw ? Number(raw) : 10000;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 10000;
 }
 
 export function jenkinsClient(): AxiosInstance {

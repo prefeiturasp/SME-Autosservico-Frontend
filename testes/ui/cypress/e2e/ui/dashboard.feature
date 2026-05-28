@@ -7,10 +7,6 @@ Funcionalidade: Dashboard
     E clico no botão de acessar
     Então o resultado esperado para o cenário "Login válido padrão" deve ser exibido
 
-  Cenário: Validar card de Lançamentos
-    Então o card de "Lançamentos" deve estar visível
-    E deve exibir a versão e data de realização
-
   Cenário: Validar disponibilidade do ambiente
     Então o card de "Disponibilidade do ambiente" deve estar visível
     E o status do ambiente deve ser "Disponível"

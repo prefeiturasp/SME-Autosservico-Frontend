@@ -13,9 +13,11 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useDeviceDistribution } from "@/hooks/useDeviceDistribution";
 import type { DeviceType } from "@/types/deviceDistribution";
+import type { AnalyticsPeriod } from "@/types/analyticsPeriod";
 
 type Props = {
   readonly systemName?: string;
+  readonly period?: AnalyticsPeriod;
   readonly className?: string;
 };
 
@@ -84,10 +86,11 @@ function WarningAlert({ message }: { readonly message: string }) {
 
 export default function DeviceDistributionCard({
   systemName,
+  period,
   className,
 }: Props) {
   const { data, isLoading, isFetching, isError, refetch } =
-    useDeviceDistribution({ systemName: systemName ?? "" });
+    useDeviceDistribution({ systemName: systemName ?? "", period });
 
   const content = () => {
     if (!systemName) {

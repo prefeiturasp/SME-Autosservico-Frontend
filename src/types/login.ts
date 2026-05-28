@@ -27,4 +27,8 @@ export type LoginResponse = {
     preferred_username?: string;
     given_name?: string;
     family_name?: string;
+    cargo?: string;
+    coordenadoria?: string;
+    ultimo_acesso?: string;
+    tempo_sessao?: string;
 };

@@ -1,85 +1,26 @@
 import { create } from "zustand";
-
-export type TourStep = {
-    id: string;
-    targetId: string;
-    title: string;
-    description: string;
-    placement: "top" | "bottom" | "left" | "right";
-    spotlightWidth?: number;
-    spotlightHeight?: number;
-    centered?: boolean;
-};
-
-export const TOUR_STEPS: TourStep[] = [
-    {
-        id: "area-coordenadoria",
-        targetId: "onboarding-page-title",
-        title: "Área ou Coordenadoria",
-        description:
-            "No topo da página você visualiza o nome da sua área ou coordenadoria.",
-        placement: "right",
-        spotlightHeight: 225,
-    },
-    {
-        id: "sistema",
-        targetId: "onboarding-page-title",
-        title: "Sistema",
-        description:
-            "No seletor você pode escolher de qual sistema deseja visualizar as informações.",
-        placement: "bottom",
-        spotlightHeight: 225,
-    },
-    {
-        id: "lancamento-versoes",
-        targetId: "onboarding-lancamentos",
-        title: "Lançamento de Versões",
-        description:
-            "Nesta área você poderá visualizar as últimas versões publicadas e/ou previstas para publicação.",
-        placement: "bottom",
-    },
-    {
-        id: "disponibilidade-ambientes",
-        targetId: "onboarding-disponibilidade",
-        title: "Disponibilidade dos ambientes",
-        description:
-            "Nesta seção estarão visíveis as informações de disponibilidade dos ambientes de Produção, Homologação, Testes e Desenvolvimento.",
-        placement: "right",
-        centered: true,
-    },
-    {
-        id: "saude-servidor",
-        targetId: "onboarding-saude-servidor",
-        title: "Saúde do servidor (Workloads)",
-        description:
-            "Nesta seção será possível acompanhar a saúde dos recursos computacionais para disponibilização do sistema, servidores, filas de publicação, comunicação com APIs, entre outros itens.",
-        placement: "right",
-        centered: true,
-    },
-    {
-        id: "banco-dados",
-        targetId: "onboarding-banco-dados",
-        title: "Banco de dados",
-        description:
-            "Essa seção acompanha a comunicação do sistema com os bancos de dados e informações das aplicações. Visa garantir que o banco esteja funcionando bem, acessível e respondendo corretamente às consultas das aplicações.",
-        placement: "right",
-        centered: true,
-    },
-    {
-        id: "bugs",
-        targetId: "onboarding-bugs",
-        title: "Bugs",
-        description:
-            "Ao final da página será possível visualizar o registro dos bugs e correções necessárias para o sistema, suas tratativas e andamento para resolução.",
-        placement: "top",
-    },
-];
+import {
+    ANALYTICS_TOUR_STEPS,
+    DEPLOY_HEALTH_TOUR_STEPS,
+    TOUR_STEPS,
+    type TourStep,
+} from "./tour-steps";
+export {
+    ANALYTICS_TOUR_STEPS,
+    DEPLOY_HEALTH_TOUR_STEPS,
+    TOUR_STEPS,
+} from "./tour-steps";
+export type { TourStep } from "./tour-steps";
 
 type OnboardingState = {
     isWelcomeModalOpen: boolean;
     hasCompletedOnboarding: boolean;
     isTourActive: boolean;
     currentStepIndex: number;
+    isDeployTourActive: boolean;
+    deployTourStepIndex: number;
+    isAnalyticsTourActive: boolean;
+    analyticsTourStepIndex: number;
 };
 
 type OnboardingActions = {
@@ -90,9 +31,50 @@ type OnboardingActions = {
     prevStep: () => void;
     closeTour: () => void;
     completeOnboarding: () => void;
+    startDeployTour: () => void;
+    nextDeployStep: () => void;
+    closeDeployTour: () => void;
+    startAnalyticsTour: () => void;
+    nextAnalyticsStep: () => void;
+    closeAnalyticsTour: () => void;
 };
 
 export const ONBOARDING_STORAGE_KEY = "autosservico-onboarding-completed";
+export const DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY =
+    "autosservico-deploy-onboarding-completed";
+export const ANALYTICS_ONBOARDING_STORAGE_KEY =
+    "autosservico-analytics-onboarding-completed";
+
+function saveTourCompletion(storageKey: string) {
+    if (globalThis.window !== undefined) {
+        localStorage.setItem(storageKey, "true");
+    }
+}
+
+function makeNextTourStep(
+    tourSteps: TourStep[],
+    storageKey: string,
+    getIndex: () => number,
+    advance: (next: number) => void,
+    complete: () => void,
+): () => void {
+    return () => {
+        const idx = getIndex();
+        if (idx < tourSteps.length - 1) {
+            advance(idx + 1);
+        } else {
+            saveTourCompletion(storageKey);
+            complete();
+        }
+    };
+}
+
+function makeCloseTour(storageKey: string, close: () => void): () => void {
+    return () => {
+        saveTourCompletion(storageKey);
+        close();
+    };
+}
 
 export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
     (set, get) => ({
@@ -100,12 +82,20 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
         hasCompletedOnboarding: false,
         isTourActive: false,
         currentStepIndex: 0,
+        isDeployTourActive: false,
+        deployTourStepIndex: 0,
+        isAnalyticsTourActive: false,
+        analyticsTourStepIndex: 0,
 
         openWelcomeModal: () => set({ isWelcomeModalOpen: true }),
         closeWelcomeModal: () => set({ isWelcomeModalOpen: false }),
 
         startTour: () => {
-            set({ isWelcomeModalOpen: false, isTourActive: true, currentStepIndex: 0 });
+            set({
+                isWelcomeModalOpen: false,
+                isTourActive: true,
+                currentStepIndex: 0,
+            });
         },
 
         nextStep: () => {
@@ -130,14 +120,54 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
         },
 
         completeOnboarding: () => {
-            if (typeof window !== "undefined") {
-                localStorage.setItem(ONBOARDING_STORAGE_KEY, "true");
-            }
+            saveTourCompletion(ONBOARDING_STORAGE_KEY);
             set({
                 hasCompletedOnboarding: true,
                 isWelcomeModalOpen: false,
                 isTourActive: false,
             });
         },
-    })
+
+        startDeployTour: () => {
+            set({ isDeployTourActive: true, deployTourStepIndex: 0 });
+        },
+
+        nextDeployStep: makeNextTourStep(
+            DEPLOY_HEALTH_TOUR_STEPS,
+            DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY,
+            () => get().deployTourStepIndex,
+            (i) => set({ deployTourStepIndex: i }),
+            () => set({ isDeployTourActive: false, deployTourStepIndex: 0 }),
+        ),
+
+        closeDeployTour: makeCloseTour(
+            DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY,
+            () => set({ isDeployTourActive: false, deployTourStepIndex: 0 }),
+        ),
+
+        startAnalyticsTour: () => {
+            set({ isAnalyticsTourActive: true, analyticsTourStepIndex: 0 });
+        },
+
+        nextAnalyticsStep: makeNextTourStep(
+            ANALYTICS_TOUR_STEPS,
+            ANALYTICS_ONBOARDING_STORAGE_KEY,
+            () => get().analyticsTourStepIndex,
+            (i) => set({ analyticsTourStepIndex: i }),
+            () =>
+                set({
+                    isAnalyticsTourActive: false,
+                    analyticsTourStepIndex: 0,
+                }),
+        ),
+
+        closeAnalyticsTour: makeCloseTour(
+            ANALYTICS_ONBOARDING_STORAGE_KEY,
+            () =>
+                set({
+                    isAnalyticsTourActive: false,
+                    analyticsTourStepIndex: 0,
+                }),
+        ),
+    }),
 );

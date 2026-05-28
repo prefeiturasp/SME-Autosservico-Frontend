@@ -52,6 +52,21 @@ export function formatDurationMs(ms?: number): string | undefined {
     return `${seconds}s`;
 }
 
+export function formatCpfMasked(cpf?: string): string | undefined {
+    if (!cpf) return undefined;
+    const digits = cpf.replace(/\D/g, "").padStart(11, "0");
+    if (digits.length !== 11) return undefined;
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.xxx-xx`;
+}
+
+export function formatUltimoAcesso(value?: string): string | undefined {
+    if (!value) return undefined;
+    const match = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/.exec(value);
+    if (!match) return value;
+    const [, yyyy, mm, dd, hh, mi] = match;
+    return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+}
+
 export function decodeJwt(token: string) {
     const payload = token.split('.')[1];
     return JSON.parse(Buffer.from(payload, 'base64').toString('utf-8'));

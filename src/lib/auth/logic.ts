@@ -51,6 +51,10 @@ export async function authorizeUser(
     const groups = loginResponse.groups ?? [];
     const given_name = loginResponse.given_name;
     const family_name = loginResponse.family_name;
+    const cargo = loginResponse.cargo;
+    const coordenadoria = loginResponse.coordenadoria;
+    const ultimo_acesso = loginResponse.ultimo_acesso;
+    const tempo_sessao = loginResponse.tempo_sessao;
 
     if (!name || !id) {
         throw new Error("Erro interno no servidor!");
@@ -69,6 +73,10 @@ export async function authorizeUser(
         groups,
         given_name,
         family_name,
+        cargo,
+        coordenadoria,
+        ultimo_acesso,
+        tempo_sessao,
     };
 }
 
@@ -86,6 +94,10 @@ export function jwtCallback({ token, user }: { token: JWT; user?: User }): JWT {
         token.groups = user.groups;
         token.given_name = user.given_name;
         token.family_name = user.family_name;
+        token.cargo = user.cargo;
+        token.coordenadoria = user.coordenadoria;
+        token.ultimo_acesso = user.ultimo_acesso;
+        token.tempo_sessao = user.tempo_sessao;
     }
 
     token.exp = Math.floor(Date.now() / 1000) + TOKEN_MAX_AGE_SECONDS;
@@ -115,6 +127,10 @@ export function sessionCallback({
         session.user.groups = token.groups;
         session.user.given_name = token.given_name;
         session.user.family_name = token.family_name;
+        session.user.cargo = token.cargo;
+        session.user.coordenadoria = token.coordenadoria;
+        session.user.ultimo_acesso = token.ultimo_acesso;
+        session.user.tempo_sessao = token.tempo_sessao;
         session.expires_at = token.exp;
     }
     return session;

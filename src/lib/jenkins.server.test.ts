@@ -90,30 +90,34 @@ describe("jenkins client", () => {
         expect(createMock).toHaveBeenCalledTimes(2);
     });
 
-    it("lança erro quando JENKINS_USERNAME não está configurada", async () => {
+    it("usa username padrão quando JENKINS_USERNAME não está configurada", async () => {
         delete process.env.JENKINS_USERNAME;
         const mod = await import("./jenkins.server");
+        mod.jenkinsClient();
 
-        expect(() => mod.jenkinsClient()).toThrow(
-            "JENKINS_USERNAME não configurada",
-        );
+        const config = createMock!.mock.calls[0][0] as Record<string, unknown>;
+        const headers = config.headers as Record<string, string>;
+        expect(headers.Authorization).toMatch(/^Basic /);
     });
 
-    it("lança erro quando JENKINS_API_TOKEN não está configurada", async () => {
+    it("usa token padrão quando JENKINS_API_TOKEN não está configurada", async () => {
         delete process.env.JENKINS_API_TOKEN;
         const mod = await import("./jenkins.server");
+        mod.jenkinsClient();
 
-        expect(() => mod.jenkinsClient()).toThrow(
-            "JENKINS_API_TOKEN não configurada",
-        );
+        const config = createMock!.mock.calls[0][0] as Record<string, unknown>;
+        const headers = config.headers as Record<string, string>;
+        expect(headers.Authorization).toMatch(/^Basic /);
     });
 
-    it("lança erro quando JENKINS_URL não está configurada", async () => {
+    it("usa URL padrão quando JENKINS_URL não está configurada", async () => {
         delete process.env.JENKINS_URL;
         const mod = await import("./jenkins.server");
+        mod.jenkinsClient();
 
-        expect(() => mod.jenkinsClient()).toThrow(
-            "JENKINS_URL não configurada",
+        const config = createMock!.mock.calls[0][0] as Record<string, unknown>;
+        expect(config.baseURL).toBe(
+            "https://jenkins2.sme.prefeitura.sp.gov.br",
         );
     });
 

@@ -17,7 +17,7 @@ export function AccountActionsCard({ onAlterarSenha }: AccountActionsCardProps) 
             <button
                 type="button"
                 onClick={onAlterarSenha}
-                className="text-sm font-semibold text-sky-600 underline-offset-4 hover:underline focus:outline-none focus-visible:underline"
+                className="hidden text-sm font-semibold text-sky-600 underline-offset-4 hover:underline focus:outline-none focus-visible:underline"
                 data-testid="btn-alterar-senha"
             >
                 Alterar senha

@@ -66,7 +66,7 @@ describe("<ChartTooltip />", () => {
                 peakHour="15h"
             />,
         );
-        expect(screen.getByText("8.102 usuarios")).toBeInTheDocument();
+        expect(screen.getByText("8.102 usuários")).toBeInTheDocument();
         expect(screen.getByText("6.935")).toBeInTheDocument();
         expect(screen.getByText("921")).toBeInTheDocument();
         expect(screen.getByText("246")).toBeInTheDocument();

@@ -38,7 +38,7 @@ export function DadosPessoaisCard({
                 <button
                     type="button"
                     onClick={onEditar}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-sky-600 underline-offset-4 hover:underline focus:outline-none focus-visible:underline"
+                    className="hidden items-center gap-1.5 text-sm font-semibold text-sky-600 underline-offset-4 hover:underline focus:outline-none focus-visible:underline"
                     data-testid="btn-editar-dados"
                     aria-label="Editar dados pessoais"
                 >

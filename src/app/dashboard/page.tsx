@@ -11,6 +11,7 @@ import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Produca
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
 import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
+import Releases from "@/components/dashboard/Releases";
 import Filas from "@/components/dashboard/SaudeDosServidores/Filas";
 import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -83,6 +84,17 @@ export default function Dashboard() {
                 </TabsList>
 
                 <TabsContent value="operacional">
+                    <div className="grid grid-cols-4 gap-4 mb-4">
+                        <div
+                            id="onboarding-lancamentos"
+                            className="col-span-2"
+                        >
+                            <Releases
+                                project={projectName}
+                                subprojects={jenkinsSubprojects}
+                            />
+                        </div>
+                    </div>
                     <div className="grid grid-cols-4 gap-4 mb-4">
                         <CardWrapperInfoAmbientes
                             id="onboarding-disponibilidade"

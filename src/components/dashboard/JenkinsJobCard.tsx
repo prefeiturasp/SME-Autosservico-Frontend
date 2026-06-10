@@ -5,13 +5,7 @@ import { RotateCcw, Clock, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { EnvironmentSelect } from "@/components/dashboard/EnvironmentSelect";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { JenkinsJobSummary } from "@/types/jenkins";
 
@@ -26,43 +20,6 @@ type Props = {
     readonly showEnvironmentSelect?: boolean;
     readonly contentOnly?: boolean;
 };
-
-function EnvironmentSelect({ 
-    value, 
-    onChange 
-}: { 
-    readonly value: "prod" | "homolog"; 
-    readonly onChange: (v: "prod" | "homolog") => void;
-}) {
-    return (
-        <Select
-            value={value}
-            onValueChange={(v) => onChange(v === "homolog" ? "homolog" : "prod")}
-        >
-            <SelectTrigger
-                size="sm"
-                className="w-auto rounded-full border-transparent bg-slate-100 px-3 text-xs font-medium text-slate-700 shadow-none hover:bg-slate-200 gap-1"
-                aria-label="Selecionar ambiente"
-            >
-                <SelectValue placeholder="Ambiente" />
-            </SelectTrigger>
-            <SelectContent>
-                <SelectItem
-                    value="prod"
-                    className="focus:bg-[#3b82f6] focus:text-white"
-                >
-                    Produção
-                </SelectItem>
-                <SelectItem
-                    value="homolog"
-                    className="focus:bg-[#3b82f6] focus:text-white"
-                >
-                    Homologação
-                </SelectItem>
-            </SelectContent>
-        </Select>
-    );
-}
 
 type HeaderProps = {
     readonly title: string;

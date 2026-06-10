@@ -152,6 +152,17 @@ describe("<Releases />", () => {
     });
   });
 
+  it("sem projeto: mostra seletor de ambiente e não busca releases", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
+      throw new Error(`fetch inesperado: ${fetchUrl(input)}`);
+    });
+
+    render(withClient(<Releases project="" subprojects={[]} />));
+
+    expect(await screen.findByLabelText("Selecionar ambiente")).toHaveTextContent("Produção");
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it("projeto N/E (ou sem chaves): não busca releases e mostra mensagem", async () => {
     const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
       const url = fetchUrl(input);

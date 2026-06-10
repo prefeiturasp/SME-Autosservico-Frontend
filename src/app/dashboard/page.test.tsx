@@ -100,6 +100,23 @@ vi.mock("@/components/dashboard/JenkinsJob", () => ({
     ),
 }));
 
+vi.mock("@/components/dashboard/Releases", () => ({
+    __esModule: true,
+    default: ({
+        title,
+        project,
+        subprojects,
+    }: {
+        title?: string;
+        project: string;
+        subprojects?: unknown[];
+    }) => (
+        <div data-testid={`releases-${title ?? "Lançamentos"}`}>
+            {project}::{Array.isArray(subprojects) ? subprojects.length : 0}
+        </div>
+    ),
+}));
+
 vi.mock("@/components/dashboard/DeployHealth/EnvironmentHeader", () => ({
     __esModule: true,
     default: () => <div data-testid="environment-header">Ambiente</div>,
@@ -251,6 +268,29 @@ describe("Dashboard page", () => {
         expect(jenkins).toHaveTextContent("Novo SGP::1");
         expect(jenkins.parentElement).toHaveClass("lg:col-span-1");
         expect(sonar.parentElement).toHaveClass("lg:col-span-3");
+    });
+
+    test("renderiza o card Lançamentos na aba Operacional", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeItem: { title: "COPED" },
+            activeProject: {
+                nome: "Novo SGP",
+                zabbixQueryFrontend: "Portal SME",
+                zabbixQueryBackend: "API SME",
+                zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
+                jenkinsSubprojects: [
+                    { label: "Backend", key: "SME-NovoSGP/master" },
+                ],
+            },
+        };
+
+        render(withClient(<Dashboard />));
+
+        const releases = screen.getByTestId("releases-Lançamentos");
+
+        expect(releases).toHaveTextContent("Novo SGP::1");
+        expect(releases.parentElement).toHaveClass("col-span-2");
     });
 
     test("quando não há projeto ativo, passa strings vazias para os filhos (ramo do ??)", () => {

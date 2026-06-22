@@ -10,9 +10,9 @@ export function temPermissaoDeAcessoV2(
         console.warn("Variável de ambiente NEXT_PUBLIC_SQUADS_VALIDAS não configurada.");
         return false;
     }
-    const gruposValidos = gruposValidosEnv.split(",").map((g) => g.trim().toUpperCase());
+    const gruposValidos = new Set(gruposValidosEnv.split(",").map((g) => g.trim().toUpperCase()));
 
-    return groups.some((group) => gruposValidos.includes(group.toUpperCase()));
+    return groups.some((group) => gruposValidos.has(group.toUpperCase()));
 }
 type PerfilPorSistema = {
     sistema: number;

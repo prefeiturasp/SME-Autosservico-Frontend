@@ -15,7 +15,7 @@ export function useAnalyticsOnboarding() {
     } = useOnboardingStore();
 
     const triggerAnalyticsTour = () => {
-        if (typeof window === "undefined") return;
+        if (globalThis.window === undefined) return;
         const hasCompleted = localStorage.getItem(
             ANALYTICS_ONBOARDING_STORAGE_KEY,
         );

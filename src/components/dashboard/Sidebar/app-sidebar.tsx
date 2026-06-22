@@ -67,13 +67,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </div>
                 </SidebarContent>
                 <SidebarFooter>
-                    <ProfileLink className="justify-end" />
+                    <ProfileLink className="justify-start px-4" />
                     <SignOutButton
                         variant="link"
-                        className="[&_svg]:size-7 text-white no-underline hover:no-underline justify-end"
+                        className="[&_svg]:size-7 text-white no-underline hover:no-underline justify-start px-4"
                     >
-                        <span>Sair</span> <LogoutIcon />
+                        <LogoutIcon /> <span>Sair</span>
                     </SignOutButton>
+                    <p className="text-center text-[10px] text-white/60 pb-1">
+                        Licença AGPL V3
+                    </p>
                 </SidebarFooter>
             </Sidebar>
         );
@@ -106,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         }
                                         data-testid={`sidebar-button-${item.title.toLowerCase()}`}
                                         onClick={() => handleItemClick(item)}
-                                        className={`px-4 rounded-sm h-auto transition-colors
+                                        className={`px-4 rounded-sm h-[55px] transition-colors
                                             ${
                                                 activeItem?.title === item.title
                                                     ? "bg-[#3B82F6] text-white"
@@ -115,17 +118,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         `}
                                     >
                                         <span
-                                            className={`${open ? "!items-start" : ""} flex gap-3 cursor-pointer [&_svg]:!size-6`}
+                                            className="flex items-center gap-3 cursor-pointer [&_svg]:!size-6"
                                         >
-                                            <item.icon className="mt-1 flex-shrink-0" />
-                                            <div className="flex flex-col gap-0.5 min-w-0 items-start">
+                                            <item.icon className="flex-shrink-0" />
+                                            {open && (
                                                 <span className="font-semibold text-sm leading-tight">
                                                     {item.title}
                                                 </span>
-                                                <span className="text-xs leading-tight">
-                                                    {item.subTitle}
-                                                </span>
-                                            </div>
+                                            )}
                                         </span>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -136,17 +136,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
             <SidebarFooter>
                 <ProfileLink
-                    className={open ? "justify-end" : "justify-center"}
+                    className={open ? "justify-start px-4" : "justify-center"}
                     showLabel={open}
                 />
                 <SignOutButton
                     variant="link"
                     className={`${
-                        open && "justify-end"
-                    } [&_svg]:size-7 text-white no-underline hover:no-underline text-right`}
+                        open ? "justify-start px-4" : "justify-center"
+                    } [&_svg]:size-7 text-white no-underline hover:no-underline`}
                 >
-                    {open && <span>Sair</span>} <LogoutIcon />
+                    <LogoutIcon /> {open && <span>Sair</span>}
                 </SignOutButton>
+                {open && (
+                    <p className="text-center text-[10px] text-white/60 pb-1">
+                        Licença AGPL V3
+                    </p>
+                )}
             </SidebarFooter>
         </Sidebar>
     );

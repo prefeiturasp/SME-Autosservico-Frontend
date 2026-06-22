@@ -24,8 +24,8 @@ export default function ProfileLink({
                 className,
             )}
         >
-            {showLabel && <span>Perfil</span>}
             <PerfilIcon />
+            {showLabel && <span>Perfil</span>}
         </Link>
     );
 }

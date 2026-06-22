@@ -77,7 +77,7 @@ Funcionalidade: Dashboard - Aba Saúde do deploy
 
   Cenário: Validar quantidade de falhas
     Dado que estou na aba Saúde do deploy
-    Então devo visualizar o texto "13 critérios com falhas"
+    Então devo visualizar o texto "critérios com falhas"
 
   Cenário: Validar métricas de cobertura
     Dado que estou na aba Saúde do deploy

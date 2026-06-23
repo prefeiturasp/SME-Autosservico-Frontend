@@ -34,11 +34,11 @@ export function temPermissaoDeAcesso(
     }
 
     const sistema = Number(sistemaEnv);
-    const squadsValidas = squadsEnv.split(",").map((s) => s.trim().toUpperCase());
+    const squadsValidas = new Set(squadsEnv.split(",").map((s) => s.trim().toUpperCase()));
 
     return perfisPorSistema?.some(
         (item) =>
             item.sistema === sistema &&
-            item.perfis.some((perfil) => squadsValidas.includes(perfil.toUpperCase()))
+            item.perfis.some((perfil) => squadsValidas.has(perfil.toUpperCase()))
     );
 }

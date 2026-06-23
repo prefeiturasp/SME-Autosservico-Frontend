@@ -3,9 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import Image from "next/image";
 
 import ClosedEye from "@/assets/icons/CloseEye";
 import OpenEye from "@/assets/icons/OpenEye";
+import LogoDevops from "@/assets/images/logo_devops.webp";
 import { AlertCircleIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -80,6 +82,18 @@ export default function LoginForm() {
             <BackgroundForm />
             <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
                 <div className="w-full max-w-md">
+                    <div className="flex justify-center mb-[60px]">
+                        <Image
+                            src={LogoDevops}
+                            alt="Logo AutoServiço"
+                            sizes="(min-width: 880px) 134w, 108w"
+                            className="w-[108px] md:w-[134px]"
+                            loading="lazy"
+                            fetchPriority="low"
+                            width={LogoDevops.width}
+                            height={LogoDevops.height}
+                        />
+                    </div>
                     <div className="bg-white rounded-sm shadow-2xl p-8 backdrop-blur-sm bg-opacity-95">
                         <div className="mb-8 text-left">
                             <h1 className="text-2xl font-bold text-gray-800 mb-2">

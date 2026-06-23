@@ -34,9 +34,14 @@ vi.mock("@/const", async (importOriginal) => {
     PERFIL_NOT_PERMISSION_ERROR_MESSAGE: "Você não tem permissão para acessar este sistema.", // sobrescreve só o necessário no teste
   };
 });
-vi.mock("@/assets/images/logo_devops.webp", () => ({
+vi.mock("@/assets/images/logo_devops.svg", () => ({
   __esModule: true,
-  default: { src: "/fake-logo.webp", width: 100, height: 100 },
+  default: { src: "/fake-logo.svg", width: 208, height: 43 },
+}));
+
+vi.mock("@/assets/images/logo_prefeitura.svg", () => ({
+  __esModule: true,
+  default: { src: "/fake-prefeitura.svg", width: 216, height: 88 },
 }));
 
 vi.mock("next/image", () => ({

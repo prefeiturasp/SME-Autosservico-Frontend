@@ -7,7 +7,8 @@ import Image from "next/image";
 
 import ClosedEye from "@/assets/icons/CloseEye";
 import OpenEye from "@/assets/icons/OpenEye";
-import LogoDevops from "@/assets/images/logo_devops.webp";
+import LogoDevops from "@/assets/images/logo_devops.svg";
+import LogoPrefeitura from "@/assets/images/logo_prefeitura.svg";
 import { AlertCircleIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -86,22 +87,21 @@ export default function LoginForm() {
                         <Image
                             src={LogoDevops}
                             alt="Logo AutoServiço"
-                            sizes="(min-width: 880px) 134w, 108w"
-                            className="w-[108px] md:w-[134px]"
+                            className="w-[199.3474px] h-[34.1841px]"
                             loading="lazy"
                             fetchPriority="low"
-                            width={LogoDevops.width}
-                            height={LogoDevops.height}
+                            width={199}
+                            height={34}
                         />
                     </div>
                     <div className="bg-white rounded-sm shadow-2xl p-8 backdrop-blur-sm bg-opacity-95">
                         <div className="mb-8 text-left">
-                            <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                            <h1 className="text-xl font-bold text-blue-900 mb-2">
                                 Boas vindas ao Autosserviço!
                             </h1>
                             <p className="text-gray-600 text-sm">
-                                Confira as informações da saúde do seu sistema e
-                                tenha mais autonomia em suas atividades diárias.
+                                Confira as informações técnicas e dados de seu
+                                sistema.
                             </p>
                         </div>
                         <div className="mb-8">
@@ -198,16 +198,6 @@ export default function LoginForm() {
                                     </button>
                                 </div>
 
-                                {/* Link esqueceu senha */}
-                                <div className="text-right">
-                                    <button
-                                        type="button"
-                                        className="text-sm text-gray-900 hover:text-blue-600 transition-colors"
-                                    >
-                                        Esqueceu sua senha?
-                                    </button>
-                                </div>
-
                                 <div>
                                     <Button
                                         type="submit"
@@ -222,6 +212,17 @@ export default function LoginForm() {
                                 </div>
                             </form>
                         </Form>
+                    </div>
+                    <div className="flex justify-center mt-[53px]">
+                        <Image
+                            src={LogoPrefeitura}
+                            alt="Logo Prefeitura de São Paulo"
+                            className="w-[208px] h-[80px]"
+                            loading="lazy"
+                            fetchPriority="low"
+                            width={208}
+                            height={80}
+                        />
                     </div>
                 </div>
             </div>

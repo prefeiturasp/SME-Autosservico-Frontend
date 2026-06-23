@@ -4,7 +4,7 @@ import BackgroundForm from "./BackgroundForm";
 import { vi } from "vitest";
 
 // Mock das imagens
-vi.mock("@/assets/images/background_forms.jpeg", () => ({
+vi.mock("@/assets/images/background_forms.png", () => ({
   default: {
     src: "/fake-background.webp",
   },

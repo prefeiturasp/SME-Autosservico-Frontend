@@ -1,5 +1,5 @@
 import Image from "next/image";
-import BackgroundFormImage from "@/assets/images/background_forms.jpeg";
+import BackgroundFormImage from "@/assets/images/background_forms.png";
 import LogoDevops from "@/assets/images/logo_devops.webp";
 
 export default function BackgroundForm() {

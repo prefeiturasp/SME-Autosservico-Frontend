@@ -19,7 +19,7 @@ type Props = {
 function getSprintName(iterationPath?: string): string {
     if (!iterationPath) return "Sem Sprint";
     const parts = iterationPath.split("\\");
-    return parts[parts.length - 1] || "Sem Sprint";
+    return parts.at(-1) || "Sem Sprint";
 }
 
 type SprintInfo = {
@@ -44,9 +44,9 @@ function extractSprintsWithCount(items: WorkItem[]): SprintInfo[] {
 
     // Ordena sprints (tenta ordenar numericamente se possível)
     sprints.sort((a, b) => {
-        const numA = parseInt(a.name.replace(/\D/g, ""), 10);
-        const numB = parseInt(b.name.replace(/\D/g, ""), 10);
-        if (!isNaN(numA) && !isNaN(numB)) return numB - numA; // Mais recente primeiro
+        const numA = Number.parseInt(a.name.replaceAll(/\D/g, ""), 10);
+        const numB = Number.parseInt(b.name.replaceAll(/\D/g, ""), 10);
+        if (!Number.isNaN(numA) && !Number.isNaN(numB)) return numB - numA; // Mais recente primeiro
         return a.name.localeCompare(b.name);
     });
 

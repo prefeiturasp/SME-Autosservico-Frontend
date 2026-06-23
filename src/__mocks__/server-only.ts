@@ -1,1 +1,1 @@
-export {}; // módulo vazio
+export default {};

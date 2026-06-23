@@ -49,7 +49,7 @@ function compareEntries(
 }
 
 function toggleSort(current: SortState, key: SortKey): SortState {
-  if (!current || current.key !== key) return { key, direction: "asc" };
+  if (current?.key !== key) return { key, direction: "asc" };
   if (current.direction === "asc") return { key, direction: "desc" };
   return null;
 }
@@ -229,7 +229,7 @@ export default function UsersByPageCard({ systemName, period, className }: Props
   const maxCurrent = useMemo(
     () =>
       sortedPages.reduce(
-        (acc, entry) => (entry.currentUsers > acc ? entry.currentUsers : acc),
+        (acc, entry) => Math.max(entry.currentUsers, acc),
         0
       ),
     [sortedPages]

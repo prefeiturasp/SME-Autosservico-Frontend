@@ -6,7 +6,7 @@ import type { WorkItem } from "@/types/backlog";
 export function normalizeText(text: string): string {
     return text
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
+        .replaceAll(/[\u0300-\u036f]/g, "")
         .toUpperCase()
         .trim();
 }
@@ -47,8 +47,8 @@ export function getProjectIdentifiers(projectName: string): string[] {
 
     // Fallback: gera identificadores a partir do nome do projeto
     const normalized = normalizeText(projectName);
-    const withoutSpaces = normalized.replace(/\s+/g, "");
-    const withHyphens = normalized.replace(/\s+/g, "-");
+    const withoutSpaces = normalized.replaceAll(/\s+/g, "");
+    const withHyphens = normalized.replaceAll(/\s+/g, "-");
 
     return [normalized, withoutSpaces, withHyphens].filter(
         (v, i, arr) => arr.indexOf(v) === i
@@ -94,9 +94,7 @@ export function extractTitleIdentifiers(title: string): string[] {
     if (prefixMatch) {
         const prefix = prefixMatch[1].trim();
         if (prefix.length >= 2) {
-            identifiers.push(prefix);
-            identifiers.push(prefix.replace(/ +/g, ""));
-            identifiers.push(prefix.replace(/ +/g, "-"));
+            identifiers.push(prefix, prefix.replaceAll(/ +/g, ""), prefix.replaceAll(/ +/g, "-"));
         }
     }
 
@@ -113,8 +111,8 @@ export function identifiersMatch(id1: string, id2: string): boolean {
     if (id1.includes(id2) || id2.includes(id1)) return true;
 
     // Remove hífens e espaços para comparação
-    const clean1 = id1.replace(/[-\s]/g, "");
-    const clean2 = id2.replace(/[-\s]/g, "");
+    const clean1 = id1.replaceAll(/[-\s]/g, "");
+    const clean2 = id2.replaceAll(/[-\s]/g, "");
     if (clean1 === clean2) return true;
     if (clean1.includes(clean2) || clean2.includes(clean1)) return true;
 
@@ -137,11 +135,11 @@ function getAllKnownIdentifiers(): string[] {
  */
 function containsAnyKnownIdentifier(searchText: string): boolean {
     const allIdentifiers = getAllKnownIdentifiers();
-    const cleanSearchText = searchText.replace(/[-\s]/g, "");
+    const cleanSearchText = searchText.replaceAll(/[-\s]/g, "");
 
     return allIdentifiers.some((id) => {
         if (searchText.includes(id)) return true;
-        const cleanId = id.replace(/[-\s]/g, "");
+        const cleanId = id.replaceAll(/[-\s]/g, "");
         if (cleanSearchText.includes(cleanId)) return true;
         return false;
     });
@@ -166,13 +164,13 @@ export function matchesBugToProject(bug: WorkItem, projectIdentifiers: string[])
     if (!containsAnyKnownIdentifier(searchText)) return true;
 
     // Verifica se algum identificador do projeto aparece no título ou nas tags
-    const cleanSearchText = searchText.replace(/[-\s]/g, "");
+    const cleanSearchText = searchText.replaceAll(/[-\s]/g, "");
     return projectIdentifiers.some((projectId) => {
         // Busca exata do identificador
         if (searchText.includes(projectId)) return true;
 
         // Busca sem hífens e espaços
-        const cleanProjectId = projectId.replace(/[-\s]/g, "");
+        const cleanProjectId = projectId.replaceAll(/[-\s]/g, "");
         if (cleanSearchText.includes(cleanProjectId)) return true;
 
         return false;

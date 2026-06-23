@@ -96,7 +96,7 @@ export default function LoginForm() {
                     </div>
                     <div className="bg-white rounded-sm shadow-2xl p-8 backdrop-blur-sm bg-opacity-95">
                         <div className="mb-8 text-left">
-                            <h1 className="text-xl font-bold text-blue-900 mb-2">
+                            <h1 className="text-xl font-medium text-blue-900 mb-2">
                                 Boas vindas ao Autosserviço!
                             </h1>
                             <p className="text-gray-600 text-sm">
@@ -113,10 +113,10 @@ export default function LoginForm() {
                                     <AlertCircleIcon />
                                     {errorMessage !==
                                         PERFIL_NOT_PERMISSION_ERROR_MESSAGE && (
-                                        <AlertTitle className="font-bold text-[#111827]">
-                                            Vamos tentar de novo?
-                                        </AlertTitle>
-                                    )}
+                                            <AlertTitle className="font-bold text-[#111827]">
+                                                Vamos tentar de novo?
+                                            </AlertTitle>
+                                        )}
                                     <AlertDescription>
                                         <p className="text-[#6b7280] !leading-4 -mt-1">
                                             {errorMessage}

@@ -20,9 +20,18 @@ export interface WorkItem {
   parent_link?: string;
 }
 
+export interface BugMetrics {
+  total_cycle: number;
+  open: number;
+  in_progress: number;
+  resolved: number;
+  average_resolution: string | null;
+}
+
 export interface BacklogResponse {
   total_items: number;
   parents: WorkItem[];
   children: WorkItem[];
+  bug_metrics?: BugMetrics;
   metadata: Record<string, unknown>;
 }

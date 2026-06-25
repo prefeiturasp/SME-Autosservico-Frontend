@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
   const projectName = (searchParams.get("project_name") ?? "").trim();
   const workItemTypes = searchParams.get("work_item_types");
   const states = searchParams.get("states");
+  const iterationPaths = searchParams.get("iteration_paths");
 
   if (!projectName) {
     return NextResponse.json({ error: "project_name é obrigatório" }, { status: 400 });
@@ -25,6 +26,7 @@ export async function GET(req: NextRequest) {
     const filters: Record<string, string> = {};
     if (workItemTypes) filters.work_item_types = workItemTypes;
     if (states) filters.states = states;
+    if (iterationPaths) filters.iteration_paths = iterationPaths;
 
     const backlog = await getBacklog(projectName, filters);
     return NextResponse.json(backlog);

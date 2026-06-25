@@ -4,6 +4,7 @@ import type { BacklogResponse } from "@/types/backlog";
 export type BacklogFilters = {
   workItemTypes?: string[];
   states?: string[];
+  iterationPaths?: string[];
 };
 
 type Options = {
@@ -33,6 +34,9 @@ export function useAzureDevOpsBacklog({
       }
       if (filters?.states?.length) {
         params.states = filters.states.join(",");
+      }
+      if (filters?.iterationPaths?.length) {
+        params.iteration_paths = filters.iterationPaths.join(",");
       }
 
       const qs = new URLSearchParams(params);

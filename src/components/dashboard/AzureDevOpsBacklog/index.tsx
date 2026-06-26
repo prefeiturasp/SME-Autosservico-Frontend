@@ -132,7 +132,7 @@ export default function AzureDevOpsBacklog({ project, className }: Props) {
         },
     });
 
-    const { filteredQuery, sprints, totalItems } = useMemo(() => {
+    const { filteredQuery, sprints } = useMemo(() => {
         if (!query.data || !project) {
             return {
                 filteredQuery: query,
@@ -205,15 +205,13 @@ export default function AzureDevOpsBacklog({ project, className }: Props) {
                             }}
                             className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
-                            <option value="all">
-                                Todas as Sprints ({totalItems})
-                            </option>
-                            {sprints.map((sprint) => (
+                            <option value="all">Todos os ciclos</option>
+                            {[...sprints].reverse().map((sprint) => (
                                 <option
                                     key={sprint.iterationPath}
                                     value={sprint.iterationPath}
                                 >
-                                    {sprint.name} ({sprint.count})
+                                    {sprint.name}
                                 </option>
                             ))}
                         </select>

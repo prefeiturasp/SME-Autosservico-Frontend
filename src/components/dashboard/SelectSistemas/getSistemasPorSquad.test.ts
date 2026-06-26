@@ -11,7 +11,7 @@ describe("getSistemasPorSquad", () => {
         // ✅ Verifica o primeiro item como exemplo
         expect(sistemas[0]).toMatchObject({
             id: "10",
-            nome: "Novo SGP",
+            nome: "SGP",
         });
 
         // ✅ Verifica se contém todos os sistemas esperados
@@ -67,9 +67,10 @@ describe("getSistemasPorSquad", () => {
         const coped = getSistemasPorSquad("COPED");
         const ascom = getSistemasPorSquad("ASCOM");
         const coplan = getSistemasPorSquad("COPLAN");
+        const emforpef = getSistemasPorSquad("EMFORPEF");
 
-        expect(coped.find((s) => s.nome === "Novo SGP")?.sonarProjectKey).toBe("SME-NovoSGP-WebClient");
-        expect(coped.find((s) => s.nome === "Cdep")?.sonarProjectKey).toBe("SME-CDEP-FRONTEND");
+        expect(coped.find((s) => s.nome === "SGP")?.sonarProjectKey).toBe("SME-NovoSGP-WebClient");
+        expect(emforpef.find((s) => s.nome === "CDEP")?.sonarProjectKey).toBe("SME-CDEP-FRONTEND");
         expect(coped.find((s) => s.nome === "Curriculo da Cidade")?.sonarProjectKey).toBe(
             "SME-plataforma-curriculo-interface"
         );

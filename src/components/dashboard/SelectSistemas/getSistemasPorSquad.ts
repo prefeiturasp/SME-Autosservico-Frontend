@@ -1,41 +1,69 @@
-import { Sistema } from "./schema"; // Importando o tipo do schema
 import type { JenkinsSubproject } from "@/types/jenkinsSubproject";
+import { Sistema } from "./schema"; // Importando o tipo do schema
+
+type SistemaConfig = {
+    id: string;
+    nome: string;
+    frontend?: string;
+    backend?: string;
+    filas?: string;
+    job: string;
+    azure: string;
+};
+
+function makeSistema({ id, nome, frontend = "", backend = "", filas = "", job, azure }: SistemaConfig): Sistema {
+    return {
+        id,
+        nome,
+        zabbixQueryFrontend: frontend,
+        zabbixQueryBackend: backend,
+        zabbixQueryFilasRabbitMQ: filas,
+        zabbixQueryJenkinsJob: job,
+        azureDevopsProjectName: azure,
+    };
+}
 
 const squads: Record<string, Sistema[]> = {
     ASCOM: [
-        { id: "1", nome: "Portal Educação", zabbixQueryFrontend: "PRD - Educacao", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-PortalEducacao/master", azureDevopsProjectName: "ASCOM - Comunicação" },
-        { id: "2", nome: "Portal CEU", zabbixQueryFrontend: "PRD - Portal CEU", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-PortalCEU/master", azureDevopsProjectName: "COCEU" },
-        { id: "3", nome: "Plateia", zabbixQueryFrontend: "PRD - Plateia", zabbixQueryBackend: "PRD - Plateia - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Plateia/master", azureDevopsProjectName: "COCEU" },
-        { id: "4", nome: "Plateia App", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Plateia-App/master", azureDevopsProjectName: "COCEU" },
-        { id: "5", nome: "Intranet", zabbixQueryFrontend: "PRD - Intranet", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Intranet/master", azureDevopsProjectName: "ASCOM - Comunicação" },
-    ],
-    COGEP: [
-        { id: "6", nome: "Escolhas", zabbixQueryFrontend: "PRD - Escolhas", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Escolhas/master", azureDevopsProjectName: "COGEP - Recursos Humanos" },
-        { id: "7", nome: "Sigla", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-SIGLA/master", azureDevopsProjectName: "COGEP - Recursos Humanos" },
+        makeSistema({ id: "5", nome: "Intranet", frontend: "PRD - Intranet", job: "SME-Intranet/master", azure: "ASCOM - Comunicação" }),
+        makeSistema({ id: "2", nome: "Portal CEU", frontend: "PRD - Portal CEU", job: "SME-PortalCEU/master", azure: "COCEU" }),
+        makeSistema({ id: "1", nome: "Portal Educação", frontend: "PRD - Educacao", job: "SME-PortalEducacao/master", azure: "ASCOM - Comunicação" }),
     ],
     CODAE: [
-        { id: "8", nome: "SigPAE", zabbixQueryFrontend: "PRD - SIGPAE", zabbixQueryBackend: "PRD - SIGPAE - API", zabbixQueryFilasRabbitMQ: "PRD - Celery Sigpae", zabbixQueryJenkinsJob: "SME-SIGPAE/master", azureDevopsProjectName: "CODAE - Alimentação" },
-        { id: "9", nome: "Rolê Agroecológico", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-RoleAgroecologico/master", azureDevopsProjectName: "CODAE - Alimentação" },
+        makeSistema({ id: "8", nome: "SigPAE", frontend: "PRD - SIGPAE", backend: "PRD - SIGPAE - API", filas: "PRD - Celery Sigpae", job: "SME-SIGPAE/master", azure: "CODAE - Alimentação" }),
+        makeSistema({ id: "9", nome: "Rolê Agroecológico", job: "SME-RoleAgroecologico/master", azure: "CODAE - Alimentação" }),
+    ],
+    COGEP: [
+        makeSistema({ id: "6", nome: "Escolhas", frontend: "PRD - Escolhas", job: "SME-Escolhas/master", azure: "COGEP - Recursos Humanos" }),
+        makeSistema({ id: "7", nome: "Sigla", job: "SME-SIGLA/master", azure: "COGEP - Recursos Humanos" }),
     ],
     COPED: [
-        { id: "10", nome: "Novo SGP", zabbixQueryFrontend: "PRD - Novo SGP", zabbixQueryBackend: "PRD - Novo SGP - Swagger", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-NovoSGP-Docs/master", azureDevopsProjectName: "COPED - Pedagógico" },
-        { id: "11", nome: "Serap", zabbixQueryFrontend: "PRD - Serap", zabbixQueryBackend: "PRD - Serap - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Serap/master", azureDevopsProjectName: "COPED - Pedagógico" },
-        { id: "12", nome: "Serap Estudantes", zabbixQueryFrontend: "PRD - Serap Estudantes", zabbixQueryBackend: "PRD - Serap Estudantes - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Serap-Estudantes/master", azureDevopsProjectName: "COPED - Pedagógico" },
-        { id: "13", nome: "Cdep", zabbixQueryFrontend: "PRD - CDEP", zabbixQueryBackend: "PRD - CDEP - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-CDEP/master", azureDevopsProjectName: "EMFORPEF - Formação" },
-        { id: "14", nome: "Curriculo da Cidade", zabbixQueryFrontend: "PRD - Curriculo", zabbixQueryBackend: "PRD - Curriculo - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-Curriculo/master", azureDevopsProjectName: "COPED - Pedagógico" },
-        { id: "15", nome: "IDEP", zabbixQueryFrontend: "PRD - Idep", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-IDEP/master", azureDevopsProjectName: "COPED - Pedagógico" },
-        { id: "16", nome: "Conecta Formação", zabbixQueryFrontend: "PRD - Conecta Formacao", zabbixQueryBackend: "PRD - Conecta Formacao - API", zabbixQueryFilasRabbitMQ: "PRD - RabbitMQ", zabbixQueryJenkinsJob: "SME-ConectaFormacao/master", azureDevopsProjectName: "EMFORPEF - Formação" },
+        makeSistema({ id: "10", nome: "SGP", frontend: "PRD - Novo SGP", backend: "PRD - Novo SGP - Swagger", filas: "PRD - RabbitMQ", job: "SME-NovoSGP-Docs/master", azure: "COPED - Pedagógico" }),
+        makeSistema({ id: "11", nome: "Serap", frontend: "PRD - Serap", backend: "PRD - Serap - API", filas: "PRD - RabbitMQ", job: "SME-Serap/master", azure: "COPED - Pedagógico" }),
+        makeSistema({ id: "12", nome: "Serap Estudantes", frontend: "PRD - Serap Estudantes", backend: "PRD - Serap Estudantes - API", filas: "PRD - RabbitMQ", job: "SME-Serap-Estudantes/master", azure: "COPED - Pedagógico" }),
+        makeSistema({ id: "15", nome: "IDEP", frontend: "PRD - Idep", job: "SME-IDEP/master", azure: "COPED - Pedagógico" }),
+        makeSistema({ id: "14", nome: "Curriculo da Cidade", frontend: "PRD - Curriculo", backend: "PRD - Curriculo - API", filas: "PRD - RabbitMQ", job: "SME-Curriculo/master", azure: "COPED - Pedagógico" }),
     ],
-    COPLAN: [{ id: "17", nome: "SigEscola", zabbixQueryFrontend: "PRD - PTRF - SIG Escola", zabbixQueryBackend: "PRD - PTRF - SIG Escola - API", zabbixQueryFilasRabbitMQ: "PRD - Celery PTRF", zabbixQueryJenkinsJob: "SME-SigEscola/master", azureDevopsProjectName: "COPLAN - PTRF" }],
-    COTIC: [{ id: "18", nome: "Autosserviço", zabbixQueryFrontend: "PRD - AUTOSSERVICO", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-Autosservico-Frontend/master", azureDevopsProjectName: "COTIC - Auto Serviço" }],
-    GIPE: [{ id: "19", nome: "GIPE", zabbixQueryFrontend: "", zabbixQueryBackend: "", zabbixQueryFilasRabbitMQ: "", zabbixQueryJenkinsJob: "SME-GIPE/master", azureDevopsProjectName: "GIPE - Desenvolvimento" }],
+    COPLAN: [
+        makeSistema({ id: "17", nome: "SigEscola", frontend: "PRD - PTRF - SIG Escola", backend: "PRD - PTRF - SIG Escola - API", filas: "PRD - Celery PTRF", job: "SME-SigEscola/master", azure: "COPLAN - PTRF" }),
+    ],
+    COTIC: [
+        makeSistema({ id: "18", nome: "Autosserviço", frontend: "PRD - AUTOSSERVICO", job: "SME-Autosservico-Frontend/master", azure: "COTIC - Auto Serviço" }),
+    ],
+    EMFORPEF: [
+        makeSistema({ id: "13", nome: "CDEP", frontend: "PRD - CDEP", backend: "PRD - CDEP - API", filas: "PRD - RabbitMQ", job: "SME-CDEP/master", azure: "EMFORPEF - Formação" }),
+        makeSistema({ id: "16", nome: "Conecta Formação", frontend: "PRD - Conecta Formacao", backend: "PRD - Conecta Formacao - API", filas: "PRD - RabbitMQ", job: "SME-ConectaFormacao/master", azure: "EMFORPEF - Formação" }),
+    ],
+    GIPE: [
+        makeSistema({ id: "19", nome: "GIPE", job: "SME-GIPE/master", azure: "GIPE - Desenvolvimento" }),
+    ],
 };
 
 function normalizeName(value: string): string {
     return value
         .trim()
         .normalize("NFD")
-        .replaceAll(/[\u0300-\u036f]/g, "")
+        .replaceAll(/[̀-ͯ]/g, "")
         .replaceAll(/\s+/g, " ")
         .toUpperCase();
 }
@@ -43,11 +71,9 @@ function normalizeName(value: string): string {
 // Fonte de verdade para subprojetos de releases por Squad/Projeto.
 const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, JenkinsSubproject[]>> = {
     ASCOM: {
-        "INTRANET": [{ label: "INTRANET", key: "INTRANET/php-fpm-prod" }],
+        INTRANET: [{ label: "INTRANET", key: "INTRANET/php-fpm-prod" }],
         "PORTAL CEU": [{ label: "CEU", key: "CEU/php-fpm-prod" }],
         "PORTAL EDUCACAO": [{ label: "EDUCACAO", key: "EDUCACAO/php-fpm-prod" }],
-        PLATEIA: [{ label: "SME-Plateia-API", key: "SME-Plateia-API" }],
-        "PLATEIA APP": [{ label: "SME-Plateia-App", key: "SME-Plateia-App" }],
     },
     CODAE: {
         "ROLE AGROECOLOGICO": [{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO" }],
@@ -60,33 +86,14 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
         SIGLA: [{ label: "sme-sigla-frontend", key: "sme-sigla-frontend" }],
     },
     COPED: {
-        CDEP: [
-            { label: "CDEP-BACKEND", key: "CDEP-BACKEND" },
-            { label: "CDEP-FRONTEND", key: "CDEP-FRONTEND" },
-            { label: "CDEP-WORKER", key: "CDEP-WORKER" },
-        ],
-        "CONECTA FORMACAO": [
-            { label: "CONECTAFORMACAO-BACKEND", key: "CONECTAFORMACAO-BACKEND" },
-            {
-                label: "CONECTAFORMACAO-BACKEND-WORKER-PRs",
-                key: "CONECTAFORMACAO-BACKEND-WORKER-PRs",
-            },
-            { label: "CONECTAFORMACAO-FRONTEND", key: "CONECTAFORMACAO-FRONTEND" },
-            { label: "CONECTAFORMACAO-FRONTEND-PRs", key: "CONECTAFORMACAO-FRONTEND-PRs" },
-            { label: "CONECTAFORMACAO-WORKER", key: "CONECTAFORMACAO-WORKER" },
-        ],
         "CURRICULO DA CIDADE": [
             { label: "SME-plataforma-curriculo-API", key: "SME-plataforma-curriculo-API" },
-            {
-                label: "SME-plataforma-curriculo-interface",
-                key: "SME-plataforma-curriculo-interface",
-            },
+            { label: "SME-plataforma-curriculo-interface", key: "SME-plataforma-curriculo-interface" },
         ],
         IDEP: [
             { label: "SME-Indice_IDEP-API", key: "SME-Indice_IDEP-API" },
             { label: "SME-Indice_IDEP-Front", key: "SME-Indice_IDEP-Front" },
         ],
-        "NOVO SGP": [{ label: "SME-NovoSGP", key: "SME-NovoSGP" }],
         SERAP: [{ label: "SME-Prova-Serap-App", key: "SME-Prova-Serap-App" }],
         "SERAP ESTUDANTES": [
             { label: "SME-PROVA-SERAP-API", key: "SME-PROVA-SERAP-API" },
@@ -97,6 +104,7 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
             { label: "SME-Simulador-Prova-Serap-Api", key: "SME-Simulador-Prova-Serap-Api" },
             { label: "SME-Simulador-Prova-Serap-App", key: "SME-Simulador-Prova-Serap-App" },
         ],
+        SGP: [{ label: "SME-NovoSGP", key: "SME-NovoSGP" }],
     },
     COPLAN: {
         SIGESCOLA: [
@@ -106,6 +114,20 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
     },
     COTIC: {
         AUTOSSERVICO: [{ label: "SME-Autosservico-Frontend", key: "SME-Autosservico-Frontend" }],
+    },
+    EMFORPEF: {
+        CDEP: [
+            { label: "CDEP-BACKEND", key: "CDEP-BACKEND" },
+            { label: "CDEP-FRONTEND", key: "CDEP-FRONTEND" },
+            { label: "CDEP-WORKER", key: "CDEP-WORKER" },
+        ],
+        "CONECTA FORMACAO": [
+            { label: "CONECTAFORMACAO-BACKEND", key: "CONECTAFORMACAO-BACKEND" },
+            { label: "CONECTAFORMACAO-BACKEND-WORKER-PRs", key: "CONECTAFORMACAO-BACKEND-WORKER-PRs" },
+            { label: "CONECTAFORMACAO-FRONTEND", key: "CONECTAFORMACAO-FRONTEND" },
+            { label: "CONECTAFORMACAO-FRONTEND-PRs", key: "CONECTAFORMACAO-FRONTEND-PRs" },
+            { label: "CONECTAFORMACAO-WORKER", key: "CONECTAFORMACAO-WORKER" },
+        ],
     },
     GIPE: {
         GIPE: [
@@ -118,20 +140,14 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
             { label: "Gipe-Intercorrencia", key: "Gipe-Intercorrencia" },
             { label: "Gipe-Intercorrencia-PRs", key: "Gipe-Intercorrencia-PRs" },
         ],
-        "GIPE-ANEXOS-INTERCORRENCIAS": [
-            { label: "Gipe-Anexos-Intercorrencias", key: "Gipe-Anexos-Intercorrencias" },
-        ],
-        "GIPE-ANEXOS-INTERCORRENCIAS-PRS": [
-            { label: "Gipe-Anexos-Intercorrencias-PRs", key: "Gipe-Anexos-Intercorrencias-PRs" },
-        ],
+        "GIPE-ANEXOS-INTERCORRENCIAS": [{ label: "Gipe-Anexos-Intercorrencias", key: "Gipe-Anexos-Intercorrencias" }],
+        "GIPE-ANEXOS-INTERCORRENCIAS-PRS": [{ label: "Gipe-Anexos-Intercorrencias-PRs", key: "Gipe-Anexos-Intercorrencias-PRs" }],
         "GIPE-BACKEND": [{ label: "GIPE-Backend", key: "GIPE-Backend" }],
         "GIPE-BACKEND-PRS": [{ label: "GIPE-Backend-PRs", key: "GIPE-Backend-PRs" }],
         "GIPE-FRONTEND": [{ label: "GIPE-Frontend", key: "GIPE-Frontend" }],
         "GIPE-FRONTEND-PRS": [{ label: "GIPE-Frontend-PRs", key: "GIPE-Frontend-PRs" }],
         "GIPE-INTERCORRENCIA": [{ label: "Gipe-Intercorrencia", key: "Gipe-Intercorrencia" }],
-        "GIPE-INTERCORRENCIA-PRS": [
-            { label: "Gipe-Intercorrencia-PRs", key: "Gipe-Intercorrencia-PRs" },
-        ],
+        "GIPE-INTERCORRENCIA-PRS": [{ label: "Gipe-Intercorrencia-PRs", key: "Gipe-Intercorrencia-PRs" }],
     },
 };
 
@@ -139,33 +155,33 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
 // Quando há múltiplos componentes no SonarQube, priorizamos o frontend/interface principal.
 const SONAR_PROJECT_KEY_BY_SQUAD_PROJECT: Record<string, Record<string, string>> = {
     ASCOM: {
-        "PORTAL EDUCACAO": "SME-EDUCACAO",
-        "PORTAL CEU": "SME-CEU",
-        PLATEIA: "SME-Plateia-API",
-        "PLATEIA APP": "SME-Plateia-App",
         INTRANET: "SME-INTRANET",
+        "PORTAL CEU": "SME-CEU",
+        "PORTAL EDUCACAO": "SME-EDUCACAO",
     },
     CODAE: {
-        SIGPAE: "SME-SIGPAE-FrontEnd",
         "ROLE AGROECOLOGICO": "SME-ROLE-AGROECOLOGICO",
+        SIGPAE: "SME-SIGPAE-FrontEnd",
     },
     COGEP: {
         SIGLA: "SME-SIGLA-Frontend",
     },
     COPED: {
-        CDEP: "SME-CDEP-FRONTEND",
-        "CONECTA FORMACAO": "SME-CONECTAFORMACAO-FRONTEND",
         "CURRICULO DA CIDADE": "SME-plataforma-curriculo-interface",
         IDEP: "SME-Indice_IDEP-Front",
-        "NOVO SGP": "SME-NovoSGP-WebClient",
         SERAP: "SME-Serap-main",
         "SERAP ESTUDANTES": "SME-prova-serap-front",
+        SGP: "SME-NovoSGP-WebClient",
     },
     COPLAN: {
         SIGESCOLA: "SME-PTRF-FrontEnd",
     },
     COTIC: {
         AUTOSSERVICO: "SME-Autosservico-Frontend",
+    },
+    EMFORPEF: {
+        CDEP: "SME-CDEP-FRONTEND",
+        "CONECTA FORMACAO": "SME-CONECTAFORMACAO-FRONTEND",
     },
     GIPE: {
         GIPE: "SME-GIPE-FRONTEND",

@@ -147,7 +147,6 @@ function containsAnyKnownIdentifier(searchText: string): boolean {
 
 /**
  * Verifica se um bug pertence a um projeto baseado no título e tags.
- * Busca os identificadores do projeto em qualquer lugar do título ou das tags.
  * Bugs sem identificadores conhecidos aparecem em todos os projetos.
  */
 export function matchesBugToProject(bug: WorkItem, projectIdentifiers: string[]): boolean {
@@ -159,6 +158,16 @@ export function matchesBugToProject(bug: WorkItem, projectIdentifiers: string[])
 
     // Bugs sem título e sem tags aparecem em todos os projetos
     if (searchText.trim().length === 0) return true;
+
+    // Se o título contém identificadores explícitos (colchetes ou prefixo antes de ":" / "-"),
+    // usa SOMENTE eles para determinar o projeto. Isso evita que bugs como
+    // "[Portal SME | Acervo] ..." apareçam em todos os projetos por não estarem no mapa.
+    const titleIdentifiers = extractTitleIdentifiers(normalizedTitle);
+    if (titleIdentifiers.length > 0) {
+        return titleIdentifiers.some((extracted) =>
+            projectIdentifiers.some((projectId) => identifiersMatch(extracted, projectId))
+        );
+    }
 
     // Se o bug não contém nenhum identificador conhecido, aparece em todos os projetos
     if (!containsAnyKnownIdentifier(searchText)) return true;

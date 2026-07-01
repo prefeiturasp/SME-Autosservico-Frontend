@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 import type { BacklogResponse } from "@/types/backlog";
 import type { UseQueryResult } from "@tanstack/react-query";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/components/ui/skeleton", () => ({
@@ -267,20 +267,25 @@ describe("<AzureDevOpsBacklog />", () => {
         ).toBeInTheDocument();
     });
 
-    it("exibe valores de bug_metrics quando presentes", () => {
+    it("exibe contadores calculados a partir dos itens filtrados pelo projeto", () => {
         mockUseAzureDevOpsBacklog.mockReturnValue(
             makeQuery({
                 data: {
-                    total_items: 0,
+                    total_items: 4,
                     parents: [],
-                    children: [],
+                    children: [
+                        { id: 1, title: "[SGP] Bug A", work_item_type: "BugFix", state: "New" },
+                        { id: 2, title: "[SGP] Bug B", work_item_type: "BugFix", state: "New" },
+                        { id: 3, title: "[SGP] Bug C", work_item_type: "BugFix", state: "Active" },
+                        { id: 4, title: "[SGP] Bug D", work_item_type: "HotFix", state: "Resolved" },
+                    ],
                     metadata: {},
                     bug_metrics: {
-                        total_cycle: 15,
-                        open: 5,
-                        in_progress: 3,
-                        resolved: 7,
-                        average_resolution: "2d",
+                        total_cycle: 99,
+                        open: 99,
+                        in_progress: 99,
+                        resolved: 99,
+                        average_resolution: "3d",
                     },
                 },
                 isSuccess: true,
@@ -289,14 +294,18 @@ describe("<AzureDevOpsBacklog />", () => {
 
         render(<AzureDevOpsBacklog project="Novo SGP" />);
 
-        expect(screen.getByText("15")).toBeInTheDocument();
-        expect(screen.getByText("5")).toBeInTheDocument();
-        expect(screen.getByText("3")).toBeInTheDocument();
-        expect(screen.getByText("7")).toBeInTheDocument();
-        expect(screen.getByText("2d")).toBeInTheDocument();
+        const bar = screen.getByTestId("bug-metrics-bar");
+
+        // Contadores refletem os itens filtrados (4 total, 2 abertos, 1 em andamento, 1 resolvido)
+        // e não os valores do backend (99) que incluiriam outros projetos
+        expect(within(bar).getByText("4")).toBeInTheDocument();
+        expect(within(bar).getByText("2")).toBeInTheDocument();
+        expect(within(bar).getAllByText("1")).toHaveLength(2); // in_progress e resolved
+        // average_resolution vem do backend
+        expect(within(bar).getByText("3d")).toBeInTheDocument();
     });
 
-    it("exibe '-' para todos os campos quando bug_metrics é undefined", () => {
+    it("exibe 0 nos contadores quando não há itens no projeto", () => {
         mockUseAzureDevOpsBacklog.mockReturnValue(
             makeQuery({
                 data: { total_items: 0, parents: [], children: [], metadata: {} },
@@ -306,24 +315,22 @@ describe("<AzureDevOpsBacklog />", () => {
 
         render(<AzureDevOpsBacklog project="Novo SGP" />);
 
-        expect(screen.getAllByText("-")).toHaveLength(5);
+        const bar = screen.getByTestId("bug-metrics-bar");
+        expect(within(bar).getAllByText("0")).toHaveLength(4);
+        expect(within(bar).getByText("-")).toBeInTheDocument();
     });
 
-    it("exibe '-' para average_resolution quando é null", () => {
+    it("exibe '-' para average_resolution quando é null no backend", () => {
         mockUseAzureDevOpsBacklog.mockReturnValue(
             makeQuery({
                 data: {
-                    total_items: 0,
+                    total_items: 1,
                     parents: [],
-                    children: [],
+                    children: [
+                        { id: 1, title: "[SGP] Bug A", work_item_type: "BugFix", state: "New" },
+                    ],
                     metadata: {},
-                    bug_metrics: {
-                        total_cycle: 10,
-                        open: 2,
-                        in_progress: 1,
-                        resolved: 7,
-                        average_resolution: null,
-                    },
+                    bug_metrics: { total_cycle: 1, open: 1, in_progress: 0, resolved: 0, average_resolution: null },
                 },
                 isSuccess: true,
             }),
@@ -331,8 +338,9 @@ describe("<AzureDevOpsBacklog />", () => {
 
         render(<AzureDevOpsBacklog project="Novo SGP" />);
 
-        expect(screen.getByText("-")).toBeInTheDocument();
-        expect(screen.getByText("10")).toBeInTheDocument();
+        const bar = screen.getByTestId("bug-metrics-bar");
+        expect(within(bar).getByText("-")).toBeInTheDocument();
+        expect(within(bar).getAllByText("1")).toHaveLength(2); // total_cycle e open
     });
 
     it("exibe skeletons nas métricas durante loading", () => {

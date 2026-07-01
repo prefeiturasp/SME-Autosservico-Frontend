@@ -23,7 +23,7 @@ const METRIC_ITEMS = [
 
 function BugMetricsBar({ metrics, isLoading }: BugMetricsBarProps) {
     return (
-        <div className="flex flex-1 items-stretch gap-2">
+        <div data-testid="bug-metrics-bar" className="flex flex-1 items-stretch gap-2">
             {METRIC_ITEMS.map(({ key, label }) => (
                 <div
                     key={key}
@@ -54,6 +54,14 @@ type Props = {
     readonly project?: string;
     readonly className?: string;
 };
+
+function getItemStatus(state?: string): "Aberto" | "Em andamento" | "Resolvido" {
+    if (!state) return "Aberto";
+    const s = state.toLowerCase();
+    if (s.includes("resolved") || s.includes("closed") || s.includes("done") || s.includes("resolvido") || s.includes("fechado")) return "Resolvido";
+    if (s.includes("active") || s.includes("progress") || s.includes("andamento") || s.includes("ativo")) return "Em andamento";
+    return "Aberto";
+}
 
 /**
  * Extrai o nome da sprint do iteration_path.
@@ -132,12 +140,12 @@ export default function AzureDevOpsBacklog({ project, className }: Props) {
         },
     });
 
-    const { filteredQuery, sprints } = useMemo(() => {
+    const { filteredQuery, sprints, computedMetrics } = useMemo(() => {
         if (!query.data || !project) {
             return {
                 filteredQuery: query,
                 sprints: cachedSprintsRef.current,
-                totalItems: cachedTotalRef.current,
+                computedMetrics: undefined,
             };
         }
 
@@ -157,6 +165,17 @@ export default function AzureDevOpsBacklog({ project, className }: Props) {
             cachedTotalRef.current = allProjectItems.length;
         }
 
+        // Calcula contadores a partir dos itens filtrados pelo projeto para que
+        // os cards sempre reflitam exatamente o que aparece na listagem abaixo.
+        // average_resolution vem do backend pois requer cálculo de datas.
+        const computedMetrics = {
+            total_cycle: allProjectItems.length,
+            open: allProjectItems.filter((i) => getItemStatus(i.state) === "Aberto").length,
+            in_progress: allProjectItems.filter((i) => getItemStatus(i.state) === "Em andamento").length,
+            resolved: allProjectItems.filter((i) => getItemStatus(i.state) === "Resolvido").length,
+            average_resolution: query.data.bug_metrics?.average_resolution ?? null,
+        };
+
         return {
             filteredQuery: {
                 ...query,
@@ -167,7 +186,7 @@ export default function AzureDevOpsBacklog({ project, className }: Props) {
                 },
             },
             sprints: cachedSprintsRef.current,
-            totalItems: cachedTotalRef.current,
+            computedMetrics,
         };
     }, [query, project, selectedIterationPath]);
 
@@ -219,7 +238,7 @@ export default function AzureDevOpsBacklog({ project, className }: Props) {
                 )}
 
                 <BugMetricsBar
-                    metrics={query.data?.bug_metrics}
+                    metrics={computedMetrics}
                     isLoading={query.isLoading || query.isFetching}
                 />
             </div>

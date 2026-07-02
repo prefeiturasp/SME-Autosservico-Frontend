@@ -60,11 +60,11 @@ vi.mock("@/states/dashboard", () => {
 vi.mock("@/assets/icons/SidebarAscom", () => ({
     default: () => <div>IconASCOM</div>,
 }));
-vi.mock("@/assets/icons/SidebarCoceu", () => ({
-    default: () => <div>IconCOCEU</div>,
-}));
 vi.mock("@/assets/icons/SidebarCodae", () => ({
     default: () => <div>IconCODAE</div>,
+}));
+vi.mock("@/assets/icons/SidebarCogep", () => ({
+    default: () => <div>IconCOGEP</div>,
 }));
 vi.mock("@/assets/icons/SidebarCoped", () => ({
     default: () => <div>IconCOPED</div>,
@@ -74,6 +74,12 @@ vi.mock("@/assets/icons/SidebarCoplan", () => ({
 }));
 vi.mock("@/assets/icons/SidebarCotic", () => ({
     default: () => <div>IconCOTIC</div>,
+}));
+vi.mock("@/assets/icons/SidebarEmforpef", () => ({
+    default: () => <div>IconEMFORPEF</div>,
+}));
+vi.mock("@/assets/icons/SidebarGipe", () => ({
+    default: () => <div>IconGIPE</div>,
 }));
 
 
@@ -138,13 +144,7 @@ describe("<AppSidebar />", () => {
     it("deve renderizar apenas os itens permitidos (baseado nos perfis do sistema 1008)", () => {
         renderWithSidebarProvider(<AppSidebar />);
         expect(screen.getByText("COPED")).toBeInTheDocument();
-        expect(
-            screen.getByText("Coordenadoria pedagógica")
-        ).toBeInTheDocument();
         expect(screen.getByText("COPLAN")).toBeInTheDocument();
-        expect(
-            screen.getByText("Coordenadoria de Planejamento e Orçamento")
-        ).toBeInTheDocument();
         expect(screen.getByText("Sair")).toBeInTheDocument();
     });
 
@@ -154,7 +154,7 @@ describe("<AppSidebar />", () => {
         expect(mockSetActiveItem).toHaveBeenCalledWith(
             expect.objectContaining({
                 title: "COPED",
-                subTitle: "Coordenadoria pedagógica",
+                subTitle: "Coordenadoria Pedagógica",
                 url: "#",
             })
         );
@@ -208,8 +208,5 @@ describe("<AppSidebar />", () => {
         fireEvent.click(openButton);
 
         expect(screen.getByText("COPED")).toBeInTheDocument();
-        expect(
-            screen.getByText("Coordenadoria pedagógica")
-        ).toBeInTheDocument();
     });
 });

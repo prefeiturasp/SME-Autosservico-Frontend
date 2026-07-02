@@ -15,7 +15,7 @@ export function useDeployHealthOnboarding() {
     } = useOnboardingStore();
 
     const triggerDeployTour = () => {
-        if (typeof window === "undefined") return;
+        if (globalThis.window === undefined) return;
         const hasCompleted = localStorage.getItem(
             DEPLOY_HEALTH_ONBOARDING_STORAGE_KEY,
         );

@@ -279,6 +279,33 @@ describe("bugFilters", () => {
             const identifiers = getProjectIdentifiers("Novo SGP");
             expect(matchesBugToProject(bug, identifiers)).toBe(true);
         });
+
+        it("não faz match quando título tem [Portal SME] mas projeto é Novo SGP", () => {
+            const bug = createBug({
+                title: "[Portal SME | Acervo] Capa de documento não exibida",
+                tags: undefined,
+            });
+            const identifiers = getProjectIdentifiers("Novo SGP");
+            expect(matchesBugToProject(bug, identifiers)).toBe(false);
+        });
+
+        it("não faz match quando título tem [Intranet] mas projeto é Novo SGP", () => {
+            const bug = createBug({
+                title: "[Intranet] Seção de comentários exibe texto errado",
+                tags: undefined,
+            });
+            const identifiers = getProjectIdentifiers("Novo SGP");
+            expect(matchesBugToProject(bug, identifiers)).toBe(false);
+        });
+
+        it("bug com título genérico sem identificadores ainda aparece em todos os projetos", () => {
+            const bug = createBug({
+                title: "Sistema de login muito lento",
+                tags: undefined,
+            });
+            const identifiers = getProjectIdentifiers("Novo SGP");
+            expect(matchesBugToProject(bug, identifiers)).toBe(true);
+        });
     });
 
     describe("PROJECT_IDENTIFIERS", () => {

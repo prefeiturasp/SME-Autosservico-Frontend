@@ -1,6 +1,6 @@
 import { autenticaCoreSSO, autenticaKeycloak } from "@/lib/axios";
-import { AxiosError } from "axios";
 import { LoginData, LoginResponse } from "@/types/login";
+import { AxiosError } from "axios";
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 
 export async function loginCoreSSO(data: LoginData): Promise<LoginResponse> {
@@ -16,7 +16,9 @@ export async function loginCoreSSO(data: LoginData): Promise<LoginResponse> {
         Authorization: `Token ${token}`,
     };
     try {
-        const response = await autenticaCoreSSO.post("/autenticacao/", data, { headers });
+        const response = await autenticaCoreSSO.post("/autenticacao/", data, {
+            headers,
+        });
         return response.data;
     } catch (e) {
         if (e instanceof AxiosError && e.response) {
@@ -30,11 +32,15 @@ export async function loginCoreSSO(data: LoginData): Promise<LoginResponse> {
     }
 }
 
+type KeycloakAccessTokenPayload = JWTPayload & {
+    resource_access?: Record<string, { roles?: string[] }>;
+};
+
 async function verifyKeycloakJwt(
     token: string,
     keycloakUrl: string,
     realm: string,
-): Promise<JWTPayload> {
+): Promise<KeycloakAccessTokenPayload> {
     const jwksUrl = new URL(
         `/realms/${realm}/protocol/openid-connect/certs`,
         keycloakUrl,
@@ -57,12 +63,16 @@ export async function loginKeycloak(data: LoginData): Promise<LoginResponse> {
     if (!process.env.KEYCLOAK_REALM) {
         throw new Error("KEYCLOAK_REALM não está definida");
     }
+    if (!process.env.KEYCLOAK_RESOURCE_CLIENT_ID) {
+        throw new Error("KEYCLOAK_RESOURCE_CLIENT_ID não está definida");
+    }
 
     const keycloakUrl = process.env.KEYCLOAK_URL;
     const clientId = process.env.KEYCLOAK_CLIENT_ID;
     const grantType = process.env.KEYCLOAK_GRANT_TYPE ?? "password";
     const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET;
     const realm = process.env.KEYCLOAK_REALM;
+    const resourceClientId = process.env.KEYCLOAK_RESOURCE_CLIENT_ID;
     const password = data.senha;
     const username = data.login;
 
@@ -86,17 +96,25 @@ export async function loginKeycloak(data: LoginData): Promise<LoginResponse> {
         );
 
         const accessToken = keycloakResponse.data.access_token;
-        const payload = await verifyKeycloakJwt(accessToken, keycloakUrl, realm);
+        const payload = await verifyKeycloakJwt(
+            accessToken,
+            keycloakUrl,
+            realm,
+        );
+
+        const groups = payload.resource_access?.[resourceClientId]?.roles ?? [];
 
         return {
             ...payload,
+            groups,
             keycloakToken: accessToken,
-        } as LoginResponse;
+        };
     } catch (e) {
         if (e instanceof AxiosError && e.response) {
             return {
                 status: e.response.status,
-                detail: e.response.data.error_description ?? e.response.data.detail,
+                detail:
+                    e.response.data.error_description ?? e.response.data.detail,
                 operation_id: e.response.data.operation_id,
             };
         }

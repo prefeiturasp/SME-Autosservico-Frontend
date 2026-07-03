@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { loginCoreSSO, loginKeycloak } from "../strategies";
 import { AxiosError, AxiosHeaders } from "axios";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { loginCoreSSO, loginKeycloak } from "../strategies";
 
 // Mocks
 vi.mock("@/lib/axios", () => ({
@@ -30,22 +30,28 @@ describe("loginCoreSSO", () => {
 
     it("lança erro se AUTENTICA_CORESSO_API_URL não definida", async () => {
         delete process.env.AUTENTICA_CORESSO_API_URL;
-        await expect(loginCoreSSO({ login: "a", senha: "b" })).rejects.toThrow(/AUTENTICA_CORESSO_API_URL/);
+        await expect(loginCoreSSO({ login: "a", senha: "b" })).rejects.toThrow(
+            /AUTENTICA_CORESSO_API_URL/,
+        );
     });
 
     it("lança erro se AUTENTICA_CORESSO_API_TOKEN não definida", async () => {
         delete process.env.AUTENTICA_CORESSO_API_TOKEN;
-        await expect(loginCoreSSO({ login: "a", senha: "b" })).rejects.toThrow(/AUTENTICA_CORESSO_API_TOKEN/);
+        await expect(loginCoreSSO({ login: "a", senha: "b" })).rejects.toThrow(
+            /AUTENTICA_CORESSO_API_TOKEN/,
+        );
     });
 
     it("retorna data em caso de sucesso", async () => {
-        vi.mocked(autenticaCoreSSO.post).mockResolvedValueOnce({ data: { status: 200, nome: "João" } });
+        vi.mocked(autenticaCoreSSO.post).mockResolvedValueOnce({
+            data: { status: 200, nome: "João" },
+        });
         const resp = await loginCoreSSO({ login: "a", senha: "b" });
         expect(resp).toEqual({ status: 200, nome: "João" });
         expect(autenticaCoreSSO.post).toHaveBeenCalledWith(
             "/autenticacao/",
             { login: "a", senha: "b" },
-            expect.objectContaining({ headers: expect.any(Object) })
+            expect.objectContaining({ headers: expect.any(Object) }),
         );
     });
 
@@ -60,12 +66,20 @@ describe("loginCoreSSO", () => {
         };
         vi.mocked(autenticaCoreSSO.post).mockRejectedValueOnce(error);
         const resp = await loginCoreSSO({ login: "a", senha: "b" });
-        expect(resp).toEqual({ status: 401, detail: "msg", operation_id: "opid" });
+        expect(resp).toEqual({
+            status: 401,
+            detail: "msg",
+            operation_id: "opid",
+        });
     });
 
     it("relança erro desconhecido", async () => {
-        vi.mocked(autenticaCoreSSO.post).mockRejectedValueOnce(new Error("outra"));
-        await expect(loginCoreSSO({ login: "a", senha: "b" })).rejects.toThrow("outra");
+        vi.mocked(autenticaCoreSSO.post).mockRejectedValueOnce(
+            new Error("outra"),
+        );
+        await expect(loginCoreSSO({ login: "a", senha: "b" })).rejects.toThrow(
+            "outra",
+        );
     });
 });
 
@@ -76,7 +90,10 @@ describe("loginKeycloak", () => {
         delete process.env.KEYCLOAK_GRANT_TYPE;
         delete process.env.KEYCLOAK_REALM;
         delete process.env.KEYCLOAK_URL;
-        await expect(loginKeycloak({ login: "a", senha: "b" })).rejects.toThrow();
+        delete process.env.KEYCLOAK_RESOURCE_CLIENT_ID;
+        await expect(
+            loginKeycloak({ login: "a", senha: "b" }),
+        ).rejects.toThrow();
 
         // restaura para não afetar outros testes
         process.env.KEYCLOAK_CLIENT_ID = "cid";
@@ -84,27 +101,43 @@ describe("loginKeycloak", () => {
         process.env.KEYCLOAK_GRANT_TYPE = "password";
         process.env.KEYCLOAK_REALM = "realm";
         process.env.KEYCLOAK_URL = "http://kc";
+        process.env.KEYCLOAK_RESOURCE_CLIENT_ID = "auto-servico-qa";
     });
-    it("lança erro se faltar clientSecret, grantType, realm ou keycloakUrl", async () => {
+    it("lança erro se faltar clientSecret, grantType, realm, keycloakUrl ou resourceClientId", async () => {
         // clientSecret
         delete process.env.KEYCLOAK_CLIENT_SECRET;
-        await expect(loginKeycloak({ login: "a", senha: "b" })).rejects.toThrow();
+        await expect(
+            loginKeycloak({ login: "a", senha: "b" }),
+        ).rejects.toThrow();
         process.env.KEYCLOAK_CLIENT_SECRET = "sec";
 
         // grantType
         delete process.env.KEYCLOAK_GRANT_TYPE;
-        await expect(loginKeycloak({ login: "a", senha: "b" })).rejects.toThrow();
+        await expect(
+            loginKeycloak({ login: "a", senha: "b" }),
+        ).rejects.toThrow();
         process.env.KEYCLOAK_GRANT_TYPE = "password";
 
         // realm
         delete process.env.KEYCLOAK_REALM;
-        await expect(loginKeycloak({ login: "a", senha: "b" })).rejects.toThrow();
+        await expect(
+            loginKeycloak({ login: "a", senha: "b" }),
+        ).rejects.toThrow();
         process.env.KEYCLOAK_REALM = "realm";
 
         // keycloakUrl
         delete process.env.KEYCLOAK_URL;
-        await expect(loginKeycloak({ login: "a", senha: "b" })).rejects.toThrow();
+        await expect(
+            loginKeycloak({ login: "a", senha: "b" }),
+        ).rejects.toThrow();
         process.env.KEYCLOAK_URL = "http://kc";
+
+        // resourceClientId
+        delete process.env.KEYCLOAK_RESOURCE_CLIENT_ID;
+        await expect(
+            loginKeycloak({ login: "a", senha: "b" }),
+        ).rejects.toThrow();
+        process.env.KEYCLOAK_RESOURCE_CLIENT_ID = "auto-servico-qa";
     });
     const OLD_ENV = process.env;
     beforeEach(() => {
@@ -114,6 +147,7 @@ describe("loginKeycloak", () => {
         process.env.KEYCLOAK_GRANT_TYPE = "password";
         process.env.KEYCLOAK_REALM = "realm";
         process.env.KEYCLOAK_URL = "http://kc";
+        process.env.KEYCLOAK_RESOURCE_CLIENT_ID = "auto-servico-qa";
         vi.resetAllMocks();
     });
     afterEach(() => {
@@ -122,22 +156,57 @@ describe("loginKeycloak", () => {
 
     it("lança erro se faltar env obrigatória", async () => {
         delete process.env.KEYCLOAK_CLIENT_ID;
-        await expect(loginKeycloak({ login: "a", senha: "b" })).rejects.toThrow();
+        await expect(
+            loginKeycloak({ login: "a", senha: "b" }),
+        ).rejects.toThrow();
     });
 
-    it("retorna payload verificado com assinatura válida e token em caso de sucesso", async () => {
-        vi.mocked(autenticaKeycloak.post).mockResolvedValueOnce({ data: { access_token: "tok123" } });
+    it("retorna payload verificado com assinatura válida e token em caso de sucesso, extraindo groups de resource_access", async () => {
+        vi.mocked(autenticaKeycloak.post).mockResolvedValueOnce({
+            data: { access_token: "tok123" },
+        });
         mockJwtVerify.mockResolvedValueOnce({
-            payload: { name: "Nome", preferred_username: "user", groups: ["G1"] },
+            payload: {
+                name: "Nome",
+                preferred_username: "user",
+                resource_access: {
+                    "auto-servico-qa": { roles: ["COTIC"] },
+                    "outro-client": { roles: ["IGNORAR"] },
+                },
+            },
         });
         const resp = await loginKeycloak({ login: "a", senha: "b" });
-        expect(resp).toMatchObject({ name: "Nome", preferred_username: "user", groups: ["G1"], keycloakToken: "tok123" });
+        expect(resp).toMatchObject({
+            name: "Nome",
+            preferred_username: "user",
+            groups: ["COTIC"],
+            keycloakToken: "tok123",
+        });
         expect(autenticaKeycloak.post).toHaveBeenCalledWith(
             "/realms/realm/protocol/openid-connect/token",
             expect.any(URLSearchParams),
-            expect.objectContaining({ headers: { "Content-Type": "application/x-www-form-urlencoded" } })
+            expect.objectContaining({
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            }),
         );
         expect(mockJwtVerify).toHaveBeenCalledWith("tok123", "mock-jwks");
+    });
+
+    it("retorna groups vazio quando resource_access não possui o client configurado", async () => {
+        vi.mocked(autenticaKeycloak.post).mockResolvedValueOnce({
+            data: { access_token: "tok123" },
+        });
+        mockJwtVerify.mockResolvedValueOnce({
+            payload: {
+                name: "Nome",
+                preferred_username: "user",
+                resource_access: {},
+            },
+        });
+        const resp = await loginKeycloak({ login: "a", senha: "b" });
+        expect(resp).toMatchObject({ groups: [] });
     });
 
     it("retorna status e detail em erro AxiosError com response", async () => {
@@ -151,7 +220,11 @@ describe("loginKeycloak", () => {
         };
         vi.mocked(autenticaKeycloak.post).mockRejectedValueOnce(error);
         const resp = await loginKeycloak({ login: "a", senha: "b" });
-        expect(resp).toEqual({ status: 400, detail: "desc", operation_id: "opid" });
+        expect(resp).toEqual({
+            status: 400,
+            detail: "desc",
+            operation_id: "opid",
+        });
     });
 
     it("retorna status e detail em erro AxiosError com response.detail", async () => {
@@ -165,11 +238,19 @@ describe("loginKeycloak", () => {
         };
         vi.mocked(autenticaKeycloak.post).mockRejectedValueOnce(error);
         const resp = await loginKeycloak({ login: "a", senha: "b" });
-        expect(resp).toEqual({ status: 403, detail: "msg", operation_id: "opid2" });
+        expect(resp).toEqual({
+            status: 403,
+            detail: "msg",
+            operation_id: "opid2",
+        });
     });
 
     it("relança erro desconhecido", async () => {
-        vi.mocked(autenticaKeycloak.post).mockRejectedValueOnce(new Error("outra"));
-        await expect(loginKeycloak({ login: "a", senha: "b" })).rejects.toThrow("outra");
+        vi.mocked(autenticaKeycloak.post).mockRejectedValueOnce(
+            new Error("outra"),
+        );
+        await expect(loginKeycloak({ login: "a", senha: "b" })).rejects.toThrow(
+            "outra",
+        );
     });
 });

@@ -28,3 +28,5 @@ Funcionalidade: Banco de dados - SME AutoServiço
     Quando clico no menu lateral "COGEP"
     E seleciono o sistema "Escolhas" no select
     Então devo ver a mensagem "Sem banco de dados" no card
+
+    

@@ -3,9 +3,11 @@
 import MetricCard from "@/components/dashboard/MetricCard";
 import { useAverageSession } from "@/hooks/useAverageSession";
 import type { MetricTrend } from "@/types/metric";
+import type { AnalyticsPeriod } from "@/types/analyticsPeriod";
 
 type Props = {
   readonly systemName?: string;
+  readonly period?: AnalyticsPeriod;
   readonly className?: string;
 };
 
@@ -28,9 +30,10 @@ function buildTrendLabel(
   return `${percentage}% ${suffix}`;
 }
 
-export default function AverageSessionCard({ systemName, className }: Props) {
+export default function AverageSessionCard({ systemName, period, className }: Props) {
   const { data, isLoading, isFetching, isError, refetch } = useAverageSession({
     systemName: systemName ?? "",
+    period,
   });
 
   return (

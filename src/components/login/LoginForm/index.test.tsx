@@ -34,11 +34,29 @@ vi.mock("@/const", async (importOriginal) => {
     PERFIL_NOT_PERMISSION_ERROR_MESSAGE: "Você não tem permissão para acessar este sistema.", // sobrescreve só o necessário no teste
   };
 });
-// (se algum asset de imagem for importado, pode mockar assim)
-// vi.mock("@/assets/images/logo_devops.webp", () => ({
-//   __esModule: true,
-//   default: { src: "/fake-logo.webp", width: 100, height: 100 },
-// }));
+vi.mock("@/assets/images/logo_devops.svg", () => ({
+  __esModule: true,
+  default: { src: "/fake-logo.svg", width: 208, height: 43 },
+}));
+
+vi.mock("@/assets/images/logo_prefeitura.svg", () => ({
+  __esModule: true,
+  default: { src: "/fake-prefeitura.svg", width: 216, height: 88 },
+}));
+
+vi.mock("next/image", () => ({
+  __esModule: true,
+  default: (props: React.ComponentProps<"img"> & { src: string | { src: string } }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { src, fetchPriority: _unused, ...rest } = props;
+    const resolvedSrc =
+      typeof src === "object" && src !== null && "src" in src
+        ? (src as { src: string }).src
+        : src;
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={resolvedSrc} alt={props.alt ?? ""} {...rest} />;
+  },
+}));
 
 describe("LoginForm", () => {
   beforeEach(() => {

@@ -3,9 +3,11 @@
 import MetricCard from "@/components/dashboard/MetricCard";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
 import type { MetricTrend } from "@/types/metric";
+import type { AnalyticsPeriod } from "@/types/analyticsPeriod";
 
 type Props = {
   readonly systemName?: string;
+  readonly period?: AnalyticsPeriod;
   readonly className?: string;
 };
 
@@ -21,9 +23,10 @@ function buildTrendLabel(trend: MetricTrend, percentage: number) {
   return `${percentage}% ${suffix}`;
 }
 
-export default function ActiveUsersCard({ systemName, className }: Props) {
+export default function ActiveUsersCard({ systemName, period, className }: Props) {
   const { data, isLoading, isFetching, isError, refetch } = useActiveUsers({
     systemName: systemName ?? "",
+    period,
   });
 
   return (

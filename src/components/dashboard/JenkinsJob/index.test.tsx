@@ -1,174 +1,303 @@
-import React from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { withClient } from "@/__mocks__/renderWithClient";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import JenkinsJob from "./index";
 
 function okJson(data: unknown) {
-  return {
-    ok: true,
-    json: async () => data,
-  } as unknown as Response;
+    return {
+        ok: true,
+        json: async () => data,
+    } as unknown as Response;
+}
+
+function metricsResponse(number: number, status = "SUCCESS") {
+    return okJson({
+        found: true,
+        data: {
+            jobName: "job",
+            jobUrl: "https://jenkins.example/job/job",
+            status,
+            stabilityPercent: 100,
+            lastBuild: {
+                number,
+                status,
+                timestampMs: Date.now(),
+                timestamp: "01/01/2024 00:00",
+                durationMs: 48000,
+                duration: "48s",
+            },
+            lastSuccessfulBuild: {
+                number,
+                status: "SUCCESS",
+                timestampMs: Date.now(),
+                timestamp: "01/01/2024 00:00",
+                durationMs: 48000,
+                duration: "48s",
+            },
+        },
+    });
 }
 
 function fetchUrl(input: RequestInfo | URL): string {
-  if (typeof input === "string") return input;
-  if (input instanceof URL) return input.toString();
-  return input.url;
+    if (typeof input === "string") return input;
+    if (input instanceof URL) return input.toString();
+    return input.url;
 }
 
 describe("<JenkinsJob />", () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
+    beforeEach(() => {
+        vi.restoreAllMocks();
+    });
 
-  it("com múltiplos subprojetos: mostra select e atualiza automaticamente ao trocar", async () => {
-    const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
-      const url = fetchUrl(input);
+    it("com múltiplos subprojetos: mostra select de projeto e atualiza automaticamente ao trocar", async () => {
+        const fetchSpy = vi
+            .spyOn(globalThis, "fetch")
+            .mockImplementation(async (input) => {
+                const url = fetchUrl(input);
 
-      if (url.startsWith("/api/zabbix/jenkins/job?project=PTRF-FrontEnd&env=homolog")) {
-        return okJson({
-          lastBuild: {
-            number: 99,
-            status: "SUCCESS",
-            timestampMs: 99,
-            timestamp: "03/01/2024 00:00",
-            durationMs: 99000,
-            duration: "99s",
-          },
+                if (
+                    url.startsWith("/api/jenkins/metrics?project=PTRF-BackEnd")
+                ) {
+                    return metricsResponse(1);
+                }
+
+                if (
+                    url.startsWith("/api/jenkins/metrics?project=PTRF-FrontEnd")
+                ) {
+                    return metricsResponse(2, "FAILURE");
+                }
+
+                throw new Error(`fetch inesperado: ${url}`);
+            });
+
+        render(
+            withClient(
+                <JenkinsJob
+                    project="SigEscola"
+                    subprojects={[
+                        { label: "Backend", key: "PTRF-BackEnd" },
+                        { label: "Frontend", key: "PTRF-FrontEnd" },
+                    ]}
+                />,
+            ),
+        );
+
+        expect(await screen.findByText("Projeto")).toBeInTheDocument();
+        expect(
+            screen.queryByLabelText("Selecionar ambiente"),
+        ).not.toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(fetchSpy).toHaveBeenCalledWith(
+                "/api/jenkins/metrics?project=PTRF-BackEnd",
+                expect.any(Object),
+            );
         });
-      }
 
-      if (url.startsWith("/api/zabbix/jenkins/job?project=PTRF-BackEnd")) {
-        return okJson({
-          lastBuild: {
-            number: 1,
-            status: "SUCCESS",
-            timestampMs: 1,
-            timestamp: "01/01/2024 00:00",
-            durationMs: 1000,
-            duration: "1s",
-          },
+        const trigger = screen.getByLabelText("Selecionar projeto");
+        fireEvent.click(trigger);
+        fireEvent.click(screen.getByText("Frontend"));
+
+        await waitFor(() => {
+            expect(fetchSpy).toHaveBeenCalledWith(
+                "/api/jenkins/metrics?project=PTRF-FrontEnd",
+                expect.any(Object),
+            );
         });
-      }
+    });
 
-      if (url.startsWith("/api/zabbix/jenkins/job?project=PTRF-FrontEnd")) {
-        return okJson({
-          lastBuild: {
-            number: 2,
-            status: "FAILURE",
-            timestampMs: 2,
-            timestamp: "02/01/2024 00:00",
-            durationMs: 2000,
-            duration: "2s",
-          },
+    it("respeita o ambiente recebido via prop (homologacao → env=homolog)", async () => {
+        const fetchSpy = vi
+            .spyOn(globalThis, "fetch")
+            .mockImplementation(async (input) => {
+                const url = fetchUrl(input);
+
+                if (
+                    url.startsWith(
+                        "/api/jenkins/metrics?project=PTRF-BackEnd&env=homolog",
+                    )
+                ) {
+                    return metricsResponse(1);
+                }
+
+                throw new Error(`fetch inesperado: ${url}`);
+            });
+
+        render(
+            withClient(
+                <JenkinsJob
+                    project="SigEscola"
+                    environment="homologacao"
+                    subprojects={[{ label: "Backend", key: "PTRF-BackEnd" }]}
+                />,
+            ),
+        );
+
+        await waitFor(() => {
+            expect(fetchSpy).toHaveBeenCalledWith(
+                "/api/jenkins/metrics?project=PTRF-BackEnd&env=homolog",
+                expect.any(Object),
+            );
         });
-      }
-
-      throw new Error(`fetch inesperado: ${url}`);
     });
 
-    render(
-      withClient(
-        <JenkinsJob
-          project="SigEscola"
-          subprojects={[
-            { label: "Backend", key: "PTRF-BackEnd" },
-            { label: "Frontend", key: "PTRF-FrontEnd" },
-          ]}
-        />
-      )
-    );
+    it("respeita o ambiente recebido via prop (qa → env=test)", async () => {
+        const fetchSpy = vi
+            .spyOn(globalThis, "fetch")
+            .mockImplementation(async (input) => {
+                const url = fetchUrl(input);
 
-    expect(await screen.findByText("Projeto")).toBeInTheDocument();
-    expect(await screen.findByLabelText("Selecionar ambiente")).toHaveTextContent("Produção");
+                if (
+                    url.startsWith(
+                        "/api/jenkins/metrics?project=PTRF-BackEnd&env=test",
+                    )
+                ) {
+                    return metricsResponse(1);
+                }
 
-    await waitFor(() => {
-      expect(fetchSpy).toHaveBeenCalledWith(
-        "/api/zabbix/jenkins/job?project=PTRF-BackEnd",
-        expect.any(Object)
-      );
-    });
+                throw new Error(`fetch inesperado: ${url}`);
+            });
 
-    const trigger = screen.getByLabelText("Selecionar projeto");
-    fireEvent.click(trigger);
-    fireEvent.click(screen.getByText("Frontend"));
+        render(
+            withClient(
+                <JenkinsJob
+                    project="SigEscola"
+                    environment="qa"
+                    subprojects={[{ label: "Backend", key: "PTRF-BackEnd" }]}
+                />,
+            ),
+        );
 
-    await waitFor(() => {
-      expect(fetchSpy).toHaveBeenCalledWith(
-        "/api/zabbix/jenkins/job?project=PTRF-FrontEnd",
-        expect.any(Object)
-      );
-    });
-
-    const envTrigger = screen.getByLabelText("Selecionar ambiente");
-    fireEvent.click(envTrigger);
-    fireEvent.click(screen.getByText("Homologação"));
-
-    await waitFor(() => {
-      expect(fetchSpy).toHaveBeenCalledWith(
-        "/api/zabbix/jenkins/job?project=PTRF-FrontEnd&env=homolog",
-        expect.any(Object)
-      );
-    });
-
-    expect(screen.getByLabelText("Selecionar ambiente")).toHaveTextContent("Homologação");
-  });
-
-  it("com apenas 1 subprojeto: não exige seleção adicional", async () => {
-    const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
-      const url = fetchUrl(input);
-
-      if (url.startsWith("/api/zabbix/jenkins/job?project=SME-NovoSGP")) {
-        return okJson({
-          lastBuild: {
-            number: 1,
-            status: "SUCCESS",
-            timestampMs: 1,
-            timestamp: "01/01/2024 00:00",
-            durationMs: 1000,
-            duration: "1s",
-          },
+        await waitFor(() => {
+            expect(fetchSpy).toHaveBeenCalledWith(
+                "/api/jenkins/metrics?project=PTRF-BackEnd&env=test",
+                expect.any(Object),
+            );
         });
-      }
-
-      throw new Error(`fetch inesperado: ${url}`);
     });
 
-    render(
-      withClient(
-        <JenkinsJob project="Novo SGP" subprojects={[{ label: "SME-NovoSGP", key: "SME-NovoSGP" }]} />
-      )
-    );
+    it("com apenas 1 subprojeto: não exige seleção adicional", async () => {
+        const fetchSpy = vi
+            .spyOn(globalThis, "fetch")
+            .mockImplementation(async (input) => {
+                const url = fetchUrl(input);
 
-    expect(screen.queryByText("Projeto")).not.toBeInTheDocument();
-    expect(await screen.findByLabelText("Selecionar ambiente")).toHaveTextContent("Produção");
+                if (
+                    url.startsWith("/api/jenkins/metrics?project=SME-NovoSGP")
+                ) {
+                    return metricsResponse(1);
+                }
 
-    await waitFor(() => {
-      expect(fetchSpy).toHaveBeenCalledWith(
-        "/api/zabbix/jenkins/job?project=SME-NovoSGP",
-        expect.any(Object)
-      );
+                throw new Error(`fetch inesperado: ${url}`);
+            });
+
+        render(
+            withClient(
+                <JenkinsJob
+                    project="Novo SGP"
+                    subprojects={[{ label: "SME-NovoSGP", key: "SME-NovoSGP" }]}
+                />,
+            ),
+        );
+
+        expect(screen.queryByText("Projeto")).not.toBeInTheDocument();
+        await waitFor(() => {
+            expect(fetchSpy).toHaveBeenCalledWith(
+                "/api/jenkins/metrics?project=SME-NovoSGP",
+                expect.any(Object),
+            );
+        });
     });
-  });
 
-  it("projeto N/E (ou sem chaves): não busca releases e mostra mensagem", async () => {
-    const fetchSpy = vi.spyOn(global, "fetch").mockImplementation(async (input) => {
-      const url = fetchUrl(input);
+    it("mantém seleção quando subprojetos mudam mas a chave atual permanece válida", async () => {
+        vi.spyOn(global, "fetch").mockResolvedValue(
+            okJson({
+                found: false,
+                message: "Not found",
+            }) as unknown as Response,
+        );
 
-      if (url.startsWith("/api/zabbix/jenkins/job?")) {
-        throw new Error("Não deveria chamar endpoint de job");
-      }
+        const client = new QueryClient({
+            defaultOptions: { queries: { retry: false } },
+        });
 
-      throw new Error(`fetch inesperado: ${url}`);
+        const { rerender } = render(
+            <JenkinsJob
+                project="SigEscola"
+                subprojects={[
+                    { label: "Backend", key: "PTRF-BackEnd" },
+                    { label: "Frontend", key: "PTRF-FrontEnd" },
+                ]}
+            />,
+            {
+                wrapper: ({ children }) => (
+                    <QueryClientProvider client={client}>
+                        {children}
+                    </QueryClientProvider>
+                ),
+            },
+        );
+
+        await waitFor(() =>
+            expect(
+                screen.getByLabelText("Selecionar projeto"),
+            ).toBeInTheDocument(),
+        );
+
+        rerender(
+            <JenkinsJob
+                project="SigEscola"
+                subprojects={[
+                    { label: "Backend atualizado", key: "PTRF-BackEnd" },
+                    { label: "Mobile", key: "PTRF-Mobile" },
+                ]}
+            />,
+        );
+
+        await waitFor(() =>
+            expect(
+                screen.getByLabelText("Selecionar projeto"),
+            ).toBeInTheDocument(),
+        );
     });
 
-    render(withClient(<JenkinsJob project="Portal Educação" subprojects={[]} />));
+    it("project vazio: renderiza card vazio sem buscar métricas", async () => {
+        const fetchSpy = vi.spyOn(globalThis, "fetch");
 
-    expect(
-      await screen.findByText("Sem lançamentos disponíveis para este projeto.")
-    ).toBeInTheDocument();
+        render(withClient(<JenkinsJob project="" />));
 
-    expect(fetchSpy).not.toHaveBeenCalled();
-  });
+        expect(
+            await screen.findByText("Jenkins - Branches e Builds"),
+        ).toBeInTheDocument();
+        expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it("projeto N/E (ou sem chaves): não busca releases e mostra mensagem", async () => {
+        const fetchSpy = vi
+            .spyOn(globalThis, "fetch")
+            .mockImplementation(async (input) => {
+                const url = fetchUrl(input);
+
+                if (url.startsWith("/api/jenkins/metrics?")) {
+                    throw new Error("Não deveria chamar endpoint de job");
+                }
+
+                throw new Error(`fetch inesperado: ${url}`);
+            });
+
+        render(
+            withClient(
+                <JenkinsJob project="Portal Educação" subprojects={[]} />,
+            ),
+        );
+
+        expect(
+            await screen.findByText(
+                "Sem lançamentos disponíveis para este projeto.",
+            ),
+        ).toBeInTheDocument();
+
+        expect(fetchSpy).not.toHaveBeenCalled();
+    });
 });

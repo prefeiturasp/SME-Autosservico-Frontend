@@ -1,9 +1,10 @@
 "use client";
 
-import { Check, XCircle, RotateCcw } from "lucide-react";
+import { Check, XCircle, MinusCircle, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import type { ReactNode } from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { ZabbixStatus } from "@/types/zabbix";
 
@@ -13,7 +14,30 @@ type Props = {
   readonly projectName?: string;
   readonly query: UseQueryResult<ZabbixStatus, unknown>;
   readonly emptyProjectHint?: string;
+  readonly unmonitoredLabel?: string;
 };
+
+type StatusPillProps = {
+  readonly label: string;
+  readonly icon: ReactNode;
+  readonly className: string;
+};
+
+function StatusPill({ label, icon, className }: StatusPillProps) {
+  return (
+    <div
+      className={cn(
+        "mt-3 h-6 w-full rounded-full px-2",
+        "flex items-center justify-center gap-2 text-xs font-medium",
+        className
+      )}
+      aria-label={`Status: ${label}`}
+    >
+      {icon}
+      {label}
+    </div>
+  );
+}
 
 export default function ZabbixStatusCard({
   title,
@@ -21,6 +45,7 @@ export default function ZabbixStatusCard({
   projectName,
   query,
   emptyProjectHint = "Selecione um projeto",
+  unmonitoredLabel,
 }: Props) {
   const { data, isLoading, isFetching, isError, refetch } = query;
 
@@ -28,7 +53,15 @@ export default function ZabbixStatusCard({
     return (
       <div className={cn("text-center", className)}>
         <div className="font-semibold text-xl">{title}</div>
-        <div className="text-sm text-muted-foreground">{emptyProjectHint}</div>
+        {unmonitoredLabel ? (
+          <StatusPill
+            label={unmonitoredLabel}
+            icon={<MinusCircle className="h-5 w-5" aria-hidden="true" />}
+            className="bg-gray-200 text-gray-600"
+          />
+        ) : (
+          <div className="text-sm text-muted-foreground">{emptyProjectHint}</div>
+        )}
       </div>
     );
   }
@@ -72,17 +105,17 @@ export default function ZabbixStatusCard({
       <div className="font-semibold text-xl">{title}</div>
       <div className="text-sm text-muted-foreground">{subtitle}</div>
 
-      <div
-        className={cn(
-          "mt-3 h-6 w-full rounded-full px-2",
-          "flex items-center justify-center gap-2 text-xs font-medium",
-          available ? "bg-emerald-500 text-white" : "bg-red-500 text-white"
-        )}
-        aria-label={`Status: ${available ? "Disponível" : "Indisponível"}`}
-      >
-        {available ? <Check className="h-5 w-5" aria-hidden="true" /> : <XCircle className="h-5 w-5" aria-hidden="true" />}
-        {available ? "Disponível" : "Indisponível"}
-      </div>
+      <StatusPill
+        label={available ? "Disponível" : "Indisponível"}
+        icon={
+          available ? (
+            <Check className="h-5 w-5" aria-hidden="true" />
+          ) : (
+            <XCircle className="h-5 w-5" aria-hidden="true" />
+          )
+        }
+        className={available ? "bg-emerald-500 text-white" : "bg-red-500 text-white"}
+      />
     </div>
   );
 }

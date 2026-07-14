@@ -8,6 +8,7 @@ import SidebarCodae from "./SidebarCodae";
 import SidebarCogep from "./SidebarCogep";
 import SidebarCoped from "./SidebarCoped";
 import SidebarCoplan from "./SidebarCoplan";
+import SidebarCoserv from "./SidebarCoserv";
 import SidebarCotic from "./SidebarCotic";
 import SidebarEmforpef from "./SidebarEmforpef";
 import SidebarGipe from "./SidebarGipe";
@@ -41,6 +42,13 @@ const icons = [
         width: "24",
         height: "24",
         testId: "sidebar-coplan-icon",
+    },
+    {
+        name: "SidebarCoserv",
+        component: SidebarCoserv,
+        width: "24",
+        height: "24",
+        testId: "sidebar-coserv-icon",
     },
     {
         name: "SidebarCotic",

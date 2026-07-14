@@ -5,6 +5,7 @@ import SidebarCodae from "@/assets/icons/SidebarCodae";
 import SidebarCogep from "@/assets/icons/SidebarCogep";
 import SidebarCoped from "@/assets/icons/SidebarCoped";
 import SidebarCoplan from "@/assets/icons/SidebarCoplan";
+import SidebarCoserv from "@/assets/icons/SidebarCoserv";
 import SidebarCotic from "@/assets/icons/SidebarCotic";
 import SidebarEmforpef from "@/assets/icons/SidebarEmforpef";
 import SidebarGipe from "@/assets/icons/SidebarGipe";
@@ -40,6 +41,12 @@ export const COORDENADORIAS: SidebarItem[] = [
         subTitle: "Coordenadoria de Planejamento e Orçamento",
         url: "#",
         icon: SidebarCoplan,
+    },
+    {
+        title: "COSERV",
+        subTitle: "Coordenadoria de Contratos de Serviços e Fornecimento",
+        url: "#",
+        icon: SidebarCoserv,
     },
     {
         title: "COTIC",

@@ -54,6 +54,12 @@ const DATABASE_CONFIG: Record<string, DbCheckConfig[]> = {
   Sigla: [
     { label: "PostgreSQL", hostid: "10605", key: "psql.running", dbType: "postgresql", isOk: psqlRunning },
   ],
+  "Bens Físicos": [
+    { label: "PostgreSQL", hostid: "10605", key: "psql.running", dbType: "postgresql", isOk: psqlRunning },
+  ],
+  Limpeza: [
+    { label: "PostgreSQL", hostid: "10605", key: "psql.running", dbType: "postgresql", isOk: psqlRunning },
+  ],
   "Novo SGP": [
     { label: "PostgreSQL (Escrita)", hostid: "10747", key: "psql.running", dbType: "postgresql", role: "escrita", isOk: psqlRunning },
     { label: "PostgreSQL (Leitura)", hostid: "10745", key: "psql.running", dbType: "postgresql", role: "leitura", isOk: psqlRunning },

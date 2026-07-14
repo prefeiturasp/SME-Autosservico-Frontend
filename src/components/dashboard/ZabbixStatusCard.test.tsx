@@ -75,6 +75,21 @@ describe("<ZabbixStatusCard />", () => {
     expect(screen.queryByLabelText(/Status:/)).not.toBeInTheDocument();
   });
 
+  it("mostra a flag neutra quando projectName está ausente e unmonitoredLabel é informado", () => {
+    render(
+      <ZabbixStatusCard
+        title="Fila"
+        className="bg-muted p-3"
+        query={makeQuery()}
+        unmonitoredLabel="Sem fila"
+      />
+    );
+
+    expect(screen.getByText("Fila")).toBeInTheDocument();
+    expect(screen.getByLabelText("Status: Sem fila")).toBeInTheDocument();
+    expect(screen.queryByText("Selecione um projeto")).not.toBeInTheDocument();
+  });
+
   it("renderiza estado de loading (isLoading)", () => {
     render(
       <ZabbixStatusCard

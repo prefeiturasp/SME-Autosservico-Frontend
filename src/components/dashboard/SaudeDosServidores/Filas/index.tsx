@@ -7,12 +7,14 @@ type FilasProps = {
     readonly projectName: string;
     readonly title?: string;
     readonly className?: string;
+    readonly unmonitoredLabel?: string;
 };
 
 export default function Filas({
     title = "Fila",
     className,
     projectName,
+    unmonitoredLabel,
 }: FilasProps) {
     const query = useZabbixStatus({
         endpoint: "/api/zabbix/status/filas",
@@ -26,6 +28,7 @@ export default function Filas({
             className={className}
             projectName={projectName}
             query={query}
+            unmonitoredLabel={unmonitoredLabel}
         />
     );
 }

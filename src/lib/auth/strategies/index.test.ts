@@ -103,7 +103,7 @@ describe("loginKeycloak", () => {
         process.env.KEYCLOAK_URL = "http://kc";
         process.env.KEYCLOAK_RESOURCE_CLIENT_ID = "auto-servico-qa";
     });
-    it("lança erro se faltar clientSecret, grantType, realm, keycloakUrl ou resourceClientId", async () => {
+    it("lança erro se faltar clientSecret, grantType, realm ou keycloakUrl", async () => {
         // clientSecret
         delete process.env.KEYCLOAK_CLIENT_SECRET;
         await expect(
@@ -131,13 +131,6 @@ describe("loginKeycloak", () => {
             loginKeycloak({ login: "a", senha: "b" }),
         ).rejects.toThrow();
         process.env.KEYCLOAK_URL = "http://kc";
-
-        // resourceClientId
-        delete process.env.KEYCLOAK_RESOURCE_CLIENT_ID;
-        await expect(
-            loginKeycloak({ login: "a", senha: "b" }),
-        ).rejects.toThrow();
-        process.env.KEYCLOAK_RESOURCE_CLIENT_ID = "auto-servico-qa";
     });
     const OLD_ENV = process.env;
     beforeEach(() => {
@@ -192,6 +185,25 @@ describe("loginKeycloak", () => {
             }),
         );
         expect(mockJwtVerify).toHaveBeenCalledWith("tok123", "mock-jwks");
+    });
+
+    it("usa auto-servico-hom como client padrão quando KEYCLOAK_RESOURCE_CLIENT_ID está ausente", async () => {
+        delete process.env.KEYCLOAK_RESOURCE_CLIENT_ID;
+        vi.mocked(autenticaKeycloak.post).mockResolvedValueOnce({
+            data: { access_token: "tok123" },
+        });
+        mockJwtVerify.mockResolvedValueOnce({
+            payload: {
+                name: "Nome",
+                preferred_username: "user",
+                resource_access: {
+                    "auto-servico-hom": { roles: ["COTIC"] },
+                    "auto-servico-qa": { roles: ["IGNORAR"] },
+                },
+            },
+        });
+        const resp = await loginKeycloak({ login: "a", senha: "b" });
+        expect(resp).toMatchObject({ groups: ["COTIC"] });
     });
 
     it("retorna groups vazio quando resource_access não possui o client configurado", async () => {

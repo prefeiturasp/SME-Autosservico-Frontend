@@ -63,16 +63,14 @@ export async function loginKeycloak(data: LoginData): Promise<LoginResponse> {
     if (!process.env.KEYCLOAK_REALM) {
         throw new Error("KEYCLOAK_REALM não está definida");
     }
-    if (!process.env.KEYCLOAK_RESOURCE_CLIENT_ID) {
-        throw new Error("KEYCLOAK_RESOURCE_CLIENT_ID não está definida");
-    }
 
     const keycloakUrl = process.env.KEYCLOAK_URL;
     const clientId = process.env.KEYCLOAK_CLIENT_ID;
     const grantType = process.env.KEYCLOAK_GRANT_TYPE ?? "password";
     const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET;
     const realm = process.env.KEYCLOAK_REALM;
-    const resourceClientId = process.env.KEYCLOAK_RESOURCE_CLIENT_ID;
+    const resourceClientId =
+        process.env.KEYCLOAK_RESOURCE_CLIENT_ID ?? "auto-servico-hom";
     const password = data.senha;
     const username = data.login;
 

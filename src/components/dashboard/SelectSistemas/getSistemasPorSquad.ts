@@ -47,6 +47,10 @@ const squads: Record<string, Sistema[]> = {
     COPLAN: [
         makeSistema({ id: "17", nome: "SigEscola", frontend: "PRD - PTRF - SIG Escola", backend: "PRD - PTRF - SIG Escola - API", filas: "PRD - Celery PTRF", job: "SME-SigEscola/master", azure: "COPLAN - PTRF" }),
     ],
+    COSERV: [
+        makeSistema({ id: "20", nome: "Bens Físicos", frontend: "PRD - Portal Bens Fisicos", job: "SME-BensFisicos-FrontEnd/master", azure: "COSERV" }),
+        makeSistema({ id: "21", nome: "Limpeza", frontend: "PRD - Limpeza", job: "SME-LIMPEZA-FRONTEND/master", azure: "COSERV" }),
+    ],
     COTIC: [
         makeSistema({ id: "18", nome: "Autosserviço", frontend: "PRD - AUTOSSERVICO", job: "SME-Autosservico-Frontend/master", azure: "COTIC - Auto Serviço" }),
     ],
@@ -112,6 +116,16 @@ const JENKINS_SUBPROJECTS_BY_SQUAD_PROJECT: Record<string, Record<string, Jenkin
             { label: "PTRF-FrontEnd", key: "PTRF-FrontEnd" },
         ],
     },
+    COSERV: {
+        "BENS FISICOS": [
+            { label: "SME-BensFisicos-BackEnd", key: "SME-BensFisicos-BackEnd" },
+            { label: "SME-BensFisicos-FrontEnd", key: "SME-BensFisicos-FrontEnd" },
+        ],
+        LIMPEZA: [
+            { label: "SME-LIMPEZA-BACKEND", key: "SME-LIMPEZA-BACKEND" },
+            { label: "SME-LIMPEZA-FRONTEND", key: "SME-LIMPEZA-FRONTEND" },
+        ],
+    },
     COTIC: {
         AUTOSSERVICO: [{ label: "SME-Autosservico-Frontend", key: "SME-Autosservico-Frontend" }],
     },
@@ -175,6 +189,10 @@ const SONAR_PROJECT_KEY_BY_SQUAD_PROJECT: Record<string, Record<string, string>>
     },
     COPLAN: {
         SIGESCOLA: "SME-PTRF-FrontEnd",
+    },
+    COSERV: {
+        "BENS FISICOS": "SME-BensFisicos-FrontEnd",
+        LIMPEZA: "SME-LIMPEZA-FRONTEND",
     },
     COTIC: {
         AUTOSSERVICO: "SME-Autosservico-Frontend",

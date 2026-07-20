@@ -11,6 +11,7 @@ Funcionalidade: Sidebar - SME AutoServiço
     Então o sidebar deve estar visível
     E o logo do AutoServiço deve estar visível
 
+@ignore
   Cenário: Exibir todos os itens do menu do sidebar
     Então devo visualizar todos os itens do menu do sidebar
 

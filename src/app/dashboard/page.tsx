@@ -119,6 +119,9 @@ export default function Dashboard() {
                             <Producao
                                 className="bg-[#F5F5F5] p-3"
                                 projectName={projectNameFrontEnd}
+                                unmonitoredLabel={
+                                    projectName ? "Sem monitoramento" : undefined
+                                }
                             />
                         </CardWrapperInfoAmbientes>
 
@@ -147,11 +150,17 @@ export default function Dashboard() {
                                 title="Fila"
                                 className="mb-5 bg-[#F5F5F5] p-3"
                                 projectName={projectNameFilasRabbitMQ}
+                                unmonitoredLabel={
+                                    projectName ? "Sem fila" : undefined
+                                }
                             />
                             <Producao
                                 title="API Service"
                                 className="bg-[#F5F5F5] p-3"
                                 projectName={projectNameBackEnd}
+                                unmonitoredLabel={
+                                    projectName ? "Sem API" : undefined
+                                }
                             />
                         </CardWrapperInfoAmbientes>
 

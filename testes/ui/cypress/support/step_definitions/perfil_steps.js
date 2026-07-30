@@ -216,3 +216,45 @@ Then('devo ser redirecionado para a tela de login', () => {
   })
 
 })
+
+// =====================================================
+// STATUS DA CONTA
+// =====================================================
+
+Then('o status da conta deve estar preenchido', () => {
+
+  cy.validarStatusContaPreenchido()
+
+})
+
+// =====================================================
+// BOTÕES (EM DESENVOLVIMENTO)
+// =====================================================
+
+Then('o botão {string} deve existir', (botao) => {
+
+  if (botao === 'Alterar senha') {
+    cy.validarBotaoAlterarSenhaExiste()
+    return
+  }
+
+  if (botao === 'Editar dados') {
+    cy.validarBotaoEditarDadosExiste()
+    return
+  }
+
+  cy.contains('button', botao, {
+    timeout: 30000
+  }).should('exist')
+
+})
+
+// =====================================================
+// ÍCONES DAS ÁREAS
+// =====================================================
+
+Then('cada área de acesso listada deve exibir um ícone', () => {
+
+  cy.validarIconesDasAreas()
+
+})

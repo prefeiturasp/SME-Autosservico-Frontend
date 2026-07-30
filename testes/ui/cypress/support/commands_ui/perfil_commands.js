@@ -244,3 +244,54 @@ Cypress.Commands.add('clicarEncerrarSessao', () => {
     .click({ force: true })
 
 })
+
+// =====================================================
+// BOTÕES (EM DESENVOLVIMENTO)
+// =====================================================
+
+Cypress.Commands.add('validarBotaoAlterarSenhaExiste', () => {
+
+  cy.get(PERFIL.botaoAlterarSenha, { timeout: 30000 })
+    .should('exist')
+
+})
+
+Cypress.Commands.add('validarBotaoEditarDadosExiste', () => {
+
+  cy.get(PERFIL.botaoEditarDados, { timeout: 30000 })
+    .should('exist')
+
+})
+
+// =====================================================
+// STATUS DA CONTA
+// =====================================================
+
+Cypress.Commands.add('validarStatusContaPreenchido', () => {
+
+  cy.get('body')
+    .invoke('text')
+    .then(texto => {
+
+      const preenchido =
+        texto.includes(PERFIL.statusContaAtiva) ||
+        texto.includes(PERFIL.statusContaInativa)
+
+      expect(preenchido, 'Status da conta não encontrado').to.eq(true)
+
+    })
+
+})
+
+// =====================================================
+// ÍCONES DAS ÁREAS
+// =====================================================
+
+Cypress.Commands.add('validarIconesDasAreas', () => {
+
+  cy.contains(PERFIL.cardAreas, { timeout: 30000 })
+    .parents('section')
+    .find(PERFIL.iconeArea)
+    .should('have.length.greaterThan', 0)
+
+})

@@ -8,6 +8,10 @@ class Perfil_Locators {
 
   botaoEncerrarSessao = '[data-testid="btn-encerrar-sessao"]'
 
+  botaoAlterarSenha = '[data-testid="btn-alterar-senha"]'
+
+  botaoEditarDados = '[data-testid="btn-editar-dados"]'
+
   // ========================
   // TÍTULO
   // ========================
@@ -47,6 +51,16 @@ class Perfil_Locators {
   // ========================
 
   cardAreas = 'Áreas de acesso'
+
+  iconeArea = 'svg'
+
+  // ========================
+  // STATUS DA CONTA
+  // ========================
+
+  statusContaAtiva = 'Conta ativa'
+
+  statusContaInativa = 'Conta inativa'
 
   // ========================
   // VALOR VAZIO (placeholder exibido pela tela quando o dado não existe)

@@ -87,3 +87,19 @@ Funcionalidade: Meu Perfil
     Dado que estou na tela Meu Perfil
     Quando clico no botão "Encerrar sessão"
     Então devo ser redirecionado para a tela de login
+
+  Cenário: Validar preenchimento do status da conta
+    Dado que estou na tela Meu Perfil
+    Então o status da conta deve estar preenchido
+
+  Cenário: Validar existência do botão Alterar senha
+    Dado que estou na tela Meu Perfil
+    Então o botão "Alterar senha" deve existir
+
+  Cenário: Validar existência do botão Editar dados
+    Dado que estou na tela Meu Perfil
+    Então o botão "Editar dados" deve existir
+
+  Cenário: Validar ícones das áreas de acesso
+    Dado que estou na tela Meu Perfil
+    Então cada área de acesso listada deve exibir um ícone

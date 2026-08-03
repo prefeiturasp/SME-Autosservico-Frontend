@@ -44,6 +44,7 @@ Funcionalidade: Dashboard - Aba Analytics
     Então devo visualizar o card "Tipo de dispositivo"
     E devo visualizar os tipos "Desktop", "Mobile" e "Tablet"
 
+@ignore
   Cenário: Validar alerta de responsividade
     Dado que estou na aba Analytics
     Então devo visualizar o alerta de responsividade

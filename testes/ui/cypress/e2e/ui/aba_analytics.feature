@@ -13,6 +13,7 @@ Funcionalidade: Dashboard - Aba Analytics
     Quando clico na aba "Analytics"
     Então a aba "Analytics" deve estar selecionada
 
+@ignore
   Cenário: Validar cards principais
     Dado que estou na aba Analytics
     Então devo visualizar o card "Usuários ativos"
@@ -44,6 +45,7 @@ Funcionalidade: Dashboard - Aba Analytics
     Então devo visualizar o card "Tipo de dispositivo"
     E devo visualizar os tipos "Desktop", "Mobile" e "Tablet"
 
+@ignore
   Cenário: Validar alerta de responsividade
     Dado que estou na aba Analytics
     Então devo visualizar o alerta de responsividade

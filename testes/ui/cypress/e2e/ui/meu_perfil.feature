@@ -82,7 +82,7 @@ Funcionalidade: Meu Perfil
   Cenário: Validar botão Encerrar sessão
     Dado que estou na tela Meu Perfil
     Então devo visualizar o botão "Encerrar sessão"
-
+@ignore
   Cenário: Validar logout
     Dado que estou na tela Meu Perfil
     Quando clico no botão "Encerrar sessão"

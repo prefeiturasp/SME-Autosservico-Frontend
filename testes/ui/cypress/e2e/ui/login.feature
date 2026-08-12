@@ -13,3 +13,5 @@ Funcionalidade: Login
       | cenario             | tipo_rf     | tipo_senha     |
       | Login válido padrão | rf_valido   | senha_valida   |
       | Login inválido      | rf_invalido | senha_invalida |
+      | Login inválido      | rf_valido   | senha_invalida |
+      | Login inválido      | rf_invalido | senha_valida   |

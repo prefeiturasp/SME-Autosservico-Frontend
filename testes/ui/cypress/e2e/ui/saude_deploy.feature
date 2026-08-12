@@ -13,6 +13,13 @@ Funcionalidade: Dashboard - Aba Saúde do deploy
     Quando clico na aba "Saúde do deploy"
     Então a aba "Saúde do deploy" deve estar selecionada
 
+  Cenário: Alternar entre abas Saúde do deploy e Operacional
+    Dado que estou no dashboard
+    Quando clico na aba "Saúde do deploy"
+    Então a aba "Saúde do deploy" deve estar selecionada
+    Quando clico na aba "Operacional"
+    Então a aba "Operacional" deve estar selecionada
+
   Cenário: Validar ambiente Produção - Master
     Dado que estou na aba Saúde do deploy
     Então devo visualizar o texto "Produção - Master"

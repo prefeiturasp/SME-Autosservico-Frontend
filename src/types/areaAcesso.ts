@@ -1,1 +1,5 @@
-export type AreaAcesso = "Operacional" | "Analytics" | "Saúde do deploy";
+export type AreaAcesso =
+  | "Operacional"
+  | "Métricas"
+  | "Analytics"
+  | "Saúde do deploy";

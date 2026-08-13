@@ -9,6 +9,11 @@ import SonarQualityIndicatorsCard from "@/components/dashboard/DeployHealth/Sona
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
+import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparisonCard";
+import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
+import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
+import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
+import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
 import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
 import Releases from "@/components/dashboard/Releases";
@@ -18,9 +23,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
 import { useDeployHealthOnboarding } from "@/hooks/useDeployHealthOnboarding";
 import useDashboardStore from "@/states/dashboard";
+import {
+    DEFAULT_ACCESS_COMPARISON_PERIOD,
+    type AccessComparisonPeriod,
+} from "@/types/accessComparisonPeriod";
 import type { DashboardTab } from "@/types/analyticsPeriod";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const SISTEMA_COM_METRICAS = "SigPAE";
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -62,14 +73,27 @@ export default function Dashboard() {
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
     const [deployEnvironment, setDeployEnvironment] =
         useState<DeployEnvironment>("producao");
+    const [accessComparisonPeriod, setAccessComparisonPeriod] =
+        useState<AccessComparisonPeriod>(DEFAULT_ACCESS_COMPARISON_PERIOD);
+    const [activeTabValue, setActiveTabValue] = useState("operacional");
     const { triggerDeployTour } = useDeployHealthOnboarding();
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
+
+    const showMetricas = projectName === SISTEMA_COM_METRICAS;
+
+    useEffect(() => {
+        if (!showMetricas && activeTabValue === "metricas") {
+            setActiveTabValue("operacional");
+        }
+    }, [showMetricas, activeTabValue]);
 
     return (
         <div className="bg-background px-6 py-4">
             <Tabs
                 defaultValue="operacional"
+                value={activeTabValue}
                 onValueChange={(value) => {
+                    setActiveTabValue(value);
                     setActiveTab(value as DashboardTab);
                     if (value === "saude-deploy") triggerDeployTour();
                     if (value === "analytics") triggerAnalyticsTour();
@@ -77,6 +101,9 @@ export default function Dashboard() {
             >
                 <TabsList className="mb-6 px-1">
                     <TabsTrigger value="operacional">Operacional</TabsTrigger>
+                    {showMetricas && (
+                        <TabsTrigger value="metricas">Métricas</TabsTrigger>
+                    )}
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
                     <TabsTrigger value="saude-deploy">
                         Saúde do deploy
@@ -209,6 +236,28 @@ export default function Dashboard() {
                         />
                     </FullWidthSection>
                 </TabsContent>
+
+                {showMetricas && (
+                    <TabsContent value="metricas">
+                        <div className="grid grid-cols-3 gap-4 mb-4">
+                            <ActiveUsersMetricCard systemName={projectName} />
+                            <UniqueUsersPerDayCard systemName={projectName} />
+                            <TodayAccessCard systemName={projectName} />
+                        </div>
+                        <div className="grid grid-cols-5 gap-4 mb-4">
+                            <UsersByProfileCard
+                                systemName={projectName}
+                                className="col-span-2"
+                            />
+                            <AccessComparisonCard
+                                systemName={projectName}
+                                period={accessComparisonPeriod}
+                                onPeriodChange={setAccessComparisonPeriod}
+                                className="col-span-3"
+                            />
+                        </div>
+                    </TabsContent>
+                )}
 
                 <TabsContent value="analytics">
                     <div

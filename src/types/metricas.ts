@@ -1,0 +1,35 @@
+import type { MetricTrend } from "@/types/metric";
+
+export type ActiveAccessUsersResponse = {
+  activeCount: number;
+  trend: MetricTrend;
+  trendLabel: string;
+};
+
+export type UniqueUsersPerDayResponse = {
+  uniqueCount: number;
+  trend: MetricTrend;
+  trendLabel: string;
+};
+
+export type TodayAccessResponse = {
+  accessCount: number;
+  trend: MetricTrend;
+  trendLabel: string;
+};
+
+export type UsersByProfileResponse = {
+  codae: number;
+  dre: number;
+  ue: number;
+};
+
+export type AccessComparisonBucket = {
+  label: string;
+  value: number;
+  isPeak: boolean;
+};
+
+export type AccessComparisonResponse = {
+  buckets: AccessComparisonBucket[];
+};

@@ -8,15 +8,15 @@ const TREND_CONFIG: Record<
 > = {
   "on-average": {
     Icon: ArrowRight,
-    className: "bg-[#F3F4F6] text-[#475569]",
+    className: "bg-[#F3F4F6] text-[#6B7280]",
   },
   above: {
     Icon: ArrowUp,
-    className: "bg-[#D1FAE5] text-[#065F46]",
+    className: "bg-[#D1FAE5] text-[#075A3E]",
   },
   below: {
     Icon: ArrowDown,
-    className: "bg-[#FCE7E7] text-[#991B1B]",
+    className: "bg-[#FCE7E7] text-[#970C0C]",
   },
 };
 
@@ -30,7 +30,7 @@ export function TrendBadge({ trend, label }: Props) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold",
+        "inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium",
         className
       )}
       aria-label={`Tendência: ${label}`}

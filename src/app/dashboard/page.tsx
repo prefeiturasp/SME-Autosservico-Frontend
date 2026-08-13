@@ -29,7 +29,9 @@ import {
 } from "@/types/accessComparisonPeriod";
 import type { DashboardTab } from "@/types/analyticsPeriod";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const SISTEMA_COM_METRICAS = "SigPAE";
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -73,14 +75,25 @@ export default function Dashboard() {
         useState<DeployEnvironment>("producao");
     const [accessComparisonPeriod, setAccessComparisonPeriod] =
         useState<AccessComparisonPeriod>(DEFAULT_ACCESS_COMPARISON_PERIOD);
+    const [activeTabValue, setActiveTabValue] = useState("operacional");
     const { triggerDeployTour } = useDeployHealthOnboarding();
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
+
+    const showMetricas = projectName === SISTEMA_COM_METRICAS;
+
+    useEffect(() => {
+        if (!showMetricas && activeTabValue === "metricas") {
+            setActiveTabValue("operacional");
+        }
+    }, [showMetricas, activeTabValue]);
 
     return (
         <div className="bg-background px-6 py-4">
             <Tabs
                 defaultValue="operacional"
+                value={activeTabValue}
                 onValueChange={(value) => {
+                    setActiveTabValue(value);
                     setActiveTab(value as DashboardTab);
                     if (value === "saude-deploy") triggerDeployTour();
                     if (value === "analytics") triggerAnalyticsTour();
@@ -88,7 +101,9 @@ export default function Dashboard() {
             >
                 <TabsList className="mb-6 px-1">
                     <TabsTrigger value="operacional">Operacional</TabsTrigger>
-                    <TabsTrigger value="metricas">Métricas</TabsTrigger>
+                    {showMetricas && (
+                        <TabsTrigger value="metricas">Métricas</TabsTrigger>
+                    )}
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
                     <TabsTrigger value="saude-deploy">
                         Saúde do deploy
@@ -222,25 +237,27 @@ export default function Dashboard() {
                     </FullWidthSection>
                 </TabsContent>
 
-                <TabsContent value="metricas">
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                        <ActiveUsersMetricCard systemName={projectName} />
-                        <UniqueUsersPerDayCard systemName={projectName} />
-                        <TodayAccessCard systemName={projectName} />
-                    </div>
-                    <div className="grid grid-cols-5 gap-4 mb-4">
-                        <UsersByProfileCard
-                            systemName={projectName}
-                            className="col-span-2"
-                        />
-                        <AccessComparisonCard
-                            systemName={projectName}
-                            period={accessComparisonPeriod}
-                            onPeriodChange={setAccessComparisonPeriod}
-                            className="col-span-3"
-                        />
-                    </div>
-                </TabsContent>
+                {showMetricas && (
+                    <TabsContent value="metricas">
+                        <div className="grid grid-cols-3 gap-4 mb-4">
+                            <ActiveUsersMetricCard systemName={projectName} />
+                            <UniqueUsersPerDayCard systemName={projectName} />
+                            <TodayAccessCard systemName={projectName} />
+                        </div>
+                        <div className="grid grid-cols-5 gap-4 mb-4">
+                            <UsersByProfileCard
+                                systemName={projectName}
+                                className="col-span-2"
+                            />
+                            <AccessComparisonCard
+                                systemName={projectName}
+                                period={accessComparisonPeriod}
+                                onPeriodChange={setAccessComparisonPeriod}
+                                className="col-span-3"
+                            />
+                        </div>
+                    </TabsContent>
+                )}
 
                 <TabsContent value="analytics">
                     <div

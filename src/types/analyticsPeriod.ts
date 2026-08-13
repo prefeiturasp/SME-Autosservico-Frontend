@@ -33,4 +33,8 @@ export function getPeakCardTitle(period: AnalyticsPeriod): string {
   );
 }
 
-export type DashboardTab = "operacional" | "analytics" | "saude-deploy";
+export type DashboardTab =
+  | "operacional"
+  | "metricas"
+  | "analytics"
+  | "saude-deploy";

@@ -9,6 +9,11 @@ import SonarQualityIndicatorsCard from "@/components/dashboard/DeployHealth/Sona
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
+import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparisonCard";
+import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
+import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
+import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
+import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
 import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
 import Releases from "@/components/dashboard/Releases";
@@ -18,6 +23,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
 import { useDeployHealthOnboarding } from "@/hooks/useDeployHealthOnboarding";
 import useDashboardStore from "@/states/dashboard";
+import {
+    DEFAULT_ACCESS_COMPARISON_PERIOD,
+    type AccessComparisonPeriod,
+} from "@/types/accessComparisonPeriod";
 import type { DashboardTab } from "@/types/analyticsPeriod";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
 import { useState } from "react";
@@ -62,6 +71,8 @@ export default function Dashboard() {
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
     const [deployEnvironment, setDeployEnvironment] =
         useState<DeployEnvironment>("producao");
+    const [accessComparisonPeriod, setAccessComparisonPeriod] =
+        useState<AccessComparisonPeriod>(DEFAULT_ACCESS_COMPARISON_PERIOD);
     const { triggerDeployTour } = useDeployHealthOnboarding();
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
 
@@ -77,6 +88,7 @@ export default function Dashboard() {
             >
                 <TabsList className="mb-6 px-1">
                     <TabsTrigger value="operacional">Operacional</TabsTrigger>
+                    <TabsTrigger value="metricas">Métricas</TabsTrigger>
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
                     <TabsTrigger value="saude-deploy">
                         Saúde do deploy
@@ -208,6 +220,26 @@ export default function Dashboard() {
                             project={projectName}
                         />
                     </FullWidthSection>
+                </TabsContent>
+
+                <TabsContent value="metricas">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <ActiveUsersMetricCard systemName={projectName} />
+                        <UniqueUsersPerDayCard systemName={projectName} />
+                        <TodayAccessCard systemName={projectName} />
+                    </div>
+                    <div className="grid grid-cols-5 gap-4 mb-4">
+                        <UsersByProfileCard
+                            systemName={projectName}
+                            className="col-span-2"
+                        />
+                        <AccessComparisonCard
+                            systemName={projectName}
+                            period={accessComparisonPeriod}
+                            onPeriodChange={setAccessComparisonPeriod}
+                            className="col-span-3"
+                        />
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="analytics">

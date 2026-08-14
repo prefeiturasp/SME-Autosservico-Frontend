@@ -33,6 +33,8 @@ const VARIANT_COLORS: Record<StatVariant, string> = {
   muted: "#111827",
 };
 
+const SKELETON_KEYS = ["skeleton-1", "skeleton-2", "skeleton-3", "skeleton-4"];
+
 const ptBrFormatter = new Intl.NumberFormat("pt-BR");
 
 export default function StatsCard({
@@ -54,10 +56,9 @@ export default function StatsCard({
     if (isLoading) {
       return (
         <div className="flex gap-3">
-          {Array.from({ length: 4 }).map((_, index) => (
-            // eslint-disable-next-line react/no-array-index-key
+          {SKELETON_KEYS.map((key) => (
             <div
-              key={index}
+              key={key}
               className="flex-1 space-y-2 rounded-md border border-[#D8D8D8] p-2"
             >
               <Skeleton className="h-7 w-16" />

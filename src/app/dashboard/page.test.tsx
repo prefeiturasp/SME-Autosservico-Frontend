@@ -224,6 +224,20 @@ vi.mock("@/components/dashboard/Metricas/AccessComparisonCard", () => ({
     ),
 }));
 
+vi.mock("@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="alimentacao-terceirizada-section">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/LogisticaSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="logistica-section">{systemName ?? ""}</div>
+    ),
+}));
+
 describe("Dashboard page", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -447,6 +461,12 @@ describe("Dashboard page", () => {
             "SigPAE",
         );
         expect(screen.getByTestId("access-comparison-card")).toHaveTextContent(
+            "SigPAE",
+        );
+        expect(
+            screen.getByTestId("alimentacao-terceirizada-section"),
+        ).toHaveTextContent("SigPAE");
+        expect(screen.getByTestId("logistica-section")).toHaveTextContent(
             "SigPAE",
         );
     });

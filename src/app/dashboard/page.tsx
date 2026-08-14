@@ -11,6 +11,8 @@ import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Produca
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
 import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparisonCard";
 import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
+import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
+import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
 import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
 import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
 import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
@@ -244,18 +246,16 @@ export default function Dashboard() {
                             <UniqueUsersPerDayCard systemName={projectName} />
                             <TodayAccessCard systemName={projectName} />
                         </div>
-                        <div className="grid grid-cols-5 gap-4 mb-4">
-                            <UsersByProfileCard
-                                systemName={projectName}
-                                className="col-span-2"
-                            />
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                            <UsersByProfileCard systemName={projectName} />
                             <AccessComparisonCard
                                 systemName={projectName}
                                 period={accessComparisonPeriod}
                                 onPeriodChange={setAccessComparisonPeriod}
-                                className="col-span-3"
                             />
                         </div>
+                        <AlimentacaoTerceirizadaSection systemName={projectName} />
+                        <LogisticaSection systemName={projectName} />
                     </TabsContent>
                 )}
 

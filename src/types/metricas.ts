@@ -33,3 +33,15 @@ export type AccessComparisonBucket = {
 export type AccessComparisonResponse = {
   buckets: AccessComparisonBucket[];
 };
+
+export type StatVariant = "neutral" | "success" | "warning" | "danger" | "muted";
+
+export type StatItem = {
+  label: string;
+  value: number;
+  variant: StatVariant;
+};
+
+export type StatsCardResponse = {
+  items: StatItem[];
+};

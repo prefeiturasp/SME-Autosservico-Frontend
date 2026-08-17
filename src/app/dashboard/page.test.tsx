@@ -189,6 +189,55 @@ vi.mock("@/components/dashboard/DatabaseStatusCard", () => ({
     ),
 }));
 
+vi.mock("@/components/dashboard/Metricas/ActiveUsersMetricCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="active-users-metric-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/UniqueUsersPerDayCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="unique-users-per-day-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/TodayAccessCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="today-access-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/UsersByProfileCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="users-by-profile-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/AccessComparisonCard", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="access-comparison-card">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="alimentacao-terceirizada-section">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/LogisticaSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="logistica-section">{systemName ?? ""}</div>
+    ),
+}));
+
 describe("Dashboard page", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -379,5 +428,75 @@ describe("Dashboard page", () => {
             "API SME",
         );
         expect(screen.getByTestId("filas-Fila")).toHaveTextContent(""); // fallback
+    });
+
+    test("não exibe a aba Métricas quando o projeto ativo não é o SigPAE", () => {
+        render(withClient(<Dashboard />));
+
+        expect(
+            screen.queryByRole("tab", { name: "Métricas" }),
+        ).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com os cards mockados quando o projeto ativo é o SigPAE", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "SigPAE" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "SigPAE",
+        );
+        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
+            "SigPAE",
+        );
+        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
+            "SigPAE",
+        );
+        expect(screen.getByTestId("users-by-profile-card")).toHaveTextContent(
+            "SigPAE",
+        );
+        expect(screen.getByTestId("access-comparison-card")).toHaveTextContent(
+            "SigPAE",
+        );
+        expect(
+            screen.getByTestId("alimentacao-terceirizada-section"),
+        ).toHaveTextContent("SigPAE");
+        expect(screen.getByTestId("logistica-section")).toHaveTextContent(
+            "SigPAE",
+        );
+    });
+
+    test("volta para a aba Operacional se o projeto mudar para um sistema sem Métricas", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "SigPAE" },
+        };
+
+        const { rerender } = render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+        expect(screen.getByRole("tab", { name: "Métricas" })).toHaveAttribute(
+            "aria-selected",
+            "true",
+        );
+
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "Novo SGP" },
+        };
+        rerender(withClient(<Dashboard />));
+
+        expect(
+            screen.queryByRole("tab", { name: "Métricas" }),
+        ).not.toBeInTheDocument();
+        expect(screen.getByRole("tab", { name: "Operacional" })).toHaveAttribute(
+            "aria-selected",
+            "true",
+        );
     });
 });

@@ -22,3 +22,11 @@ Funcionalidade: Sidebar - SME AutoServiço
   Cenário: Ativar item COPLAN no sidebar
     Quando clico no item "COPLAN" do sidebar
     Então o item "COPLAN" deve estar ativo no sidebar
+
+  Cenário: Ativar item COTIC no sidebar
+    Quando clico no item "COTIC" do sidebar
+    Então o item "COTIC" deve estar ativo no sidebar
+
+  Cenário: Ativar item ASCOM no sidebar
+    Quando clico no item "ASCOM" do sidebar
+    Então o item "ASCOM" deve estar ativo no sidebar

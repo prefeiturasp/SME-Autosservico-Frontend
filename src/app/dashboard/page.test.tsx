@@ -238,6 +238,29 @@ vi.mock("@/components/dashboard/Metricas/LogisticaSection", () => ({
     ),
 }));
 
+vi.mock("@/components/dashboard/Metricas/SorteiosSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="sorteios-section">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/OrdemInscricaoSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="ordem-inscricao-section">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/OportunidadesRecrutamentoSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="oportunidades-recrutamento-section">
+            {systemName ?? ""}
+        </div>
+    ),
+}));
+
 describe("Dashboard page", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -469,6 +492,56 @@ describe("Dashboard page", () => {
         expect(screen.getByTestId("logistica-section")).toHaveTextContent(
             "SigPAE",
         );
+        expect(
+            screen.queryByTestId("sorteios-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("ordem-inscricao-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("oportunidades-recrutamento-section"),
+        ).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com as seções da Intranet quando o projeto ativo é a Intranet", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "Intranet" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(screen.getByTestId("sorteios-section")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(screen.getByTestId("ordem-inscricao-section")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(
+            screen.getByTestId("oportunidades-recrutamento-section"),
+        ).toHaveTextContent("Intranet");
+
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("alimentacao-terceirizada-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
     });
 
     test("volta para a aba Operacional se o projeto mudar para um sistema sem Métricas", () => {

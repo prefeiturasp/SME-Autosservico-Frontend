@@ -45,3 +45,8 @@ export type StatItem = {
 export type StatsCardResponse = {
   items: StatItem[];
 };
+
+export type TableRow = {
+  label: string;
+  value: number;
+};

@@ -28,10 +28,10 @@ export default function AccessComparisonPeriodSwitcher({
           <label
             key={period.value}
             className={cn(
-              "inline-flex cursor-pointer items-center rounded-full border px-4 py-1.5 text-sm font-semibold transition-colors focus-within:ring-2 focus-within:ring-[#2563EB]",
+              "inline-flex cursor-pointer items-center rounded-full border px-4 py-1.5 text-xs font-medium transition-colors focus-within:ring-2 focus-within:ring-[#2563EB]",
               isSelected
-                ? "border-[#1E3A8A] bg-[#1E3A8A] text-white"
-                : "border-[#D1D5DB] bg-white text-[#1E3A8A] hover:bg-gray-50",
+                ? "border-[#1E4D8C] bg-[#1E4D8C] text-white"
+                : "border-[#E2E8F0] bg-white text-[#111827] hover:bg-gray-50",
             )}
           >
             <input

@@ -13,6 +13,9 @@ import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparis
 import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
 import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
 import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
+import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
+import OrdemInscricaoSection from "@/components/dashboard/Metricas/OrdemInscricaoSection";
+import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
 import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
 import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
 import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
@@ -33,7 +36,7 @@ import type { DashboardTab } from "@/types/analyticsPeriod";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
 import { useEffect, useState } from "react";
 
-const SISTEMA_COM_METRICAS = "SigPAE";
+const SISTEMAS_COM_METRICAS = new Set(["SigPAE", "Intranet"]);
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -81,7 +84,9 @@ export default function Dashboard() {
     const { triggerDeployTour } = useDeployHealthOnboarding();
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
 
-    const showMetricas = projectName === SISTEMA_COM_METRICAS;
+    const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
+    const isSigPaeMetricas = projectName === "SigPAE";
+    const isIntranetMetricas = projectName === "Intranet";
 
     useEffect(() => {
         if (!showMetricas && activeTabValue === "metricas") {
@@ -246,16 +251,31 @@ export default function Dashboard() {
                             <UniqueUsersPerDayCard systemName={projectName} />
                             <TodayAccessCard systemName={projectName} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                            <UsersByProfileCard systemName={projectName} />
-                            <AccessComparisonCard
-                                systemName={projectName}
-                                period={accessComparisonPeriod}
-                                onPeriodChange={setAccessComparisonPeriod}
-                            />
-                        </div>
-                        <AlimentacaoTerceirizadaSection systemName={projectName} />
-                        <LogisticaSection systemName={projectName} />
+                        {isSigPaeMetricas && (
+                            <>
+                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                    <UsersByProfileCard systemName={projectName} />
+                                    <AccessComparisonCard
+                                        systemName={projectName}
+                                        period={accessComparisonPeriod}
+                                        onPeriodChange={setAccessComparisonPeriod}
+                                    />
+                                </div>
+                                <AlimentacaoTerceirizadaSection
+                                    systemName={projectName}
+                                />
+                                <LogisticaSection systemName={projectName} />
+                            </>
+                        )}
+                        {isIntranetMetricas && (
+                            <>
+                                <SorteiosSection systemName={projectName} />
+                                <OrdemInscricaoSection systemName={projectName} />
+                                <OportunidadesRecrutamentoSection
+                                    systemName={projectName}
+                                />
+                            </>
+                        )}
                     </TabsContent>
                 )}
 

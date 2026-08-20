@@ -13,6 +13,7 @@ type StoreState = {
     activeProject: null | {
         nome?: string;
         zabbixQueryFrontend?: string;
+        zabbixQueryFrontendHomolog?: string;
         zabbixQueryBackend?: string;
         zabbixQueryFilasRabbitMQ?: string;
         sonarProjectKey?: string;
@@ -269,6 +270,7 @@ describe("Dashboard page", () => {
             activeProject: {
                 nome: "Novo SGP",
                 zabbixQueryFrontend: "Portal SME",
+                zabbixQueryFrontendHomolog: "Portal SME HOM",
                 zabbixQueryBackend: "API SME",
                 zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
             },
@@ -292,6 +294,9 @@ describe("Dashboard page", () => {
         ).toBeInTheDocument();
         expect(screen.getByTestId("producao-Frontend")).toHaveTextContent(
             "Portal SME",
+        );
+        expect(screen.getByTestId("producao-Homologação")).toHaveTextContent(
+            "Portal SME HOM",
         );
 
         // Segundo card (Saúde do servidor)

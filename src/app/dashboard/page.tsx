@@ -72,6 +72,8 @@ export default function Dashboard() {
     const projectName = activeProject?.nome?.trim() ?? "";
     const projectNameFrontEnd =
         activeProject?.zabbixQueryFrontend?.trim() ?? "";
+    const projectNameFrontEndHomolog =
+        activeProject?.zabbixQueryFrontendHomolog?.trim() ?? "";
     const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim() ?? "";
     const projectNameFilasRabbitMQ =
         activeProject?.zabbixQueryFilasRabbitMQ?.trim() ?? "";
@@ -151,8 +153,16 @@ export default function Dashboard() {
                             }
                         >
                             <Producao
-                                className="bg-[#F5F5F5] p-3"
+                                className="mb-5 bg-[#F5F5F5] p-3"
                                 projectName={projectNameFrontEnd}
+                                unmonitoredLabel={
+                                    projectName ? "Sem monitoramento" : undefined
+                                }
+                            />
+                            <Producao
+                                title="Homologação"
+                                className="bg-[#F5F5F5] p-3"
+                                projectName={projectNameFrontEndHomolog}
                                 unmonitoredLabel={
                                     projectName ? "Sem monitoramento" : undefined
                                 }

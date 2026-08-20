@@ -25,6 +25,7 @@ import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
 import Releases from "@/components/dashboard/Releases";
 import Filas from "@/components/dashboard/SaudeDosServidores/Filas";
 import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
+import UsersWithAccessCard from "@/components/dashboard/UsersWithAccessCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
 import { useDeployHealthOnboarding } from "@/hooks/useDeployHealthOnboarding";
@@ -120,7 +121,7 @@ export default function Dashboard() {
                 </TabsList>
 
                 <TabsContent value="operacional">
-                    <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
                         <div
                             id="onboarding-lancamentos"
                             className="col-span-2"
@@ -130,12 +131,12 @@ export default function Dashboard() {
                                 subprojects={jenkinsSubprojects}
                             />
                         </div>
+                        <UsersWithAccessCard systemName={projectName} />
                     </div>
-                    <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
                         <CardWrapperInfoAmbientes
                             id="onboarding-disponibilidade"
                             title="Disponibilidade do ambiente"
-                            className="max-w-sm"
                             tooltipContent={
                                 <>
                                     <p className="mb-4">
@@ -164,7 +165,6 @@ export default function Dashboard() {
                         <CardWrapperInfoAmbientes
                             id="onboarding-saude-servidor"
                             title="Saúde do servidor (Workloads)"
-                            className="max-w-sm"
                             tooltipContent={
                                 <>
                                     <p className="mb-4">
@@ -203,7 +203,6 @@ export default function Dashboard() {
                         <CardWrapperInfoAmbientes
                             id="onboarding-banco-dados"
                             title="Banco de dados"
-                            className="max-w-sm"
                             tooltipContent={
                                 <>
                                     <p className="mb-4">

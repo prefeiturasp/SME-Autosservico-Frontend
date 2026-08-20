@@ -15,6 +15,7 @@ import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/Alim
 import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
 import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
 import OrdemInscricaoSection from "@/components/dashboard/Metricas/OrdemInscricaoSection";
+import ProvasSection from "@/components/dashboard/Metricas/ProvasSection";
 import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
 import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
 import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
@@ -36,7 +37,7 @@ import type { DashboardTab } from "@/types/analyticsPeriod";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
 import { useEffect, useState } from "react";
 
-const SISTEMAS_COM_METRICAS = new Set(["SigPAE", "Intranet"]);
+const SISTEMAS_COM_METRICAS = new Set(["SigPAE", "Intranet", "Serap"]);
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -87,6 +88,7 @@ export default function Dashboard() {
     const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
     const isSigPaeMetricas = projectName === "SigPAE";
     const isIntranetMetricas = projectName === "Intranet";
+    const isSerapMetricas = projectName === "Serap";
 
     useEffect(() => {
         if (!showMetricas && activeTabValue === "metricas") {
@@ -275,6 +277,9 @@ export default function Dashboard() {
                                     systemName={projectName}
                                 />
                             </>
+                        )}
+                        {isSerapMetricas && (
+                            <ProvasSection systemName={projectName} />
                         )}
                     </TabsContent>
                 )}

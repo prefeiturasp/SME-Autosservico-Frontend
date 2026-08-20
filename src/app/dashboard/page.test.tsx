@@ -261,6 +261,13 @@ vi.mock("@/components/dashboard/Metricas/OportunidadesRecrutamentoSection", () =
     ),
 }));
 
+vi.mock("@/components/dashboard/Metricas/ProvasSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="provas-section">{systemName ?? ""}</div>
+    ),
+}));
+
 describe("Dashboard page", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -501,6 +508,7 @@ describe("Dashboard page", () => {
         expect(
             screen.queryByTestId("oportunidades-recrutamento-section"),
         ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas com as seções da Intranet quando o projeto ativo é a Intranet", () => {
@@ -542,6 +550,47 @@ describe("Dashboard page", () => {
             screen.queryByTestId("alimentacao-terceirizada-section"),
         ).not.toBeInTheDocument();
         expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com a seção Provas quando o projeto ativo é o Serap", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "Serap" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "Serap",
+        );
+        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
+            "Serap",
+        );
+        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
+            "Serap",
+        );
+        expect(screen.getByTestId("provas-section")).toHaveTextContent("Serap");
+
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("alimentacao-terceirizada-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("ordem-inscricao-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("oportunidades-recrutamento-section"),
+        ).not.toBeInTheDocument();
     });
 
     test("volta para a aba Operacional se o projeto mudar para um sistema sem Métricas", () => {

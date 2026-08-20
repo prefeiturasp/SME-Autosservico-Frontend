@@ -110,6 +110,27 @@ describe("getSistemasPorSquad", () => {
         ]);
     });
 
+    it("mapeia as descrições de homologação (frontend) para os sistemas monitorados em HOM", () => {
+        const ascom = getSistemasPorSquad("ASCOM");
+        const codae = getSistemasPorSquad("CODAE");
+        const coped = getSistemasPorSquad("COPED");
+        const coplan = getSistemasPorSquad("COPLAN");
+
+        expect(coped.find((s) => s.nome === "Serap")?.zabbixQueryFrontendHomolog).toBe("HOM - Serap");
+        expect(coped.find((s) => s.nome === "Serap Estudantes")?.zabbixQueryFrontendHomolog).toBe("HOM - Serap Estudantes");
+        expect(coped.find((s) => s.nome === "SGP")?.zabbixQueryFrontendHomolog).toBe("HOM - NovoSGP");
+        expect(codae.find((s) => s.nome === "SigPAE")?.zabbixQueryFrontendHomolog).toBe("HOM - SIGPAE");
+        expect(coplan.find((s) => s.nome === "SigEscola")?.zabbixQueryFrontendHomolog).toBe("HOM - PTRF - SIG Escola");
+        expect(ascom.find((s) => s.nome === "Intranet")?.zabbixQueryFrontendHomolog).toBe("HOM - Intranet");
+        expect(ascom.find((s) => s.nome === "Portal Educação")?.zabbixQueryFrontendHomolog).toBe("HOM - Educacao");
+        expect(ascom.find((s) => s.nome === "Portal CEU")?.zabbixQueryFrontendHomolog).toBe("HOM - Portal CEU");
+    });
+
+    it("sistemas sem monitoramento HOM ficam com o frontend de homologação vazio", () => {
+        const cotic = getSistemasPorSquad("COTIC");
+        expect(cotic.find((s) => s.nome === "Autosserviço")?.zabbixQueryFrontendHomolog).toBe("");
+    });
+
     it("inclui lista de projetos para GIPE", () => {
         const sistemas = getSistemasPorSquad("GIPE");
         const gipe = sistemas.find((s) => s.nome === "GIPE");

@@ -50,3 +50,8 @@ export type TableRow = {
   label: string;
   value: number;
 };
+
+export type ProvasResponse = {
+  items: StatItem[];
+  progressPercentage: number;
+};

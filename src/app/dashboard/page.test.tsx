@@ -598,6 +598,49 @@ describe("Dashboard page", () => {
         ).not.toBeInTheDocument();
     });
 
+    test("exibe a aba Métricas apenas com os KPIs genéricos quando o projeto ativo é o Serap Estudantes", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: {
+                ...mockStoreState.activeProject,
+                nome: "Serap Estudantes",
+            },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "Serap Estudantes",
+        );
+        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
+            "Serap Estudantes",
+        );
+        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
+            "Serap Estudantes",
+        );
+
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("alimentacao-terceirizada-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("ordem-inscricao-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("oportunidades-recrutamento-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+    });
+
     test("volta para a aba Operacional se o projeto mudar para um sistema sem Métricas", () => {
         mockStoreState = {
             ...mockStoreState,

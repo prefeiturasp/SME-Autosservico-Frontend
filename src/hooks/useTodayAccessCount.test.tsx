@@ -46,8 +46,8 @@ describe("useTodayAccessCount", () => {
 
     expect(result.current.data).toEqual({
       accessCount: 2453,
-      trend: "below",
-      trendLabel: "12% abaixo da média diária",
+      trend: "on-average",
+      trendLabel: "Dentro da média diária",
     });
   });
 });

@@ -38,7 +38,12 @@ import type { DashboardTab } from "@/types/analyticsPeriod";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
 import { useEffect, useState } from "react";
 
-const SISTEMAS_COM_METRICAS = new Set(["SigPAE", "Intranet", "Serap"]);
+const SISTEMAS_COM_METRICAS = new Set([
+    "SigPAE",
+    "Intranet",
+    "Serap",
+    "Serap Estudantes",
+]);
 
 type FullWidthSectionProps = {
     readonly id?: string;

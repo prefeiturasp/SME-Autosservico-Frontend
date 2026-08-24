@@ -2,14 +2,12 @@ import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useUniqueUsersPerDay } from "./useUniqueUsersPerDay";
+import { useOportunidadesRecrutamento } from "./useOportunidadesRecrutamento";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
     const client = new QueryClient({
-      defaultOptions: {
-        queries: { retry: false, gcTime: Infinity },
-      },
+      defaultOptions: { queries: { retry: false, gcTime: Infinity } },
     });
     return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
   };
@@ -21,12 +19,11 @@ beforeEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("useUniqueUsersPerDay", () => {
+describe("useOportunidadesRecrutamento", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
     const wrapper = createWrapper();
-
     const { result } = renderHook(
-      () => useUniqueUsersPerDay({ systemName: "" }),
+      () => useOportunidadesRecrutamento({ systemName: "" }),
       { wrapper }
     );
 
@@ -34,20 +31,20 @@ describe("useUniqueUsersPerDay", () => {
     expect(result.current.data).toBeUndefined();
   });
 
-  it("retorna os dados mockados de usuários únicos por dia", async () => {
+  it("retorna os itens mockados de oportunidades e recrutamento", async () => {
     const wrapper = createWrapper();
-
     const { result } = renderHook(
-      () => useUniqueUsersPerDay({ systemName: "SigPAE" }),
+      () => useOportunidadesRecrutamento({ systemName: "Intranet" }),
       { wrapper }
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toEqual({
-      uniqueCount: 3560,
-      trend: "above",
-      trendLabel: "8% acima da média dos últimos 30 dias",
-    });
+    expect(result.current.data?.items).toEqual([
+      { label: "Oportunidades cadastradas", value: 86, variant: "neutral" },
+      { label: "CVs cadastrados", value: 2340, variant: "neutral" },
+      { label: "Inscrições realizadas", value: 1912, variant: "warning" },
+      { label: "Contratações efetivadas", value: 64, variant: "success" },
+    ]);
   });
 });

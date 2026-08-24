@@ -13,6 +13,10 @@ import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparis
 import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
 import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
 import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
+import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
+import OrdemInscricaoSection from "@/components/dashboard/Metricas/OrdemInscricaoSection";
+import ProvasSection from "@/components/dashboard/Metricas/ProvasSection";
+import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
 import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
 import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
 import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
@@ -21,6 +25,7 @@ import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
 import Releases from "@/components/dashboard/Releases";
 import Filas from "@/components/dashboard/SaudeDosServidores/Filas";
 import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
+import UsersWithAccessCard from "@/components/dashboard/UsersWithAccessCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
 import { useDeployHealthOnboarding } from "@/hooks/useDeployHealthOnboarding";
@@ -33,7 +38,12 @@ import type { DashboardTab } from "@/types/analyticsPeriod";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
 import { useEffect, useState } from "react";
 
-const SISTEMA_COM_METRICAS = "SigPAE";
+const SISTEMAS_COM_METRICAS = new Set([
+    "SigPAE",
+    "Intranet",
+    "Serap",
+    "Serap Estudantes",
+]);
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -69,6 +79,8 @@ export default function Dashboard() {
     const projectName = activeProject?.nome?.trim() ?? "";
     const projectNameFrontEnd =
         activeProject?.zabbixQueryFrontend?.trim() ?? "";
+    const projectNameFrontEndHomolog =
+        activeProject?.zabbixQueryFrontendHomolog?.trim() ?? "";
     const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim() ?? "";
     const projectNameFilasRabbitMQ =
         activeProject?.zabbixQueryFilasRabbitMQ?.trim() ?? "";
@@ -81,7 +93,10 @@ export default function Dashboard() {
     const { triggerDeployTour } = useDeployHealthOnboarding();
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
 
-    const showMetricas = projectName === SISTEMA_COM_METRICAS;
+    const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
+    const isSigPaeMetricas = projectName === "SigPAE";
+    const isIntranetMetricas = projectName === "Intranet";
+    const isSerapMetricas = projectName === "Serap";
 
     useEffect(() => {
         if (!showMetricas && activeTabValue === "metricas") {
@@ -113,7 +128,7 @@ export default function Dashboard() {
                 </TabsList>
 
                 <TabsContent value="operacional">
-                    <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
                         <div
                             id="onboarding-lancamentos"
                             className="col-span-2"
@@ -123,12 +138,12 @@ export default function Dashboard() {
                                 subprojects={jenkinsSubprojects}
                             />
                         </div>
+                        <UsersWithAccessCard systemName={projectName} />
                     </div>
-                    <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
                         <CardWrapperInfoAmbientes
                             id="onboarding-disponibilidade"
                             title="Disponibilidade do ambiente"
-                            className="max-w-sm"
                             tooltipContent={
                                 <>
                                     <p className="mb-4">
@@ -146,8 +161,16 @@ export default function Dashboard() {
                             }
                         >
                             <Producao
-                                className="bg-[#F5F5F5] p-3"
+                                className="mb-5 bg-[#F5F5F5] p-3"
                                 projectName={projectNameFrontEnd}
+                                unmonitoredLabel={
+                                    projectName ? "Sem monitoramento" : undefined
+                                }
+                            />
+                            <Producao
+                                title="Homologação"
+                                className="bg-[#F5F5F5] p-3"
+                                projectName={projectNameFrontEndHomolog}
                                 unmonitoredLabel={
                                     projectName ? "Sem monitoramento" : undefined
                                 }
@@ -157,7 +180,6 @@ export default function Dashboard() {
                         <CardWrapperInfoAmbientes
                             id="onboarding-saude-servidor"
                             title="Saúde do servidor (Workloads)"
-                            className="max-w-sm"
                             tooltipContent={
                                 <>
                                     <p className="mb-4">
@@ -196,7 +218,6 @@ export default function Dashboard() {
                         <CardWrapperInfoAmbientes
                             id="onboarding-banco-dados"
                             title="Banco de dados"
-                            className="max-w-sm"
                             tooltipContent={
                                 <>
                                     <p className="mb-4">
@@ -246,16 +267,34 @@ export default function Dashboard() {
                             <UniqueUsersPerDayCard systemName={projectName} />
                             <TodayAccessCard systemName={projectName} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                            <UsersByProfileCard systemName={projectName} />
-                            <AccessComparisonCard
-                                systemName={projectName}
-                                period={accessComparisonPeriod}
-                                onPeriodChange={setAccessComparisonPeriod}
-                            />
-                        </div>
-                        <AlimentacaoTerceirizadaSection systemName={projectName} />
-                        <LogisticaSection systemName={projectName} />
+                        {isSigPaeMetricas && (
+                            <>
+                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                    <UsersByProfileCard systemName={projectName} />
+                                    <AccessComparisonCard
+                                        systemName={projectName}
+                                        period={accessComparisonPeriod}
+                                        onPeriodChange={setAccessComparisonPeriod}
+                                    />
+                                </div>
+                                <AlimentacaoTerceirizadaSection
+                                    systemName={projectName}
+                                />
+                                <LogisticaSection systemName={projectName} />
+                            </>
+                        )}
+                        {isIntranetMetricas && (
+                            <>
+                                <SorteiosSection systemName={projectName} />
+                                <OrdemInscricaoSection systemName={projectName} />
+                                <OportunidadesRecrutamentoSection
+                                    systemName={projectName}
+                                />
+                            </>
+                        )}
+                        {isSerapMetricas && (
+                            <ProvasSection systemName={projectName} />
+                        )}
                     </TabsContent>
                 )}
 

@@ -7,8 +7,8 @@ type Options = {
 
 const MOCK_RESPONSE: UniqueUsersPerDayResponse = {
   uniqueCount: 3560,
-  trend: "on-average",
-  trendLabel: "Média dos últimos 30 dias",
+  trend: "above",
+  trendLabel: "8% acima da média dos últimos 30 dias",
 };
 
 export function useUniqueUsersPerDay({ systemName }: Options) {

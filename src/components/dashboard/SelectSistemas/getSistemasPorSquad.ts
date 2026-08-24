@@ -5,17 +5,19 @@ type SistemaConfig = {
     id: string;
     nome: string;
     frontend?: string;
+    frontendHomolog?: string;
     backend?: string;
     filas?: string;
     job: string;
     azure: string;
 };
 
-function makeSistema({ id, nome, frontend = "", backend = "", filas = "", job, azure }: SistemaConfig): Sistema {
+function makeSistema({ id, nome, frontend = "", frontendHomolog = "", backend = "", filas = "", job, azure }: SistemaConfig): Sistema {
     return {
         id,
         nome,
         zabbixQueryFrontend: frontend,
+        zabbixQueryFrontendHomolog: frontendHomolog,
         zabbixQueryBackend: backend,
         zabbixQueryFilasRabbitMQ: filas,
         zabbixQueryJenkinsJob: job,
@@ -25,12 +27,12 @@ function makeSistema({ id, nome, frontend = "", backend = "", filas = "", job, a
 
 const squads: Record<string, Sistema[]> = {
     ASCOM: [
-        makeSistema({ id: "5", nome: "Intranet", frontend: "PRD - Intranet", job: "SME-Intranet/master", azure: "ASCOM - Comunicação" }),
-        makeSistema({ id: "2", nome: "Portal CEU", frontend: "PRD - Portal CEU", job: "SME-PortalCEU/master", azure: "COCEU" }),
-        makeSistema({ id: "1", nome: "Portal Educação", frontend: "PRD - Educacao", job: "SME-PortalEducacao/master", azure: "ASCOM - Comunicação" }),
+        makeSistema({ id: "5", nome: "Intranet", frontend: "PRD - Intranet", frontendHomolog: "HOM - Intranet", job: "SME-Intranet/master", azure: "ASCOM - Comunicação" }),
+        makeSistema({ id: "2", nome: "Portal CEU", frontend: "PRD - Portal CEU", frontendHomolog: "HOM - Portal CEU", job: "SME-PortalCEU/master", azure: "COCEU" }),
+        makeSistema({ id: "1", nome: "Portal Educação", frontend: "PRD - Educacao", frontendHomolog: "HOM - Educacao", job: "SME-PortalEducacao/master", azure: "ASCOM - Comunicação" }),
     ],
     CODAE: [
-        makeSistema({ id: "8", nome: "SigPAE", frontend: "PRD - SIGPAE", backend: "PRD - SIGPAE - API", filas: "PRD - Celery Sigpae", job: "SME-SIGPAE/master", azure: "CODAE - Alimentação" }),
+        makeSistema({ id: "8", nome: "SigPAE", frontend: "PRD - SIGPAE", frontendHomolog: "HOM - SIGPAE", backend: "PRD - SIGPAE - API", filas: "PRD - Celery Sigpae", job: "SME-SIGPAE/master", azure: "CODAE - Alimentação" }),
         makeSistema({ id: "9", nome: "Rolê Agroecológico", job: "SME-RoleAgroecologico/master", azure: "CODAE - Alimentação" }),
     ],
     COGEP: [
@@ -38,14 +40,14 @@ const squads: Record<string, Sistema[]> = {
         makeSistema({ id: "7", nome: "Sigla", job: "SME-SIGLA/master", azure: "COGEP - Recursos Humanos" }),
     ],
     COPED: [
-        makeSistema({ id: "10", nome: "SGP", frontend: "PRD - Novo SGP", backend: "PRD - Novo SGP - Swagger", filas: "PRD - RabbitMQ", job: "SME-NovoSGP-Docs/master", azure: "COPED - Pedagógico" }),
-        makeSistema({ id: "11", nome: "Serap", frontend: "PRD - Serap", backend: "PRD - Serap - API", filas: "PRD - RabbitMQ", job: "SME-Serap/master", azure: "COPED - Pedagógico" }),
-        makeSistema({ id: "12", nome: "Serap Estudantes", frontend: "PRD - Serap Estudantes", backend: "PRD - Serap Estudantes - API", filas: "PRD - RabbitMQ", job: "SME-Serap-Estudantes/master", azure: "COPED - Pedagógico" }),
+        makeSistema({ id: "10", nome: "SGP", frontend: "PRD - Novo SGP", frontendHomolog: "HOM - NovoSGP", backend: "PRD - Novo SGP - Swagger", filas: "PRD - RabbitMQ", job: "SME-NovoSGP-Docs/master", azure: "COPED - Pedagógico" }),
+        makeSistema({ id: "11", nome: "Serap", frontend: "PRD - Serap", frontendHomolog: "HOM - Serap", backend: "PRD - Serap - API", filas: "PRD - RabbitMQ", job: "SME-Serap/master", azure: "COPED - Pedagógico" }),
+        makeSistema({ id: "12", nome: "Serap Estudantes", frontend: "PRD - Serap Estudantes", frontendHomolog: "HOM - Serap Estudantes", backend: "PRD - Serap Estudantes - API", filas: "PRD - RabbitMQ", job: "SME-Serap-Estudantes/master", azure: "COPED - Pedagógico" }),
         makeSistema({ id: "15", nome: "IDEP", frontend: "PRD - Idep", job: "SME-IDEP/master", azure: "COPED - Pedagógico" }),
         makeSistema({ id: "14", nome: "Curriculo da Cidade", frontend: "PRD - Curriculo", backend: "PRD - Curriculo - API", filas: "PRD - RabbitMQ", job: "SME-Curriculo/master", azure: "COPED - Pedagógico" }),
     ],
     COPLAN: [
-        makeSistema({ id: "17", nome: "SigEscola", frontend: "PRD - PTRF - SIG Escola", backend: "PRD - PTRF - SIG Escola - API", filas: "PRD - Celery PTRF", job: "SME-SigEscola/master", azure: "COPLAN - PTRF" }),
+        makeSistema({ id: "17", nome: "SigEscola", frontend: "PRD - PTRF - SIG Escola", frontendHomolog: "HOM - PTRF - SIG Escola", backend: "PRD - PTRF - SIG Escola - API", filas: "PRD - Celery PTRF", job: "SME-SigEscola/master", azure: "COPLAN - PTRF" }),
     ],
     COSERV: [
         makeSistema({ id: "20", nome: "Bens Físicos", frontend: "PRD - Portal Bens Fisicos", job: "SME-BensFisicos-FrontEnd/master", azure: "COSERV" }),

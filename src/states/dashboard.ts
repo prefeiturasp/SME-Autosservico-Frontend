@@ -18,6 +18,7 @@ export interface ProjectItem {
     id: string;
     nome: string;
     zabbixQueryFrontend: string;
+    zabbixQueryFrontendHomolog?: string;
     zabbixQueryBackend: string;
     zabbixQueryFilasRabbitMQ: string;
     zabbixQueryJenkinsJob: string;

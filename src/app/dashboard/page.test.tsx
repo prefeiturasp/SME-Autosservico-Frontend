@@ -13,6 +13,7 @@ type StoreState = {
     activeProject: null | {
         nome?: string;
         zabbixQueryFrontend?: string;
+        zabbixQueryFrontendHomolog?: string;
         zabbixQueryBackend?: string;
         zabbixQueryFilasRabbitMQ?: string;
         sonarProjectKey?: string;
@@ -238,6 +239,36 @@ vi.mock("@/components/dashboard/Metricas/LogisticaSection", () => ({
     ),
 }));
 
+vi.mock("@/components/dashboard/Metricas/SorteiosSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="sorteios-section">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/OrdemInscricaoSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="ordem-inscricao-section">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/OportunidadesRecrutamentoSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="oportunidades-recrutamento-section">
+            {systemName ?? ""}
+        </div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/ProvasSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="provas-section">{systemName ?? ""}</div>
+    ),
+}));
+
 describe("Dashboard page", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -246,6 +277,7 @@ describe("Dashboard page", () => {
             activeProject: {
                 nome: "Novo SGP",
                 zabbixQueryFrontend: "Portal SME",
+                zabbixQueryFrontendHomolog: "Portal SME HOM",
                 zabbixQueryBackend: "API SME",
                 zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
             },
@@ -269,6 +301,9 @@ describe("Dashboard page", () => {
         ).toBeInTheDocument();
         expect(screen.getByTestId("producao-Frontend")).toHaveTextContent(
             "Portal SME",
+        );
+        expect(screen.getByTestId("producao-Homologação")).toHaveTextContent(
+            "Portal SME HOM",
         );
 
         // Segundo card (Saúde do servidor)
@@ -469,6 +504,141 @@ describe("Dashboard page", () => {
         expect(screen.getByTestId("logistica-section")).toHaveTextContent(
             "SigPAE",
         );
+        expect(
+            screen.queryByTestId("sorteios-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("ordem-inscricao-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("oportunidades-recrutamento-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com as seções da Intranet quando o projeto ativo é a Intranet", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "Intranet" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(screen.getByTestId("sorteios-section")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(screen.getByTestId("ordem-inscricao-section")).toHaveTextContent(
+            "Intranet",
+        );
+        expect(
+            screen.getByTestId("oportunidades-recrutamento-section"),
+        ).toHaveTextContent("Intranet");
+
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("alimentacao-terceirizada-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com a seção Provas quando o projeto ativo é o Serap", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "Serap" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "Serap",
+        );
+        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
+            "Serap",
+        );
+        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
+            "Serap",
+        );
+        expect(screen.getByTestId("provas-section")).toHaveTextContent("Serap");
+
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("alimentacao-terceirizada-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("ordem-inscricao-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("oportunidades-recrutamento-section"),
+        ).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas apenas com os KPIs genéricos quando o projeto ativo é o Serap Estudantes", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: {
+                ...mockStoreState.activeProject,
+                nome: "Serap Estudantes",
+            },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "Serap Estudantes",
+        );
+        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
+            "Serap Estudantes",
+        );
+        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
+            "Serap Estudantes",
+        );
+
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("alimentacao-terceirizada-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("ordem-inscricao-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("oportunidades-recrutamento-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
     });
 
     test("volta para a aba Operacional se o projeto mudar para um sistema sem Métricas", () => {

@@ -46,8 +46,8 @@ describe("useUniqueUsersPerDay", () => {
 
     expect(result.current.data).toEqual({
       uniqueCount: 3560,
-      trend: "on-average",
-      trendLabel: "Média dos últimos 30 dias",
+      trend: "above",
+      trendLabel: "8% acima da média dos últimos 30 dias",
     });
   });
 });

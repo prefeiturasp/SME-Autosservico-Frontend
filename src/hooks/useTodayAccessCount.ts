@@ -7,8 +7,8 @@ type Options = {
 
 const MOCK_RESPONSE: TodayAccessResponse = {
   accessCount: 2453,
-  trend: "below",
-  trendLabel: "12% abaixo da média diária",
+  trend: "on-average",
+  trendLabel: "Dentro da média diária",
 };
 
 export function useTodayAccessCount({ systemName }: Options) {

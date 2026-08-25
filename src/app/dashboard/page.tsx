@@ -16,6 +16,7 @@ import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
 import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
 import OrdemInscricaoSection from "@/components/dashboard/Metricas/OrdemInscricaoSection";
 import ProvasSection from "@/components/dashboard/Metricas/ProvasSection";
+import SgpSection from "@/components/dashboard/Metricas/SgpSection";
 import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
 import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
 import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
@@ -43,6 +44,7 @@ const SISTEMAS_COM_METRICAS = new Set([
     "Intranet",
     "Serap",
     "Serap Estudantes",
+    "SGP",
 ]);
 
 type FullWidthSectionProps = {
@@ -97,6 +99,7 @@ export default function Dashboard() {
     const isSigPaeMetricas = projectName === "SigPAE";
     const isIntranetMetricas = projectName === "Intranet";
     const isSerapMetricas = projectName === "Serap";
+    const isSgpMetricas = projectName === "SGP";
 
     useEffect(() => {
         if (!showMetricas && activeTabValue === "metricas") {
@@ -294,6 +297,9 @@ export default function Dashboard() {
                         )}
                         {isSerapMetricas && (
                             <ProvasSection systemName={projectName} />
+                        )}
+                        {isSgpMetricas && (
+                            <SgpSection systemName={projectName} />
                         )}
                     </TabsContent>
                 )}

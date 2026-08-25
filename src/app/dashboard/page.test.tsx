@@ -164,8 +164,16 @@ vi.mock("@/components/dashboard/PeakUsageTodayCard", () => ({
 
 vi.mock("@/components/dashboard/UsersByPageCard", () => ({
     __esModule: true,
-    default: ({ systemName }: { systemName?: string }) => (
-        <div data-testid="users-by-page-card">{systemName ?? ""}</div>
+    default: ({
+        systemName,
+        coordenadoria,
+    }: {
+        systemName?: string;
+        coordenadoria?: string;
+    }) => (
+        <div data-testid="users-by-page-card">
+            {systemName ?? ""}::{coordenadoria ?? ""}
+        </div>
     ),
 }));
 
@@ -444,8 +452,27 @@ describe("Dashboard page", () => {
         expect(
             screen.getByTestId("device-distribution-card"),
         ).toHaveTextContent("Novo SGP");
+        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
+            "COPED",
+        );
         expect(screen.getByTestId("peak-hours-chart")).toHaveTextContent(
             "Novo SGP",
+        );
+    });
+
+    test("propaga a coordenadoria CODAE pro UsersByPageCard", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeItem: { title: "CODAE" },
+            activeProject: { ...mockStoreState.activeProject, nome: "SigPAE" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Analytics" }));
+
+        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
+            "SigPAE::CODAE",
         );
     });
 

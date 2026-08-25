@@ -68,8 +68,13 @@ let mockQueryResult: MockQueryResult = {
     refetch: vi.fn(),
 };
 
+let lastCoordenadoriaArg: string | undefined;
+
 vi.mock("@/hooks/useUsersByPage", () => ({
-    useUsersByPage: () => mockQueryResult,
+    useUsersByPage: ({ coordenadoria }: { coordenadoria?: string }) => {
+        lastCoordenadoriaArg = coordenadoria;
+        return mockQueryResult;
+    },
 }));
 
 import UsersByPageCard from "./UsersByPageCard";
@@ -84,6 +89,7 @@ const buildPages = (count: number): UsersByPageResponse["pages"] =>
 describe("<UsersByPageCard />", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        lastCoordenadoriaArg = undefined;
         mockQueryResult = {
             data: undefined,
             isLoading: false,
@@ -96,6 +102,11 @@ describe("<UsersByPageCard />", () => {
     it("sem systemName mostra placeholder", () => {
         render(<UsersByPageCard />);
         expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
+    });
+
+    it("propaga a coordenadoria pro hook", () => {
+        render(<UsersByPageCard systemName="SigPAE" coordenadoria="CODAE" />);
+        expect(lastCoordenadoriaArg).toBe("CODAE");
     });
 
     it("loading mostra skeletons", () => {

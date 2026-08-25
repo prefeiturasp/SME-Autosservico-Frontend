@@ -55,3 +55,8 @@ export type ProvasResponse = {
   items: StatItem[];
   progressPercentage: number;
 };
+
+export type ProgressStatsResponse = {
+  items: StatItem[];
+  progressPercentage: number;
+};

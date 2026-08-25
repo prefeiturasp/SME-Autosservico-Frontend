@@ -164,8 +164,16 @@ vi.mock("@/components/dashboard/PeakUsageTodayCard", () => ({
 
 vi.mock("@/components/dashboard/UsersByPageCard", () => ({
     __esModule: true,
-    default: ({ systemName }: { systemName?: string }) => (
-        <div data-testid="users-by-page-card">{systemName ?? ""}</div>
+    default: ({
+        systemName,
+        coordenadoria,
+    }: {
+        systemName?: string;
+        coordenadoria?: string;
+    }) => (
+        <div data-testid="users-by-page-card">
+            {systemName ?? ""}::{coordenadoria ?? ""}
+        </div>
     ),
 }));
 
@@ -266,6 +274,13 @@ vi.mock("@/components/dashboard/Metricas/ProvasSection", () => ({
     __esModule: true,
     default: ({ systemName }: { systemName?: string }) => (
         <div data-testid="provas-section">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/SgpSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="sgp-section">{systemName ?? ""}</div>
     ),
 }));
 
@@ -437,8 +452,27 @@ describe("Dashboard page", () => {
         expect(
             screen.getByTestId("device-distribution-card"),
         ).toHaveTextContent("Novo SGP");
+        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
+            "COPED",
+        );
         expect(screen.getByTestId("peak-hours-chart")).toHaveTextContent(
             "Novo SGP",
+        );
+    });
+
+    test("propaga a coordenadoria CODAE pro UsersByPageCard", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeItem: { title: "CODAE" },
+            activeProject: { ...mockStoreState.activeProject, nome: "SigPAE" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Analytics" }));
+
+        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
+            "SigPAE::CODAE",
         );
     });
 
@@ -514,6 +548,7 @@ describe("Dashboard page", () => {
             screen.queryByTestId("oportunidades-recrutamento-section"),
         ).not.toBeInTheDocument();
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas com as seções da Intranet quando o projeto ativo é a Intranet", () => {
@@ -556,6 +591,7 @@ describe("Dashboard page", () => {
         ).not.toBeInTheDocument();
         expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas com a seção Provas quando o projeto ativo é o Serap", () => {
@@ -596,6 +632,7 @@ describe("Dashboard page", () => {
         expect(
             screen.queryByTestId("oportunidades-recrutamento-section"),
         ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas apenas com os KPIs genéricos quando o projeto ativo é o Serap Estudantes", () => {
@@ -620,6 +657,48 @@ describe("Dashboard page", () => {
         expect(screen.getByTestId("today-access-card")).toHaveTextContent(
             "Serap Estudantes",
         );
+
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("alimentacao-terceirizada-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("ordem-inscricao-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("oportunidades-recrutamento-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com a seção SGP quando o projeto ativo é o SGP", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "SGP" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "SGP",
+        );
+        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
+            "SGP",
+        );
+        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
+            "SGP",
+        );
+        expect(screen.getByTestId("sgp-section")).toHaveTextContent("SGP");
 
         expect(
             screen.queryByTestId("users-by-profile-card"),

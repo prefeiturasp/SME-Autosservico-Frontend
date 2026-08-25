@@ -53,4 +53,41 @@ describe("useUsersByPage", () => {
       averageUsers: expect.any(Number),
     });
   });
+
+  it("retorna o mock específico do SigPAE quando a coordenadoria é CODAE", async () => {
+    const wrapper = createWrapper();
+
+    const { result } = renderHook(
+      () => useUsersByPage({ systemName: "SigPAE", coordenadoria: "CODAE" }),
+      { wrapper }
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    const paths = result.current.data?.pages.map((page) => page.path);
+    expect(paths).toEqual([
+      "/Página Inicial",
+      "/Lançamento de Medição Inicial",
+      "/Solicitação de Alimentação",
+      "/Fichas Técnicas",
+      "/Acompanhamento de Medição Inicial",
+      "/Cronogramas de Entrega",
+      "/Consulta Dieta Especial",
+    ]);
+  });
+
+  it("retorna o mock genérico quando a coordenadoria não é CODAE", async () => {
+    const wrapper = createWrapper();
+
+    const { result } = renderHook(
+      () => useUsersByPage({ systemName: "Intranet", coordenadoria: "COPED" }),
+      { wrapper }
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(
+      result.current.data?.pages.some((page) => page.path === "/Fichas Técnicas"),
+    ).toBe(false);
+  });
 });

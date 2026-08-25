@@ -20,6 +20,7 @@ import type { AnalyticsPeriod } from "@/types/analyticsPeriod";
 type Props = {
   readonly systemName?: string;
   readonly period?: AnalyticsPeriod;
+  readonly coordenadoria?: string;
   readonly className?: string;
 };
 
@@ -194,10 +195,16 @@ function TableHeader({ sort, onSort }: TableHeaderProps) {
   );
 }
 
-export default function UsersByPageCard({ systemName, period, className }: Props) {
+export default function UsersByPageCard({
+  systemName,
+  period,
+  coordenadoria,
+  className,
+}: Props) {
   const { data, isLoading, isFetching, isError, refetch } = useUsersByPage({
     systemName: systemName ?? "",
     period,
+    coordenadoria,
   });
 
   const [selectedPath, setSelectedPath] = useState<string>(ALL_PAGES_VALUE);

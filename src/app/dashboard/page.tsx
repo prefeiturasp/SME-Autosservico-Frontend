@@ -75,6 +75,7 @@ function FullWidthSection({
 }
 
 export default function Dashboard() {
+    const activeItem = useDashboardStore((state) => state.activeItem);
     const activeProject = useDashboardStore((state) => state.activeProject);
     const setActiveTab = useDashboardStore((state) => state.setActiveTab);
     const activePeriod = useDashboardStore((state) => state.activePeriod);
@@ -330,6 +331,7 @@ export default function Dashboard() {
                             <UsersByPageCard
                                 systemName={projectName}
                                 period={activePeriod}
+                                coordenadoria={activeItem?.title}
                             />
                         </div>
                         <div

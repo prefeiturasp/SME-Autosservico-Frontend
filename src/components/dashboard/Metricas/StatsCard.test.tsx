@@ -96,7 +96,7 @@ describe("<StatsCard />", () => {
     expect(screen.getByText("2")).toHaveStyle({ color: "#075A3E" });
     expect(screen.getByText("3")).toHaveStyle({ color: "#9C6507" });
     expect(screen.getByText("4")).toHaveStyle({ color: "#970C0C" });
-    expect(screen.getByText("5")).toHaveStyle({ color: "#111827" });
+    expect(screen.getByText("5")).toHaveStyle({ color: "#6B7280" });
   });
 
   it("renderiza o slot de action no header quando informado", () => {

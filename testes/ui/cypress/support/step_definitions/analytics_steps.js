@@ -1,143 +1,135 @@
 import { Given, When, Then } from 'cypress-cucumber-preprocessor/steps'
 
-// ========================
-// CONTEXTO
-// ========================
+const INDICADORES_ACESSO = [
+  'Usuários com acesso ativo',
+  'Usuários únicos por dia',
+  'Total de acessos ao sistema hoje'
+]
+
+const STATUS_SORTEIOS = ['Cadastrados', 'Realizados', 'Ativos', 'Encerrados']
+const STATUS_OPORTUNIDADES = [
+  'Oportunidades cadastradas',
+  'CVs cadastrados',
+  'Inscrições realizadas',
+  'Contratações efetivadas'
+]
+
+const localizarTitulo = (titulo) =>
+  cy.contains(titulo, { timeout: 20000, matchCase: false }).should('be.visible')
+
+const fecharSobreposicaoAberta = () => {
+  cy.fecharModalBoasVindasSeExistir()
+
+  cy.get('body', { timeout: 10000 })
+    .should('not.have.attr', 'data-scroll-locked')
+}
 
 Given('que estou no dashboard', () => {
   cy.url({ timeout: 20000 }).should('include', '/dashboard')
 })
 
-// ========================
-// ABA ANALYTICS
-// ========================
-
-Given('que estou na aba Analytics', () => {
+Given('que estou na aba Métricas', () => {
   cy.url({ timeout: 20000 }).should('include', '/dashboard')
+  fecharSobreposicaoAberta()
 
-  cy.contains('[role="tab"]', 'Analytics', { timeout: 20000 })
+  cy.contains('[role="tab"]', /^Métricas$/i, { timeout: 20000 })
     .should('be.visible')
-    .click({ force: true })
-
-  cy.contains('[role="tab"]', 'Analytics')
+    .click()
     .should('have.attr', 'aria-selected', 'true')
 })
 
-// ✔️ CORREÇÃO DEFINITIVA (STEP QUE ESTAVA FALTANDO)
-When('clico na aba {string}', (aba) => {
-  cy.contains('[role="tab"]', aba, { timeout: 20000 })
-    .should('be.visible')
-    .click({ force: true })
+When('acesso a aba {string} do dashboard', (aba) => {
+  fecharSobreposicaoAberta()
 
-  cy.contains('[role="tab"]', aba, { timeout: 20000 })
+  cy.contains('[role="tab"]', new RegExp(`^${aba}$`, 'i'), { timeout: 20000 })
+    .should('be.visible')
+    .click()
+})
+
+Then('a aba {string} deve estar ativa', (aba) => {
+  cy.contains('[role="tab"]', new RegExp(`^${aba}$`, 'i'), { timeout: 20000 })
     .should('have.attr', 'aria-selected', 'true')
 })
 
-// ========================
-// ABA SELECIONADA
-// ========================
-
-Then('a aba {string} deve estar selecionada', (aba) => {
-  cy.contains('[role="tab"]', aba, { timeout: 20000 })
-    .should('be.visible')
-    .and('have.attr', 'aria-selected', 'true')
+Then('devo visualizar o seletor {string}', (rotulo) => {
+  localizarTitulo(rotulo)
+  cy.get('select, [role="combobox"], button[aria-haspopup="listbox"]', { timeout: 20000 })
+    .filter(':visible')
+    .should('have.length.at.least', 1)
 })
 
-// ========================
-// CARDS
-// ========================
-
-Then('devo visualizar o card {string}', (card) => {
-  cy.contains(card, { timeout: 20000 })
-    .should('be.visible')
+Then('devo visualizar a instrução {string}', (instrucao) => {
+  localizarTitulo(instrucao)
 })
 
-Then('o card {string} deve possuir valor', (card) => {
-  cy.contains(card, { timeout: 20000 })
-    .parent()
-    .should('be.visible')
-    .and('not.contain.text', '-')
+Then('devo visualizar os indicadores de acesso', () => {
+  INDICADORES_ACESSO.forEach(localizarTitulo)
 })
 
-// ========================
-// TABELA
-// ========================
-
-Then('devo visualizar as colunas {string}, {string}, {string}, {string}', (c1, c2, c3, c4) => {
-  cy.contains(c1).should('be.visible')
-  cy.contains(c2).should('be.visible')
-  cy.contains(c3).should('be.visible')
-  cy.contains(c4).should('be.visible')
-})
-
-Then('devo visualizar pelo menos uma linha na tabela', () => {
-  cy.get('tbody tr, [role="row"]', { timeout: 20000 })
-    .should('have.length.greaterThan', 0)
-})
-
-// ========================
-// ORDENAÇÃO
-// ========================
-
-When('clico para ordenar por {string}', (coluna) => {
-  cy.contains(coluna, { timeout: 20000 })
-    .click({ force: true })
-})
-
-Then('a ordenação deve ser aplicada', () => {
-  cy.wait(1000)
-})
-
-// ========================
-// FILTRO
-// ========================
-
-When('clico no filtro de páginas', () => {
-  cy.contains('Todas as páginas', { timeout: 20000 })
-    .click({ force: true })
-})
-
-Then('devo visualizar a opção {string}', (opcao) => {
-  cy.contains(opcao, { timeout: 20000 })
-    .should('be.visible')
-})
-
-// ========================
-// DISPOSITIVOS
-// ========================
-
-Then('devo visualizar os tipos {string}, {string} e {string}', (t1, t2, t3) => {
-  cy.contains(t1).should('be.visible')
-  cy.contains(t2).should('be.visible')
-  cy.contains(t3).should('be.visible')
-})
-
-// ========================
-// ALERTA RESPONSIVIDADE
-// ========================
-
-Then('devo visualizar o alerta de responsividade', () => {
-  cy.get('body', { timeout: 20000 }).then(($body) => {
-    const texto = $body.text().toLowerCase()
-
-    const encontrou = [
-      'responsiv',
-      'alerta',
-      'layout',
-      'não é responsivo',
-      'nao é responsivo',
-      'compatível'
-    ].some(t => texto.includes(t))
-
-    expect(encontrou, 'Alerta de responsividade não encontrado').to.eq(true)
+Then('cada indicador de acesso deve exibir um valor numérico', () => {
+  INDICADORES_ACESSO.forEach((indicador) => {
+    cy.contains(indicador, { timeout: 20000 })
+      .parentsUntil('body')
+      .filter((_, elemento) => /\d/.test(elemento.innerText))
+      .first()
+      .invoke('text')
+      .should('match', /\d/)
   })
 })
 
-// ========================
-// HORÁRIOS DE PICO
-// ========================
+Then('devo visualizar a seção {string}', (secao) => {
+  localizarTitulo(secao)
+})
 
-Then('devo visualizar o texto {string}', (texto) => {
-  cy.contains(texto, { matchCase: false, timeout: 20000 })
-    .should('be.visible')
+Then('devo visualizar o resumo de status de sorteios', () => {
+  STATUS_SORTEIOS.forEach(localizarTitulo)
+})
+
+Then('devo visualizar o resumo de status de ordens de inscrição', () => {
+  STATUS_SORTEIOS.forEach(localizarTitulo)
+})
+
+Then('devo visualizar a tabela {string}', (titulo) => {
+  localizarTitulo(titulo)
+})
+
+When('seleciono o período {string} na seção {string}', (periodo, secao) => {
+  localizarTitulo(secao)
+  cy.contains(new RegExp(`^${periodo}$`, 'i'), { timeout: 20000 })
+    .filter(':visible')
+    .first()
+    .click()
+})
+
+Then('o período {string} deve estar disponível na seção {string}', (periodo, secao) => {
+  localizarTitulo(secao)
+  cy.contains(new RegExp(`^${periodo}$`, 'i'), { timeout: 20000 })
+    .filter(':visible')
+    .should('have.length.at.least', 1)
+})
+
+When('solicito mais DREs na tabela {string}', (titulo) => {
+  localizarTitulo(titulo)
+  cy.contains('button', /Ver mais DREs/i, { timeout: 20000 })
+    .filter(':visible')
+    .first()
+    .click()
+})
+
+Then('a tabela {string} deve conter ao menos uma linha', (titulo) => {
+  localizarTitulo(titulo)
+  cy.get('tbody tr', { timeout: 20000 })
+    .filter(':visible')
+    .should('have.length.at.least', 1)
+})
+
+Then('devo visualizar o filtro de mês na tabela {string}', (titulo) => {
+  localizarTitulo(titulo)
+  cy.get('select, [role="combobox"], button[aria-haspopup="listbox"]', { timeout: 20000 })
+    .filter(':visible')
+    .should('have.length.at.least', 1)
+})
+
+Then('devo visualizar os indicadores de oportunidades e recrutamento', () => {
+  STATUS_OPORTUNIDADES.forEach(localizarTitulo)
 })

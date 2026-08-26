@@ -9,18 +9,43 @@ import SonarQualityIndicatorsCard from "@/components/dashboard/DeployHealth/Sona
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
+import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparisonCard";
+import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
+import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
+import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
+import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
+import OrdemInscricaoSection from "@/components/dashboard/Metricas/OrdemInscricaoSection";
+import ProvasSection from "@/components/dashboard/Metricas/ProvasSection";
+import SgpSection from "@/components/dashboard/Metricas/SgpSection";
+import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
+import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
+import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
+import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
 import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
 import Releases from "@/components/dashboard/Releases";
 import Filas from "@/components/dashboard/SaudeDosServidores/Filas";
 import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
+import UsersWithAccessCard from "@/components/dashboard/UsersWithAccessCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
 import { useDeployHealthOnboarding } from "@/hooks/useDeployHealthOnboarding";
 import useDashboardStore from "@/states/dashboard";
+import {
+    DEFAULT_ACCESS_COMPARISON_PERIOD,
+    type AccessComparisonPeriod,
+} from "@/types/accessComparisonPeriod";
 import type { DashboardTab } from "@/types/analyticsPeriod";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const SISTEMAS_COM_METRICAS = new Set([
+    "SigPAE",
+    "Intranet",
+    "Serap",
+    "Serap Estudantes",
+    "SGP",
+]);
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -50,26 +75,46 @@ function FullWidthSection({
 }
 
 export default function Dashboard() {
+    const activeItem = useDashboardStore((state) => state.activeItem);
     const activeProject = useDashboardStore((state) => state.activeProject);
     const setActiveTab = useDashboardStore((state) => state.setActiveTab);
     const activePeriod = useDashboardStore((state) => state.activePeriod);
     const projectName = activeProject?.nome?.trim() ?? "";
     const projectNameFrontEnd =
         activeProject?.zabbixQueryFrontend?.trim() ?? "";
+    const projectNameFrontEndHomolog =
+        activeProject?.zabbixQueryFrontendHomolog?.trim() ?? "";
     const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim() ?? "";
     const projectNameFilasRabbitMQ =
         activeProject?.zabbixQueryFilasRabbitMQ?.trim() ?? "";
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
     const [deployEnvironment, setDeployEnvironment] =
         useState<DeployEnvironment>("producao");
+    const [accessComparisonPeriod, setAccessComparisonPeriod] =
+        useState<AccessComparisonPeriod>(DEFAULT_ACCESS_COMPARISON_PERIOD);
+    const [activeTabValue, setActiveTabValue] = useState("operacional");
     const { triggerDeployTour } = useDeployHealthOnboarding();
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
+
+    const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
+    const isSigPaeMetricas = projectName === "SigPAE";
+    const isIntranetMetricas = projectName === "Intranet";
+    const isSerapMetricas = projectName === "Serap";
+    const isSgpMetricas = projectName === "SGP";
+
+    useEffect(() => {
+        if (!showMetricas && activeTabValue === "metricas") {
+            setActiveTabValue("operacional");
+        }
+    }, [showMetricas, activeTabValue]);
 
     return (
         <div className="bg-background px-6 py-4">
             <Tabs
                 defaultValue="operacional"
+                value={activeTabValue}
                 onValueChange={(value) => {
+                    setActiveTabValue(value);
                     setActiveTab(value as DashboardTab);
                     if (value === "saude-deploy") triggerDeployTour();
                     if (value === "analytics") triggerAnalyticsTour();
@@ -77,6 +122,9 @@ export default function Dashboard() {
             >
                 <TabsList className="mb-6 px-1">
                     <TabsTrigger value="operacional">Operacional</TabsTrigger>
+                    {showMetricas && (
+                        <TabsTrigger value="metricas">Métricas</TabsTrigger>
+                    )}
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
                     <TabsTrigger value="saude-deploy">
                         Saúde do deploy
@@ -84,7 +132,7 @@ export default function Dashboard() {
                 </TabsList>
 
                 <TabsContent value="operacional">
-                    <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
                         <div
                             id="onboarding-lancamentos"
                             className="col-span-2"
@@ -94,12 +142,12 @@ export default function Dashboard() {
                                 subprojects={jenkinsSubprojects}
                             />
                         </div>
+                        <UsersWithAccessCard systemName={projectName} />
                     </div>
-                    <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
                         <CardWrapperInfoAmbientes
                             id="onboarding-disponibilidade"
                             title="Disponibilidade do ambiente"
-                            className="max-w-sm"
                             tooltipContent={
                                 <>
                                     <p className="mb-4">
@@ -117,8 +165,16 @@ export default function Dashboard() {
                             }
                         >
                             <Producao
-                                className="bg-[#F5F5F5] p-3"
+                                className="mb-5 bg-[#F5F5F5] p-3"
                                 projectName={projectNameFrontEnd}
+                                unmonitoredLabel={
+                                    projectName ? "Sem monitoramento" : undefined
+                                }
+                            />
+                            <Producao
+                                title="Homologação"
+                                className="bg-[#F5F5F5] p-3"
+                                projectName={projectNameFrontEndHomolog}
                                 unmonitoredLabel={
                                     projectName ? "Sem monitoramento" : undefined
                                 }
@@ -128,7 +184,6 @@ export default function Dashboard() {
                         <CardWrapperInfoAmbientes
                             id="onboarding-saude-servidor"
                             title="Saúde do servidor (Workloads)"
-                            className="max-w-sm"
                             tooltipContent={
                                 <>
                                     <p className="mb-4">
@@ -167,7 +222,6 @@ export default function Dashboard() {
                         <CardWrapperInfoAmbientes
                             id="onboarding-banco-dados"
                             title="Banco de dados"
-                            className="max-w-sm"
                             tooltipContent={
                                 <>
                                     <p className="mb-4">
@@ -210,6 +264,47 @@ export default function Dashboard() {
                     </FullWidthSection>
                 </TabsContent>
 
+                {showMetricas && (
+                    <TabsContent value="metricas">
+                        <div className="grid grid-cols-3 gap-4 mb-4">
+                            <ActiveUsersMetricCard systemName={projectName} />
+                            <UniqueUsersPerDayCard systemName={projectName} />
+                            <TodayAccessCard systemName={projectName} />
+                        </div>
+                        {isSigPaeMetricas && (
+                            <>
+                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                    <UsersByProfileCard systemName={projectName} />
+                                    <AccessComparisonCard
+                                        systemName={projectName}
+                                        period={accessComparisonPeriod}
+                                        onPeriodChange={setAccessComparisonPeriod}
+                                    />
+                                </div>
+                                <AlimentacaoTerceirizadaSection
+                                    systemName={projectName}
+                                />
+                                <LogisticaSection systemName={projectName} />
+                            </>
+                        )}
+                        {isIntranetMetricas && (
+                            <>
+                                <SorteiosSection systemName={projectName} />
+                                <OrdemInscricaoSection systemName={projectName} />
+                                <OportunidadesRecrutamentoSection
+                                    systemName={projectName}
+                                />
+                            </>
+                        )}
+                        {isSerapMetricas && (
+                            <ProvasSection systemName={projectName} />
+                        )}
+                        {isSgpMetricas && (
+                            <SgpSection systemName={projectName} />
+                        )}
+                    </TabsContent>
+                )}
+
                 <TabsContent value="analytics">
                     <div
                         id="onboarding-analytics-kpis"
@@ -236,6 +331,7 @@ export default function Dashboard() {
                             <UsersByPageCard
                                 systemName={projectName}
                                 period={activePeriod}
+                                coordenadoria={activeItem?.title}
                             />
                         </div>
                         <div

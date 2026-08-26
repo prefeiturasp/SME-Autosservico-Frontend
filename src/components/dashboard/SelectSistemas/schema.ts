@@ -5,6 +5,7 @@ export interface Sistema {
   id: string;
   nome: string;
   zabbixQueryFrontend: string;
+  zabbixQueryFrontendHomolog?: string;
   zabbixQueryBackend: string;
   zabbixQueryFilasRabbitMQ: string;
   zabbixQueryJenkinsJob: string;
@@ -22,6 +23,7 @@ export const SistemaSchema = z.object({
   id: z.string(),
   nome: z.string(),
   zabbixQueryFrontend: z.string(),
+  zabbixQueryFrontendHomolog: z.string().optional(),
   zabbixQueryBackend: z.string(),
   zabbixQueryFilasRabbitMQ: z.string(),
   zabbixQueryJenkinsJob: z.string(),

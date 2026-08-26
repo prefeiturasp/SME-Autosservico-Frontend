@@ -72,7 +72,7 @@ export default function MetricCard({
 
     return (
       <>
-        <div className="text-3xl font-bold text-[#2563EB]">{value}</div>
+        <div className="text-2xl font-bold text-[#3B82F6]">{value}</div>
         <div className="mt-4 flex items-center gap-3">
           {badge ?? (trend && trendLabel && <TrendBadge trend={trend} label={trendLabel} />)}
           {comparison && (
@@ -84,9 +84,14 @@ export default function MetricCard({
   };
 
   return (
-    <Card className={cn("rounded-md shadow-sm gap-3 py-4 px-1", className)}>
+    <Card
+      className={cn(
+        "rounded-md border-0 shadow-[3px_4px_6px_0px_#0000001A] gap-3 py-4 px-1",
+        className,
+      )}
+    >
       <CardHeader className="pb-1 px-4">
-        <CardTitle className="text-base font-bold">{title}</CardTitle>
+        <CardTitle className="text-sm font-bold text-[#111827]">{title}</CardTitle>
       </CardHeader>
       <CardContent className="px-4">{renderContent()}</CardContent>
     </Card>

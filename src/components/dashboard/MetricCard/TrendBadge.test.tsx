@@ -14,20 +14,20 @@ describe("<TrendBadge />", () => {
     render(<TrendBadge trend="above" label="18% acima da média" />);
     const badge = screen.getByText("18% acima da média");
     expect(badge.className).toContain("#D1FAE5");
-    expect(badge.className).toContain("#065F46");
+    expect(badge.className).toContain("#075A3E");
   });
 
   it("aplica estilo vermelho para trend = below", () => {
     render(<TrendBadge trend="below" label="12% abaixo da média" />);
     const badge = screen.getByText("12% abaixo da média");
     expect(badge.className).toContain("#FCE7E7");
-    expect(badge.className).toContain("#991B1B");
+    expect(badge.className).toContain("#970C0C");
   });
 
   it("aplica estilo neutro para trend = on-average", () => {
     render(<TrendBadge trend="on-average" label="Na média" />);
     const badge = screen.getByText("Na média");
     expect(badge.className).toContain("#F3F4F6");
-    expect(badge.className).toContain("#475569");
+    expect(badge.className).toContain("#6B7280");
   });
 });

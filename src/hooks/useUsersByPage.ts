@@ -8,6 +8,7 @@ import {
 type Options = {
   systemName: string;
   period?: AnalyticsPeriod;
+  coordenadoria?: string;
 };
 
 const MOCK_PAGES: UsersByPageResponse["pages"] = [
@@ -23,19 +24,30 @@ const MOCK_PAGES: UsersByPageResponse["pages"] = [
   { path: "/Ajuda", currentUsers: 513, averageUsers: 1305 },
 ];
 
+const MOCK_PAGES_CODAE: UsersByPageResponse["pages"] = [
+  { path: "/Página Inicial", currentUsers: 6820, averageUsers: 7150 },
+  { path: "/Lançamento de Medição Inicial", currentUsers: 5340, averageUsers: 5680 },
+  { path: "/Solicitação de Alimentação", currentUsers: 4210, averageUsers: 4590 },
+  { path: "/Fichas Técnicas", currentUsers: 3175, averageUsers: 3420 },
+  { path: "/Acompanhamento de Medição Inicial", currentUsers: 2680, averageUsers: 2950 },
+  { path: "/Cronogramas de Entrega", currentUsers: 1840, averageUsers: 2100 },
+  { path: "/Consulta Dieta Especial", currentUsers: 1290, averageUsers: 1560 },
+];
+
 export function useUsersByPage({
   systemName,
   period = DEFAULT_ANALYTICS_PERIOD,
+  coordenadoria,
 }: Options) {
   return useQuery<UsersByPageResponse>({
-    queryKey: ["users-by-page", systemName, period],
+    queryKey: ["users-by-page", systemName, period, coordenadoria],
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {
       await new Promise((resolve) => setTimeout(resolve, 300));
       return {
         system: systemName,
-        pages: MOCK_PAGES,
+        pages: coordenadoria === "CODAE" ? MOCK_PAGES_CODAE : MOCK_PAGES,
       };
     },
   });

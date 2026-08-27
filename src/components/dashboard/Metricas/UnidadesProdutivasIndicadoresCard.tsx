@@ -77,11 +77,7 @@ export default function UnidadesProdutivasIndicadoresCard({
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-4">
-                {!systemName ? (
-                    <div className="text-sm text-muted-foreground">
-                        Selecione um projeto
-                    </div>
-                ) : (
+                {systemName ? (
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 items-start gap-4">
                             {renderIndicadores()}
@@ -94,6 +90,10 @@ export default function UnidadesProdutivasIndicadoresCard({
                             bare
                             systemName={systemName}
                         />
+                    </div>
+                ) : (
+                    <div className="text-sm text-muted-foreground">
+                        Selecione um projeto
                     </div>
                 )}
             </CardContent>

@@ -33,11 +33,7 @@ export default function AgendamentosRolesIndicadoresCard({
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-4">
-                {!systemName ? (
-                    <div className="text-sm text-muted-foreground">
-                        Selecione um projeto
-                    </div>
-                ) : (
+                {systemName ? (
                     <div className="space-y-4">
                         <StatsCard
                             bare
@@ -50,6 +46,10 @@ export default function AgendamentosRolesIndicadoresCard({
                             items={data?.items}
                         />
                         <AgendamentosPorDreCard bare systemName={systemName} />
+                    </div>
+                ) : (
+                    <div className="text-sm text-muted-foreground">
+                        Selecione um projeto
                     </div>
                 )}
             </CardContent>

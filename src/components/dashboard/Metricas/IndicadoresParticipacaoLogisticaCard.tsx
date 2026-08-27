@@ -112,11 +112,7 @@ export default function IndicadoresParticipacaoLogisticaCard({
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-4">
-                {!systemName ? (
-                    <div className="text-sm text-muted-foreground">
-                        Selecione um projeto
-                    </div>
-                ) : (
+                {systemName ? (
                     <div className="space-y-4">
                         {renderIndicadores()}
                         <div className="grid grid-cols-2 gap-4">
@@ -126,6 +122,10 @@ export default function IndicadoresParticipacaoLogisticaCard({
                                 systemName={systemName}
                             />
                         </div>
+                    </div>
+                ) : (
+                    <div className="text-sm text-muted-foreground">
+                        Selecione um projeto
                     </div>
                 )}
             </CardContent>

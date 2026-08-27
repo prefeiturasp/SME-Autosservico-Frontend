@@ -1,9 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
 import type { TableRow } from "@/types/metricas";
-
-type Options = {
-  systemName: string;
-};
+import { useTableStats, type TableStatsOptions } from "./_helpers/tableStats";
 
 const MOCK_ROWS: TableRow[] = [
   { label: "Capela do Socorro", value: 15 },
@@ -21,14 +17,6 @@ const MOCK_ROWS: TableRow[] = [
   { label: "São Mateus", value: 4 },
 ];
 
-export function useUesParticipantesPorDre({ systemName }: Options) {
-  return useQuery<TableRow[]>({
-    queryKey: ["ues-participantes-por-dre", systemName],
-    enabled: !!systemName,
-    refetchOnWindowFocus: false,
-    queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return MOCK_ROWS;
-    },
-  });
+export function useUesParticipantesPorDre(options: TableStatsOptions) {
+  return useTableStats("ues-participantes-por-dre", MOCK_ROWS, options);
 }

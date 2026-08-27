@@ -1,17 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardAction,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 import type { ProfileBreakdownBlock } from "@/types/metricas";
-import { RotateCcw } from "lucide-react";
+import MetricasCardShell from "./MetricasCardShell";
+import MetricasErrorState from "./MetricasErrorState";
+import MetricasMessage from "./MetricasMessage";
 
 type Props = {
     readonly title: string;
@@ -44,11 +37,7 @@ export default function ProfileBreakdownCard({
 }: Props) {
     const renderContent = () => {
         if (!systemName) {
-            return (
-                <div className="text-sm text-muted-foreground">
-                    Selecione um projeto
-                </div>
-            );
+            return <MetricasMessage>Selecione um projeto</MetricasMessage>;
         }
 
         if (isLoading) {
@@ -67,22 +56,7 @@ export default function ProfileBreakdownCard({
 
         if (isError || !blocks) {
             return (
-                <div>
-                    <div className="text-sm text-muted-foreground">
-                        {errorMessage}
-                    </div>
-                    {onRetry && (
-                        <Button
-                            onClick={onRetry}
-                            variant="secondary"
-                            size="sm"
-                            className="mt-3"
-                        >
-                            <RotateCcw className="mr-2 h-4 w-4" />
-                            Tentar novamente
-                        </Button>
-                    )}
-                </div>
+                <MetricasErrorState message={errorMessage} onRetry={onRetry} />
             );
         }
 
@@ -121,24 +95,14 @@ export default function ProfileBreakdownCard({
         );
     };
 
-    if (bare) {
-        return <>{renderContent()}</>;
-    }
-
     return (
-        <Card
-            className={cn(
-                "rounded-md border-0 shadow-[3px_4px_6px_0px_#0000001A] gap-3 py-4 px-1",
-                className,
-            )}
+        <MetricasCardShell
+            title={title}
+            action={action}
+            bare={bare}
+            className={className}
         >
-            <CardHeader className="pb-1 px-4">
-                <CardTitle className="text-sm font-bold text-[#111827]">
-                    {title}
-                </CardTitle>
-                {action && <CardAction>{action}</CardAction>}
-            </CardHeader>
-            <CardContent className="px-4">{renderContent()}</CardContent>
-        </Card>
+            {renderContent()}
+        </MetricasCardShell>
     );
 }

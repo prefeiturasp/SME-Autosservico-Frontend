@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import type { StatItem, StatVariant } from "@/types/metricas";
+import type { StatItem } from "@/types/metricas";
 import { RotateCcw } from "lucide-react";
+import StatItemBox from "./StatItemBox";
 
 type Props = {
     readonly title: string;
@@ -23,15 +24,8 @@ type Props = {
     readonly items?: StatItem[];
     readonly progressPercentage?: number;
     readonly action?: React.ReactNode;
+    readonly bare?: boolean;
     readonly className?: string;
-};
-
-const VARIANT_COLORS: Record<StatVariant, string> = {
-    neutral: "#3B82F6",
-    success: "#075A3E",
-    warning: "#9C6507",
-    danger: "#970C0C",
-    muted: "#6B7280",
 };
 
 const PROGRESS_COLOR_OVER_LIMIT = "#F59E0B";
@@ -41,7 +35,6 @@ const PROGRESS_OVER_SEGMENT_UNITS = 10;
 
 const SKELETON_KEYS = ["skeleton-1", "skeleton-2", "skeleton-3", "skeleton-4"];
 
-const ptBrFormatter = new Intl.NumberFormat("pt-BR");
 const percentFormatter = new Intl.NumberFormat("pt-BR", {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -57,6 +50,7 @@ export default function ProgressStatsCard({
     items,
     progressPercentage,
     action,
+    bare,
     className,
 }: Props) {
     const renderContent = () => {
@@ -125,20 +119,7 @@ export default function ProgressStatsCard({
             <div>
                 <div className="flex gap-3">
                     {items.map((item) => (
-                        <div
-                            key={item.label}
-                            className="flex-1 space-y-1 rounded-md border border-[#D8D8D8] p-2"
-                        >
-                            <div
-                                className="text-2xl font-medium"
-                                style={{ color: VARIANT_COLORS[item.variant] }}
-                            >
-                                {ptBrFormatter.format(item.value)}
-                            </div>
-                            <div className="text-sm font-normal text-[#6B7280]">
-                                {item.label}
-                            </div>
-                        </div>
+                        <StatItemBox key={item.label} item={item} />
                     ))}
                 </div>
                 <div className="mt-4 flex items-center gap-3">
@@ -178,6 +159,10 @@ export default function ProgressStatsCard({
             </div>
         );
     };
+
+    if (bare) {
+        return <>{renderContent()}</>;
+    }
 
     return (
         <Card

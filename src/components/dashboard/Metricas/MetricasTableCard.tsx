@@ -28,6 +28,7 @@ type Props = {
     readonly initialVisibleRows?: number;
     readonly expandLabel?: string;
     readonly collapseLabel?: string;
+    readonly bare?: boolean;
     readonly className?: string;
 };
 
@@ -49,6 +50,7 @@ export default function MetricasTableCard({
     initialVisibleRows,
     expandLabel = "Ver mais",
     collapseLabel = "Ver menos",
+    bare,
     className,
 }: Props) {
     const [expanded, setExpanded] = useState(false);
@@ -103,19 +105,24 @@ export default function MetricasTableCard({
 
         return (
             <div className="overflow-hidden rounded-md border border-[#D8D8D8]">
+                {bare && (
+                    <div className="px-3 pt-3 text-sm font-bold text-[#111827]">
+                        {title}
+                    </div>
+                )}
                 <div className="px-3">
                     <table className="w-full table-fixed border-collapse">
                         <thead>
                             <tr className="border-b border-[#D8D8D8] text-sm text-[#111827]">
                                 <th
                                     scope="col"
-                                    className="pt-3 pb-2 text-left font-medium"
+                                    className="pt-3 pb-2 text-left font-medium text-[#111827]"
                                 >
                                     {firstColumnLabel}
                                 </th>
                                 <th
                                     scope="col"
-                                    className="w-24 pt-3 pb-2 text-right font-medium"
+                                    className="w-25 pt-3 pb-2 text-right font-medium text-[#111827]"
                                 >
                                     {secondColumnLabel}
                                 </th>
@@ -156,6 +163,10 @@ export default function MetricasTableCard({
             </div>
         );
     };
+
+    if (bare) {
+        return <>{renderContent()}</>;
+    }
 
     return (
         <Card

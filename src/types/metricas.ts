@@ -18,6 +18,12 @@ export type TodayAccessResponse = {
     trendLabel: string;
 };
 
+export type UesAptasPrestarContasResponse = {
+    count: number;
+    trend: MetricTrend;
+    trendLabel: string;
+};
+
 export type UsersByProfileResponse = {
     codae: number;
     dre: number;

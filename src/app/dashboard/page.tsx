@@ -13,6 +13,7 @@ import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparis
 import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
 import AgendamentosRolesSection from "@/components/dashboard/Metricas/AgendamentosRolesSection";
 import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
+import BensFisicosSection from "@/components/dashboard/Metricas/BensFisicosSection";
 import IndicadoresParticipacaoLogisticaSection from "@/components/dashboard/Metricas/IndicadoresParticipacaoLogisticaSection";
 import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
 import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
@@ -49,9 +50,13 @@ const SISTEMAS_COM_METRICAS = new Set([
     "Serap Estudantes",
     "SGP",
     "Rolê Agroecológico",
+    "Bens Físicos",
 ]);
 
-const SISTEMAS_SEM_KPIS_GENERICOS = new Set(["Rolê Agroecológico"]);
+const SISTEMAS_SEM_KPIS_GENERICOS = new Set([
+    "Rolê Agroecológico",
+    "Bens Físicos",
+]);
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -137,6 +142,7 @@ export default function Dashboard() {
                 <AgendamentosRolesSection systemName={projectName} />
             </>
         ),
+        "Bens Físicos": <BensFisicosSection systemName={projectName} />,
     };
 
     useEffect(() => {

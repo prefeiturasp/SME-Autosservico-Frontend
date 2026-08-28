@@ -6,6 +6,7 @@ export const AREAS_POR_COORDENADORIA: Record<string, AreaAcesso[]> = {
     COGEP: ["Operacional", "Métricas", "Analytics"],
     COPED: ["Operacional", "Métricas", "Analytics", "Saúde do deploy"],
     COPLAN: ["Operacional"],
+    COSERV: ["Operacional", "Métricas", "Saúde do deploy"],
     COTIC: ["Operacional", "Métricas", "Analytics"],
     GIPE: ["Operacional", "Métricas", "Analytics", "Saúde do deploy"],
 };

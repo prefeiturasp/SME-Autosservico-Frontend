@@ -284,6 +284,32 @@ vi.mock("@/components/dashboard/Metricas/SgpSection", () => ({
     ),
 }));
 
+vi.mock(
+    "@/components/dashboard/Metricas/IndicadoresParticipacaoLogisticaSection",
+    () => ({
+        __esModule: true,
+        default: ({ systemName }: { systemName?: string }) => (
+            <div data-testid="indicadores-participacao-logistica-section">
+                {systemName ?? ""}
+            </div>
+        ),
+    }),
+);
+
+vi.mock("@/components/dashboard/Metricas/UnidadesProdutivasSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="unidades-produtivas-section">{systemName ?? ""}</div>
+    ),
+}));
+
+vi.mock("@/components/dashboard/Metricas/AgendamentosRolesSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="agendamentos-roles-section">{systemName ?? ""}</div>
+    ),
+}));
+
 describe("Dashboard page", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -549,6 +575,15 @@ describe("Dashboard page", () => {
         ).not.toBeInTheDocument();
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("indicadores-participacao-logistica-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unidades-produtivas-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("agendamentos-roles-section"),
+        ).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas com as seções da Intranet quando o projeto ativo é a Intranet", () => {
@@ -592,6 +627,15 @@ describe("Dashboard page", () => {
         expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("indicadores-participacao-logistica-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unidades-produtivas-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("agendamentos-roles-section"),
+        ).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas com a seção Provas quando o projeto ativo é o Serap", () => {
@@ -633,6 +677,15 @@ describe("Dashboard page", () => {
             screen.queryByTestId("oportunidades-recrutamento-section"),
         ).not.toBeInTheDocument();
         expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("indicadores-participacao-logistica-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unidades-produtivas-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("agendamentos-roles-section"),
+        ).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas apenas com os KPIs genéricos quando o projeto ativo é o Serap Estudantes", () => {
@@ -677,6 +730,15 @@ describe("Dashboard page", () => {
         ).not.toBeInTheDocument();
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("indicadores-participacao-logistica-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unidades-produtivas-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("agendamentos-roles-section"),
+        ).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas com a seção SGP quando o projeto ativo é o SGP", () => {
@@ -718,6 +780,66 @@ describe("Dashboard page", () => {
             screen.queryByTestId("oportunidades-recrutamento-section"),
         ).not.toBeInTheDocument();
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("indicadores-participacao-logistica-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unidades-produtivas-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("agendamentos-roles-section"),
+        ).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com as seções do Rolê Agroecológico quando o projeto ativo é o Rolê Agroecológico", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: {
+                ...mockStoreState.activeProject,
+                nome: "Rolê Agroecológico",
+            },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(
+            screen.getByTestId("indicadores-participacao-logistica-section"),
+        ).toHaveTextContent("Rolê Agroecológico");
+        expect(
+            screen.getByTestId("unidades-produtivas-section"),
+        ).toHaveTextContent("Rolê Agroecológico");
+        expect(
+            screen.getByTestId("agendamentos-roles-section"),
+        ).toHaveTextContent("Rolê Agroecológico");
+
+        expect(
+            screen.queryByTestId("active-users-metric-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unique-users-per-day-card"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("alimentacao-terceirizada-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("ordem-inscricao-section"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("oportunidades-recrutamento-section"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
     });
 
     test("volta para a aba Operacional se o projeto mudar para um sistema sem Métricas", () => {

@@ -28,6 +28,7 @@ const VARIANT_COLORS: Record<StatVariant, string> = {
     warning: "#9C6507",
     danger: "#970C0C",
     muted: "#6B7280",
+    normal: "#111827",
 };
 
 const SKELETON_KEYS = ["skeleton-1", "skeleton-2", "skeleton-3", "skeleton-4"];

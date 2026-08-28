@@ -1,6 +1,5 @@
 "use client";
 
-import type { TableRow } from "@/types/metricas";
 import { useState } from "react";
 import MetricasCardShell from "./MetricasCardShell";
 import MetricasErrorState from "./MetricasErrorState";
@@ -15,11 +14,9 @@ type Props = {
     readonly isError?: boolean;
     readonly onRetry?: () => void;
     readonly errorMessage?: string;
-    readonly rows?: TableRow[];
-    readonly firstColumnLabel: string;
-    readonly secondColumnLabel: string;
+    readonly items?: string[];
     readonly action?: React.ReactNode;
-    readonly initialVisibleRows?: number;
+    readonly initialVisibleItems?: number;
     readonly expandLabel?: string;
     readonly collapseLabel?: string;
     readonly bare?: boolean;
@@ -28,20 +25,16 @@ type Props = {
 
 const SKELETON_KEYS = ["skeleton-1", "skeleton-2", "skeleton-3"];
 
-const ptBrFormatter = new Intl.NumberFormat("pt-BR");
-
-export default function MetricasTableCard({
+export default function SimpleListCard({
     title,
     systemName,
     isLoading,
     isError,
     onRetry,
     errorMessage = "Não foi possível carregar os dados.",
-    rows,
-    firstColumnLabel,
-    secondColumnLabel,
+    items,
     action,
-    initialVisibleRows,
+    initialVisibleItems,
     expandLabel = "Ver mais",
     collapseLabel = "Ver menos",
     bare,
@@ -64,58 +57,36 @@ export default function MetricasTableCard({
             );
         }
 
-        if (isError || !rows) {
+        if (isError || !items) {
             return (
                 <MetricasErrorState message={errorMessage} onRetry={onRetry} />
             );
         }
 
         const canExpand =
-            initialVisibleRows !== undefined &&
-            rows.length > initialVisibleRows;
-        const visibleRows =
-            expanded || initialVisibleRows === undefined
-                ? rows
-                : rows.slice(0, initialVisibleRows);
+            initialVisibleItems !== undefined &&
+            items.length > initialVisibleItems;
+        const visibleItems =
+            expanded || initialVisibleItems === undefined
+                ? items
+                : items.slice(0, initialVisibleItems);
 
         return (
             <div className="overflow-hidden rounded-md border border-[#D8D8D8]">
                 {bare && (
-                    <div className="px-3 pt-3 text-sm font-bold text-[#111827]">
+                    <div className="px-3 py-3 text-sm font-bold text-[#111827]">
                         {title}
                     </div>
                 )}
                 <div className="px-3">
-                    <table className="w-full table-fixed border-collapse">
-                        <thead>
-                            <tr className="border-b border-[#D8D8D8] text-sm text-[#111827]">
-                                <th
-                                    scope="col"
-                                    className="pt-3 pb-2 text-left font-medium text-[#111827]"
-                                >
-                                    {firstColumnLabel}
-                                </th>
-                                <th
-                                    scope="col"
-                                    className="w-25 pt-3 pb-2 text-right font-medium text-[#111827]"
-                                >
-                                    {secondColumnLabel}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {visibleRows.map((row) => (
-                                <tr key={row.label}>
-                                    <td className="py-3 align-middle text-xs font-normal text-[#111827]">
-                                        {row.label}
-                                    </td>
-                                    <td className="py-3 align-middle text-right text-sm font-medium text-[#111827]">
-                                        {ptBrFormatter.format(row.value)}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    {visibleItems.map((item) => (
+                        <div
+                            key={item}
+                            className="py-2 text-xs font-normal text-[#111827]"
+                        >
+                            {item}
+                        </div>
+                    ))}
                 </div>
                 {canExpand && (
                     <MetricasExpandToggle

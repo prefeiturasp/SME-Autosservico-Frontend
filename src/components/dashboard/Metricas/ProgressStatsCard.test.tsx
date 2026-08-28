@@ -112,4 +112,22 @@ describe("<ProgressStatsCard />", () => {
     });
     expect(screen.getByText("122,3%")).toHaveStyle({ color: "#F59E0B" });
   });
+
+  it("bare renderiza só o conteúdo, sem o card/título", () => {
+    render(
+      <ProgressStatsCard
+        title="Vivências com refeição"
+        systemName="Rolê Agroecológico"
+        bare
+        items={[
+          { label: "Vivências que incluíram refeição", value: 156, variant: "neutral" },
+        ]}
+        progressPercentage={84.8}
+      />,
+    );
+
+    expect(screen.queryByText("Vivências com refeição")).not.toBeInTheDocument();
+    expect(screen.getByText("156")).toBeInTheDocument();
+    expect(screen.getByText("84,8%")).toBeInTheDocument();
+  });
 });

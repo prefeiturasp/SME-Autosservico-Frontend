@@ -153,4 +153,22 @@ describe("<MetricasTableCard />", () => {
 
     expect(screen.getByTestId("period-switcher")).toBeInTheDocument();
   });
+
+  it("bare renderiza sem o card externo, mas com o título dentro da caixa da tabela", () => {
+    render(
+      <MetricasTableCard
+        title="Inscrições em sorteios por DRE"
+        systemName="Intranet"
+        firstColumnLabel="DRE"
+        secondColumnLabel="Inscrições"
+        rows={[{ label: "Ipiranga", value: 12 }]}
+        bare
+      />
+    );
+
+    expect(
+      screen.getByText("Inscrições em sorteios por DRE"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Ipiranga")).toBeInTheDocument();
+  });
 });

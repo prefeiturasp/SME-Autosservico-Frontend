@@ -11,7 +11,10 @@ import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Produca
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
 import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparisonCard";
 import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
+import AgendamentosRolesSection from "@/components/dashboard/Metricas/AgendamentosRolesSection";
 import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
+import BensFisicosSection from "@/components/dashboard/Metricas/BensFisicosSection";
+import IndicadoresParticipacaoLogisticaSection from "@/components/dashboard/Metricas/IndicadoresParticipacaoLogisticaSection";
 import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
 import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
 import OrdemInscricaoSection from "@/components/dashboard/Metricas/OrdemInscricaoSection";
@@ -19,6 +22,7 @@ import ProvasSection from "@/components/dashboard/Metricas/ProvasSection";
 import SgpSection from "@/components/dashboard/Metricas/SgpSection";
 import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
 import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
+import UnidadesProdutivasSection from "@/components/dashboard/Metricas/UnidadesProdutivasSection";
 import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
 import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
 import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
@@ -45,6 +49,13 @@ const SISTEMAS_COM_METRICAS = new Set([
     "Serap",
     "Serap Estudantes",
     "SGP",
+    "Rolê Agroecológico",
+    "Bens Físicos",
+]);
+
+const SISTEMAS_SEM_KPIS_GENERICOS = new Set([
+    "Rolê Agroecológico",
+    "Bens Físicos",
 ]);
 
 type FullWidthSectionProps = {
@@ -97,10 +108,42 @@ export default function Dashboard() {
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
 
     const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
-    const isSigPaeMetricas = projectName === "SigPAE";
-    const isIntranetMetricas = projectName === "Intranet";
-    const isSerapMetricas = projectName === "Serap";
-    const isSgpMetricas = projectName === "SGP";
+
+    const metricasContentBySistema: Record<string, React.ReactNode> = {
+        SigPAE: (
+            <>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                    <UsersByProfileCard systemName={projectName} />
+                    <AccessComparisonCard
+                        systemName={projectName}
+                        period={accessComparisonPeriod}
+                        onPeriodChange={setAccessComparisonPeriod}
+                    />
+                </div>
+                <AlimentacaoTerceirizadaSection systemName={projectName} />
+                <LogisticaSection systemName={projectName} />
+            </>
+        ),
+        Intranet: (
+            <>
+                <SorteiosSection systemName={projectName} />
+                <OrdemInscricaoSection systemName={projectName} />
+                <OportunidadesRecrutamentoSection systemName={projectName} />
+            </>
+        ),
+        Serap: <ProvasSection systemName={projectName} />,
+        SGP: <SgpSection systemName={projectName} />,
+        "Rolê Agroecológico": (
+            <>
+                <IndicadoresParticipacaoLogisticaSection
+                    systemName={projectName}
+                />
+                <UnidadesProdutivasSection systemName={projectName} />
+                <AgendamentosRolesSection systemName={projectName} />
+            </>
+        ),
+        "Bens Físicos": <BensFisicosSection systemName={projectName} />,
+    };
 
     useEffect(() => {
         if (!showMetricas && activeTabValue === "metricas") {
@@ -266,42 +309,14 @@ export default function Dashboard() {
 
                 {showMetricas && (
                     <TabsContent value="metricas">
-                        <div className="grid grid-cols-3 gap-4 mb-4">
-                            <ActiveUsersMetricCard systemName={projectName} />
-                            <UniqueUsersPerDayCard systemName={projectName} />
-                            <TodayAccessCard systemName={projectName} />
-                        </div>
-                        {isSigPaeMetricas && (
-                            <>
-                                <div className="grid grid-cols-2 gap-4 mb-4">
-                                    <UsersByProfileCard systemName={projectName} />
-                                    <AccessComparisonCard
-                                        systemName={projectName}
-                                        period={accessComparisonPeriod}
-                                        onPeriodChange={setAccessComparisonPeriod}
-                                    />
-                                </div>
-                                <AlimentacaoTerceirizadaSection
-                                    systemName={projectName}
-                                />
-                                <LogisticaSection systemName={projectName} />
-                            </>
+                        {!SISTEMAS_SEM_KPIS_GENERICOS.has(projectName) && (
+                            <div className="grid grid-cols-3 gap-4 mb-4">
+                                <ActiveUsersMetricCard systemName={projectName} />
+                                <UniqueUsersPerDayCard systemName={projectName} />
+                                <TodayAccessCard systemName={projectName} />
+                            </div>
                         )}
-                        {isIntranetMetricas && (
-                            <>
-                                <SorteiosSection systemName={projectName} />
-                                <OrdemInscricaoSection systemName={projectName} />
-                                <OportunidadesRecrutamentoSection
-                                    systemName={projectName}
-                                />
-                            </>
-                        )}
-                        {isSerapMetricas && (
-                            <ProvasSection systemName={projectName} />
-                        )}
-                        {isSgpMetricas && (
-                            <SgpSection systemName={projectName} />
-                        )}
+                        {metricasContentBySistema[projectName]}
                     </TabsContent>
                 )}
 

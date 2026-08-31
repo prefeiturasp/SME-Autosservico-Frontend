@@ -111,4 +111,31 @@ describe("<StatsCard />", () => {
 
     expect(screen.getByTestId("period-switcher")).toBeInTheDocument();
   });
+
+  it("renderiza os itens em layout flex", () => {
+    render(
+      <StatsCard
+        title="Indicador"
+        systemName="SigPAE"
+        items={[{ label: "Neutro", value: 1, variant: "neutral" }]}
+      />
+    );
+
+    const container = screen.getByTestId("stats-card-items");
+    expect(container).toHaveClass("flex");
+  });
+
+  it("bare renderiza só o conteúdo, sem o card/título", () => {
+    render(
+      <StatsCard
+        title="Indicador"
+        systemName="SigPAE"
+        bare
+        items={[{ label: "Neutro", value: 1, variant: "neutral" }]}
+      />
+    );
+
+    expect(screen.queryByText("Indicador")).not.toBeInTheDocument();
+    expect(screen.getByText("1")).toBeInTheDocument();
+  });
 });

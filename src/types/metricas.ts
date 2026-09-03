@@ -52,6 +52,7 @@ export type StatItem = {
     label: string;
     value: number;
     variant: StatVariant;
+    format?: "number" | "currency";
 };
 
 export type StatsCardResponse = {

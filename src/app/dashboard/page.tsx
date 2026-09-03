@@ -20,6 +20,7 @@ import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/Op
 import OrdemInscricaoSection from "@/components/dashboard/Metricas/OrdemInscricaoSection";
 import ProvasSection from "@/components/dashboard/Metricas/ProvasSection";
 import SgpSection from "@/components/dashboard/Metricas/SgpSection";
+import SigEscolaSection from "@/components/dashboard/Metricas/SigEscolaSection";
 import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
 import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
 import UnidadesProdutivasSection from "@/components/dashboard/Metricas/UnidadesProdutivasSection";
@@ -51,11 +52,13 @@ const SISTEMAS_COM_METRICAS = new Set([
     "SGP",
     "Rolê Agroecológico",
     "Bens Físicos",
+    "SigEscola",
 ]);
 
 const SISTEMAS_SEM_KPIS_GENERICOS = new Set([
     "Rolê Agroecológico",
     "Bens Físicos",
+    "SigEscola",
 ]);
 
 type FullWidthSectionProps = {
@@ -143,6 +146,7 @@ export default function Dashboard() {
             </>
         ),
         "Bens Físicos": <BensFisicosSection systemName={projectName} />,
+        SigEscola: <SigEscolaSection systemName={projectName} />,
     };
 
     useEffect(() => {

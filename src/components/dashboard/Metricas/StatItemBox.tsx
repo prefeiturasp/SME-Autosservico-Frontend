@@ -16,8 +16,15 @@ const VARIANT_COLORS: Record<StatVariant, string> = {
 };
 
 const ptBrFormatter = new Intl.NumberFormat("pt-BR");
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+});
 
 export default function StatItemBox({ item, className }: Props) {
+    const formatter =
+        item.format === "currency" ? currencyFormatter : ptBrFormatter;
+
     return (
         <div
             className={cn(
@@ -29,7 +36,7 @@ export default function StatItemBox({ item, className }: Props) {
                 className="text-2xl font-medium"
                 style={{ color: VARIANT_COLORS[item.variant] }}
             >
-                {ptBrFormatter.format(item.value)}
+                {formatter.format(item.value)}
             </div>
             <div className="text-sm font-normal text-[#6B7280]">
                 {item.label}

@@ -24,7 +24,7 @@ type Props = {
 };
 
 const PROGRESS_COLOR_OVER_LIMIT = "#F59E0B";
-const PROGRESS_COLOR_WITHIN_LIMIT = "#1E3A8A";
+const PROGRESS_COLOR_WITHIN_LIMIT = "#3B82F6";
 const PROGRESS_SCALE_OVER_LIMIT = 120;
 const PROGRESS_OVER_SEGMENT_UNITS = 10;
 
@@ -92,7 +92,7 @@ export default function ProgressStatsCard({
                         <StatItemBox key={item.label} item={item} />
                     ))}
                 </div>
-                <div className="mt-4 flex items-center gap-3">
+                <div className="flex items-center gap-3">
                     <div
                         className="flex h-[18px] flex-1 overflow-hidden rounded-full bg-[#E5E7EB]"
                         aria-hidden="true"
@@ -105,7 +105,7 @@ export default function ProgressStatsCard({
                             )}
                             style={{
                                 width: `${baseWidth}%`,
-                                backgroundColor: PROGRESS_COLOR_WITHIN_LIMIT,
+                                backgroundColor: "#1E3A8A",
                             }}
                         />
                         {isOverLimit && (

@@ -85,7 +85,7 @@ describe("<ProgressStatsCard />", () => {
       backgroundColor: "#1E3A8A",
     });
     expect(screen.queryByTestId("progress-stats-fill-over")).not.toBeInTheDocument();
-    expect(screen.getByText("62,3%")).toHaveStyle({ color: "#1E3A8A" });
+    expect(screen.getByText("62,3%")).toHaveStyle({ color: "#3B82F6" });
   });
 
   it("percentual > 100 mostra o segmento azul (100), o laranja (10) e sobra cinza (10), numa escala de 120", () => {

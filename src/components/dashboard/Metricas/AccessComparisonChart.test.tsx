@@ -18,17 +18,22 @@ vi.mock("recharts", () => {
 
   function MockBarChart({
     data,
+    barCategoryGap,
+    children,
   }: {
     readonly data: Array<AccessComparisonBucket & { fill: string }>;
+    readonly barCategoryGap?: number | string;
+    readonly children?: React.ReactNode;
   }) {
     return (
-      <div data-testid="bar-chart">
+      <div data-testid="bar-chart" data-bar-category-gap={String(barCategoryGap)}>
         {data.map((bucket) => (
           <div key={bucket.label} data-testid={`bucket-${bucket.label}`}>
             <span data-testid="bucket-value">{bucket.value}</span>
             <span data-testid="bucket-fill">{bucket.fill}</span>
           </div>
         ))}
+        {children}
       </div>
     );
   }
@@ -37,8 +42,26 @@ vi.mock("recharts", () => {
     return <div data-testid="bar" data-key={dataKey} />;
   }
 
-  function MockXAxis({ dataKey }: { readonly dataKey: string }) {
-    return <div data-testid="x-axis" data-key={dataKey} />;
+  type TickRenderer = (props: {
+    payload: { value: string };
+  }) => React.ReactNode;
+
+  function MockXAxis({
+    dataKey,
+    tick,
+  }: {
+    readonly dataKey: string;
+    readonly tick?: TickRenderer | object;
+  }) {
+    return (
+      <div data-testid="x-axis" data-key={dataKey}>
+        {typeof tick === "function" && (
+          <svg data-testid="x-axis-custom-tick-mes-2">
+            {tick({ payload: { value: "Mês 2" } })}
+          </svg>
+        )}
+      </div>
+    );
   }
 
   function MockYAxis() {
@@ -91,5 +114,35 @@ describe("<AccessComparisonChart />", () => {
     expect(
       screen.getByTestId("bucket-Mês 2").querySelector('[data-testid="bucket-value"]')
     ).toHaveTextContent("58900");
+  });
+
+  it("usa '30%' de barCategoryGap por padrão, sem highlightPeakLabel", () => {
+    render(<AccessComparisonChart buckets={BUCKETS} />);
+
+    expect(screen.getByTestId("bar-chart")).toHaveAttribute(
+      "data-bar-category-gap",
+      "30%",
+    );
+    expect(
+      screen.queryByTestId("x-axis-custom-tick-mes-2"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("repassa um barCategoryGap customizado", () => {
+    render(<AccessComparisonChart buckets={BUCKETS} barCategoryGap={5} />);
+
+    expect(screen.getByTestId("bar-chart")).toHaveAttribute(
+      "data-bar-category-gap",
+      "5",
+    );
+  });
+
+  it("com highlightPeakLabel, o tick do mês de pico fica em #111827 bold 12px", () => {
+    render(<AccessComparisonChart buckets={BUCKETS} highlightPeakLabel />);
+
+    const tickText = screen.getByText("Mês 2");
+    expect(tickText).toHaveAttribute("fill", "#111827");
+    expect(tickText).toHaveAttribute("font-weight", "bold");
+    expect(tickText).toHaveAttribute("font-size", "12");
   });
 });

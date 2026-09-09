@@ -1,3 +1,4 @@
+import { TrendBadge } from "@/components/dashboard/MetricCard/TrendBadge";
 import { cn } from "@/lib/utils";
 import type { StatItem, StatVariant } from "@/types/metricas";
 
@@ -21,10 +22,17 @@ const currencyFormatter = new Intl.NumberFormat("pt-BR", {
     currency: "BRL",
 });
 
-export default function StatItemBox({ item, className }: Props) {
-    const formatter =
-        item.format === "currency" ? currencyFormatter : ptBrFormatter;
+function formatValue(item: StatItem): string {
+    if (item.format === "currency") {
+        return currencyFormatter.format(item.value);
+    }
+    if (item.format === "days") {
+        return `${ptBrFormatter.format(item.value)} dias`;
+    }
+    return ptBrFormatter.format(item.value);
+}
 
+export default function StatItemBox({ item, className }: Props) {
     return (
         <div
             className={cn(
@@ -36,11 +44,14 @@ export default function StatItemBox({ item, className }: Props) {
                 className="text-2xl font-medium"
                 style={{ color: VARIANT_COLORS[item.variant] }}
             >
-                {formatter.format(item.value)}
+                {formatValue(item)}
             </div>
             <div className="text-sm font-normal text-[#6B7280]">
                 {item.label}
             </div>
+            {item.trend && item.trendLabel && (
+                <TrendBadge trend={item.trend} label={item.trendLabel} />
+            )}
         </div>
     );
 }

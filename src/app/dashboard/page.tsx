@@ -23,6 +23,7 @@ import EscolhasSection from "@/components/dashboard/Metricas/EscolhasSection";
 import FluxoDeAtendimentoSection from "@/components/dashboard/Metricas/FluxoDeAtendimentoSection";
 import GestaoSection from "@/components/dashboard/Metricas/GestaoSection";
 import IndicadoresParticipacaoLogisticaSection from "@/components/dashboard/Metricas/IndicadoresParticipacaoLogisticaSection";
+import LimpezaSection from "@/components/dashboard/Metricas/LimpezaSection";
 import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
 import OcorrenciasSection from "@/components/dashboard/Metricas/OcorrenciasSection";
 import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
@@ -72,6 +73,7 @@ const SISTEMAS_COM_METRICAS = new Set([
     "SigEscola",
     "Sigla",
     "GIPE",
+    "Limpeza",
 ]);
 
 const SISTEMAS_SEM_KPIS_GENERICOS = new Set([
@@ -80,6 +82,7 @@ const SISTEMAS_SEM_KPIS_GENERICOS = new Set([
     "SigEscola",
     "Sigla",
     "GIPE",
+    "Limpeza",
 ]);
 
 type FullWidthSectionProps = {
@@ -197,6 +200,7 @@ export default function Dashboard() {
                 <ProdutividadeSection systemName={projectName} />
             </>
         ),
+        Limpeza: <LimpezaSection systemName={projectName} />,
     };
 
     useEffect(() => {

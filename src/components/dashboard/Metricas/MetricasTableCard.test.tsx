@@ -154,6 +154,35 @@ describe("<MetricasTableCard />", () => {
     expect(screen.getByTestId("period-switcher")).toBeInTheDocument();
   });
 
+  it("com valueFormat='currency', formata a 2ª coluna como moeda", () => {
+    render(
+      <MetricasTableCard
+        title="Valores pagos no mês por prestador"
+        systemName="Limpeza"
+        firstColumnLabel="Prestador"
+        secondColumnLabel="Valor pago"
+        rows={[{ label: "Prestador 1", value: 4350 }]}
+        valueFormat="currency"
+      />
+    );
+
+    expect(screen.getByText("R$ 4.350,00")).toBeInTheDocument();
+  });
+
+  it("sem valueFormat, mantém a formatação numérica padrão", () => {
+    render(
+      <MetricasTableCard
+        title="Indicador"
+        systemName="Intranet"
+        firstColumnLabel="Tipo"
+        secondColumnLabel="Quantidade"
+        rows={[{ label: "Único", value: 4350 }]}
+      />
+    );
+
+    expect(screen.getByText("4.350")).toBeInTheDocument();
+  });
+
   it("bare renderiza sem o card externo, mas com o título dentro da caixa da tabela", () => {
     render(
       <MetricasTableCard

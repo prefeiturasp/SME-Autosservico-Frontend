@@ -18,6 +18,7 @@ type Props = {
     readonly rows?: TableRow[];
     readonly firstColumnLabel: string;
     readonly secondColumnLabel: string;
+    readonly valueFormat?: "number" | "currency";
     readonly action?: React.ReactNode;
     readonly initialVisibleRows?: number;
     readonly expandLabel?: string;
@@ -29,6 +30,10 @@ type Props = {
 const SKELETON_KEYS = ["skeleton-1", "skeleton-2", "skeleton-3"];
 
 const ptBrFormatter = new Intl.NumberFormat("pt-BR");
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+});
 
 export default function MetricasTableCard({
     title,
@@ -40,6 +45,7 @@ export default function MetricasTableCard({
     rows,
     firstColumnLabel,
     secondColumnLabel,
+    valueFormat = "number",
     action,
     initialVisibleRows,
     expandLabel = "Ver mais",
@@ -110,7 +116,11 @@ export default function MetricasTableCard({
                                         {row.label}
                                     </td>
                                     <td className="py-3 align-middle text-right text-sm font-medium text-[#111827]">
-                                        {ptBrFormatter.format(row.value)}
+                                        {valueFormat === "currency"
+                                            ? currencyFormatter.format(
+                                                  row.value,
+                                              )
+                                            : ptBrFormatter.format(row.value)}
                                     </td>
                                 </tr>
                             ))}

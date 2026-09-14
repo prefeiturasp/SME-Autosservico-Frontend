@@ -10,21 +10,40 @@ import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCar
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
 import JenkinsJob from "@/components/dashboard/JenkinsJob";
 import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparisonCard";
+import AcessoAtivoGipeCard from "@/components/dashboard/Metricas/AcessoAtivoGipeCard";
+import AcessoAtivoSiglaCard from "@/components/dashboard/Metricas/AcessoAtivoSiglaCard";
 import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
 import AgendamentosRolesSection from "@/components/dashboard/Metricas/AgendamentosRolesSection";
 import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
 import BensFisicosSection from "@/components/dashboard/Metricas/BensFisicosSection";
+import CandidatosSection from "@/components/dashboard/Metricas/CandidatosSection";
+import ConvocacaoSection from "@/components/dashboard/Metricas/ConvocacaoSection";
+import DistribuicaoSection from "@/components/dashboard/Metricas/DistribuicaoSection";
+import EscolhasSection from "@/components/dashboard/Metricas/EscolhasSection";
+import FluxoDeAtendimentoSection from "@/components/dashboard/Metricas/FluxoDeAtendimentoSection";
+import GestaoSection from "@/components/dashboard/Metricas/GestaoSection";
 import IndicadoresParticipacaoLogisticaSection from "@/components/dashboard/Metricas/IndicadoresParticipacaoLogisticaSection";
+import LimpezaSection from "@/components/dashboard/Metricas/LimpezaSection";
 import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
+import OcorrenciasSection from "@/components/dashboard/Metricas/OcorrenciasSection";
 import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
 import OrdemInscricaoSection from "@/components/dashboard/Metricas/OrdemInscricaoSection";
+import ProdutividadeSection from "@/components/dashboard/Metricas/ProdutividadeSection";
 import ProvasSection from "@/components/dashboard/Metricas/ProvasSection";
+import RelatoriosSection from "@/components/dashboard/Metricas/RelatoriosSection";
 import SgpSection from "@/components/dashboard/Metricas/SgpSection";
+import SigEscolaSection from "@/components/dashboard/Metricas/SigEscolaSection";
 import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
 import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
+import TotalAcessosHojeGipeCard from "@/components/dashboard/Metricas/TotalAcessosHojeGipeCard";
+import TotalAcessosHojeSiglaCard from "@/components/dashboard/Metricas/TotalAcessosHojeSiglaCard";
 import UnidadesProdutivasSection from "@/components/dashboard/Metricas/UnidadesProdutivasSection";
 import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
 import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
+import UsuariosSection from "@/components/dashboard/Metricas/UsuariosSection";
+import UsuariosUnicosGipeCard from "@/components/dashboard/Metricas/UsuariosUnicosGipeCard";
+import UsuariosUnicosSiglaCard from "@/components/dashboard/Metricas/UsuariosUnicosSiglaCard";
+import VagasSection from "@/components/dashboard/Metricas/VagasSection";
 import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
 import Releases from "@/components/dashboard/Releases";
@@ -51,11 +70,19 @@ const SISTEMAS_COM_METRICAS = new Set([
     "SGP",
     "Rolê Agroecológico",
     "Bens Físicos",
+    "SigEscola",
+    "Sigla",
+    "GIPE",
+    "Limpeza",
 ]);
 
 const SISTEMAS_SEM_KPIS_GENERICOS = new Set([
     "Rolê Agroecológico",
     "Bens Físicos",
+    "SigEscola",
+    "Sigla",
+    "GIPE",
+    "Limpeza",
 ]);
 
 type FullWidthSectionProps = {
@@ -143,6 +170,37 @@ export default function Dashboard() {
             </>
         ),
         "Bens Físicos": <BensFisicosSection systemName={projectName} />,
+        SigEscola: <SigEscolaSection systemName={projectName} />,
+        Sigla: (
+            <>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                    <AcessoAtivoSiglaCard systemName={projectName} />
+                    <UsuariosUnicosSiglaCard systemName={projectName} />
+                    <TotalAcessosHojeSiglaCard systemName={projectName} />
+                </div>
+                <ConvocacaoSection systemName={projectName} />
+                <CandidatosSection systemName={projectName} />
+                <VagasSection systemName={projectName} />
+                <EscolhasSection systemName={projectName} />
+                <GestaoSection systemName={projectName} />
+                <RelatoriosSection systemName={projectName} />
+            </>
+        ),
+        GIPE: (
+            <>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                    <AcessoAtivoGipeCard systemName={projectName} />
+                    <UsuariosUnicosGipeCard systemName={projectName} />
+                    <TotalAcessosHojeGipeCard systemName={projectName} />
+                </div>
+                <OcorrenciasSection systemName={projectName} />
+                <FluxoDeAtendimentoSection systemName={projectName} />
+                <DistribuicaoSection systemName={projectName} />
+                <UsuariosSection systemName={projectName} />
+                <ProdutividadeSection systemName={projectName} />
+            </>
+        ),
+        Limpeza: <LimpezaSection systemName={projectName} />,
     };
 
     useEffect(() => {

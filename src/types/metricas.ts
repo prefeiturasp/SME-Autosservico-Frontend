@@ -52,6 +52,9 @@ export type StatItem = {
     label: string;
     value: number;
     variant: StatVariant;
+    format?: "number" | "currency" | "days";
+    trend?: MetricTrend;
+    trendLabel?: string;
 };
 
 export type StatsCardResponse = {
@@ -76,4 +79,20 @@ export type ProgressStatsResponse = {
 export type ProfileBreakdownBlock = {
     title: string;
     rows: TableRow[];
+};
+
+export type ProfileDistributionItem = {
+    label: string;
+    percentage: number;
+    color: string;
+};
+
+export type ProfileDistributionResponse = {
+    items: ProfileDistributionItem[];
+};
+
+export type AnalistaTableRow = {
+    analista: string;
+    ocorrenciasTratadas: number;
+    tempoMedio: string;
 };

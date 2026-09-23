@@ -20,10 +20,13 @@ export default function UeSelect({ value, onChange, className }: Props) {
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger
-        className={cn("h-9 w-[220px]", className)}
+        className={cn(
+          "h-9 w-[220px] [&>[data-slot=select-value]]:block [&>[data-slot=select-value]]:min-w-0 [&>[data-slot=select-value]]:flex-1 [&>[data-slot=select-value]]:truncate [&>[data-slot=select-value]]:text-left",
+          className,
+        )}
         aria-label="Filtrar por UE"
       >
-        <SelectValue className="min-w-0 flex-1 truncate text-left" />
+        <SelectValue />
       </SelectTrigger>
       <SelectContent>
         {UE_OPTIONS.map((ue) => (

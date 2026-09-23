@@ -1,6 +1,14 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
+
+vi.mock("./SigEscolaFiltrosBar", () => ({
+  __esModule: true,
+  default: ({ value }: { value: SigEscolaFiltros }) => (
+    <div data-testid="sig-escola-filtros-bar">{value.modo}</div>
+  ),
+}));
 
 vi.mock("./AcessoAtivoSigEscolaCard", () => ({
   __esModule: true,
@@ -16,12 +24,19 @@ vi.mock("./UsuariosUnicosSigEscolaCard", () => ({
   ),
 }));
 
-vi.mock("./UesAptasPrestarContasSigEscolaCard", () => ({
+vi.mock("./TotalAcessosHojeSigEscolaCard", () => ({
   __esModule: true,
   default: ({ systemName }: { systemName?: string }) => (
-    <div data-testid="ues-aptas-prestar-contas-sig-escola-card">
+    <div data-testid="total-acessos-hoje-sig-escola-card">
       {systemName ?? ""}
     </div>
+  ),
+}));
+
+vi.mock("./PlanoAnualDeAtividadesCard", () => ({
+  __esModule: true,
+  default: ({ systemName }: { systemName?: string }) => (
+    <div data-testid="plano-anual-de-atividades-card">{systemName ?? ""}</div>
   ),
 }));
 
@@ -32,12 +47,37 @@ vi.mock("./PrestacaoDeContasCard", () => ({
   ),
 }));
 
+vi.mock("./SituacaoPatrimonialCard", () => ({
+  __esModule: true,
+  default: ({ systemName }: { systemName?: string }) => (
+    <div data-testid="situacao-patrimonial-card">{systemName ?? ""}</div>
+  ),
+}));
+
 import SigEscolaSection from "./SigEscolaSection";
 
-describe("<SigEscolaSection />", () => {
-  it("renderiza os 4 cards propagando systemName", () => {
-    render(<SigEscolaSection systemName="SigEscola" />);
+const BASE_FILTROS: SigEscolaFiltros = {
+  modo: "periodo",
+  periodo: "2026.2",
+  dataInicio: "2026-01-01",
+  dataFim: "2026-09-22",
+  dre: "all",
+  ue: "all",
+};
 
+describe("<SigEscolaSection />", () => {
+  it("renderiza a barra de filtros e os 6 cards propagando systemName", () => {
+    render(
+      <SigEscolaSection
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+        onFiltrosChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId("sig-escola-filtros-bar")).toHaveTextContent(
+      "periodo",
+    );
     expect(
       screen.getByTestId("acesso-ativo-sig-escola-card"),
     ).toHaveTextContent("SigEscola");
@@ -45,10 +85,16 @@ describe("<SigEscolaSection />", () => {
       screen.getByTestId("usuarios-unicos-sig-escola-card"),
     ).toHaveTextContent("SigEscola");
     expect(
-      screen.getByTestId("ues-aptas-prestar-contas-sig-escola-card"),
+      screen.getByTestId("total-acessos-hoje-sig-escola-card"),
+    ).toHaveTextContent("SigEscola");
+    expect(
+      screen.getByTestId("plano-anual-de-atividades-card"),
     ).toHaveTextContent("SigEscola");
     expect(screen.getByTestId("prestacao-de-contas-card")).toHaveTextContent(
       "SigEscola",
     );
+    expect(
+      screen.getByTestId("situacao-patrimonial-card"),
+    ).toHaveTextContent("SigEscola");
   });
 });

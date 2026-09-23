@@ -2,7 +2,8 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { UesAptasPrestarContasResponse } from "@/types/metricas";
+import type { StatsCardResponse } from "@/types/metricas";
+import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 
 vi.mock("@/components/ui/skeleton", () => ({
   Skeleton: (props: Readonly<React.HTMLAttributes<HTMLDivElement>>) => (
@@ -22,7 +23,7 @@ vi.mock("@/components/ui/button", () => ({
 }));
 
 type MockQueryResult = {
-  data?: UesAptasPrestarContasResponse;
+  data?: StatsCardResponse;
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;
@@ -37,13 +38,22 @@ let mockQueryResult: MockQueryResult = {
   refetch: vi.fn(),
 };
 
-vi.mock("@/hooks/useUesAptasPrestarContasSigEscola", () => ({
-  useUesAptasPrestarContasSigEscola: () => mockQueryResult,
+vi.mock("@/hooks/usePlanoAnualDeAtividades", () => ({
+  usePlanoAnualDeAtividades: () => mockQueryResult,
 }));
 
-import UesAptasPrestarContasSigEscolaCard from "./UesAptasPrestarContasSigEscolaCard";
+import PlanoAnualDeAtividadesCard from "./PlanoAnualDeAtividadesCard";
 
-describe("<UesAptasPrestarContasSigEscolaCard />", () => {
+const BASE_FILTROS: SigEscolaFiltros = {
+  modo: "periodo",
+  periodo: "2026.2",
+  dataInicio: "2026-01-01",
+  dataFim: "2026-09-22",
+  dre: "all",
+  ue: "all",
+};
+
+describe("<PlanoAnualDeAtividadesCard />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockQueryResult = {
@@ -56,24 +66,34 @@ describe("<UesAptasPrestarContasSigEscolaCard />", () => {
   });
 
   it("sem systemName mostra placeholder", () => {
-    render(<UesAptasPrestarContasSigEscolaCard />);
+    render(<PlanoAnualDeAtividadesCard filtros={BASE_FILTROS} />);
     expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
   });
 
   it("loading mostra skeletons", () => {
     mockQueryResult = { ...mockQueryResult, isLoading: true };
-    render(<UesAptasPrestarContasSigEscolaCard systemName="SigEscola" />);
+    render(
+      <PlanoAnualDeAtividadesCard
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+      />,
+    );
     expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(1);
   });
 
   it("erro mostra mensagem e botão de retry", async () => {
     const refetch = vi.fn();
     mockQueryResult = { ...mockQueryResult, isError: true, refetch };
-    render(<UesAptasPrestarContasSigEscolaCard systemName="SigEscola" />);
+    render(
+      <PlanoAnualDeAtividadesCard
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+      />,
+    );
 
     expect(
       screen.getByText(
-        "Não foi possível carregar as UEs aptas a prestar contas.",
+        "Não foi possível carregar o plano anual de atividades.",
       ),
     ).toBeInTheDocument();
 
@@ -81,18 +101,26 @@ describe("<UesAptasPrestarContasSigEscolaCard />", () => {
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 
-  it("formata valor em pt-BR e mostra o badge de tendência", () => {
+  it("sucesso renderiza os itens mockados", () => {
     mockQueryResult = {
       ...mockQueryResult,
       data: {
-        count: 1644,
-        trend: "above",
-        trendLabel: "13 novos nos últimos 30 dias",
+        items: [
+          { label: "PAAs em andamento", value: 318, variant: "neutral" },
+          { label: "PAAs finalizados", value: 1204, variant: "success" },
+          { label: "PAAs em retificação", value: 42, variant: "warning" },
+        ],
       },
     };
-    render(<UesAptasPrestarContasSigEscolaCard systemName="SigEscola" />);
+    render(
+      <PlanoAnualDeAtividadesCard
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+      />,
+    );
 
-    expect(screen.getByText("1.644")).toBeInTheDocument();
-    expect(screen.getByText("13 novos nos últimos 30 dias")).toBeInTheDocument();
+    expect(screen.getByText("318")).toBeInTheDocument();
+    expect(screen.getByText("1.204")).toBeInTheDocument();
+    expect(screen.getByText("42")).toBeInTheDocument();
   });
 });

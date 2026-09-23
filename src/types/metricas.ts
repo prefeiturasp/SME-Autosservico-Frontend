@@ -61,6 +61,11 @@ export type StatsCardResponse = {
     items: StatItem[];
 };
 
+export type PrestacaoDeContasResponse = {
+    destaque: StatItem[];
+    items: StatItem[];
+};
+
 export type TableRow = {
     label: string;
     value: number;

@@ -9,7 +9,7 @@ pipeline {
 
     options {
         ansiColor('xterm')
-        buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20'))
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
         disableConcurrentBuilds()
         skipDefaultCheckout()
     }
@@ -50,7 +50,7 @@ pipeline {
                                         -v "$WORKSPACE/$TESTES_DIR:/app" \
                                         -w /app \
                                         ${CYPRESS_AGENT_IMAGE} \
-                                        sh -c "rm -rf ui/allure-results && \
+                                        sh -c "rm -rf allure-results && \
                                             npm install && \
                                             npm install cypress@14.5.2 cypress-cloud@beta \
                                             @shelex/cypress-allure-plugin allure-mocha crypto-js@4.1.1 --save-dev && \
@@ -92,7 +92,7 @@ pipeline {
                             sh """
                                 export JAVA_HOME=\$(dirname \$(dirname \$(readlink -f \$(which java)))); \
                                 export PATH=\$JAVA_HOME/bin:/usr/local/bin:\$PATH; \
-                                allure generate testes/ui/allure-results --clean --output testes/ui/allure-report; \
+                                ${TESTES_DIR}/node_modules/allure-commandline/dist/bin/allure generate ${ALLURE_RESULTS_PATH} --clean --output ${TESTES_DIR}/allure-report; \
                                 cd ${TESTES_DIR}; \
                                 zip -r allure-results-${BUILD_NUMBER}-\$(date +"%d-%m-%Y").zip allure-results
                             """
@@ -116,7 +116,9 @@ pipeline {
                             -v "$WORKSPACE:/app" \
                             -w /app \
                             ${CYPRESS_AGENT_IMAGE} \
-                            sh -c "rm -rf package-lock.json node_modules/ || true && chown 1001:1001 * -R || true  && chmod 777 * -R || true"
+                            sh -c "rm -rf package-lock.json node_modules/ || true && \
+                                (ls -t testes/ui/allure-results-*.zip 2>/dev/null | tail -n +11 | xargs -r rm -f) || true && \
+                                chown 1001:1001 * -R || true  && chmod 777 * -R || true"
                     '''
                 }
 
@@ -126,9 +128,9 @@ pipeline {
                     echo "⚠️ Resultados do Allure não encontrados ou vazios, plugin não será acionado."
                 }
 
-                def zipExists = sh(script: "ls testes/allure-results-*.zip 2>/dev/null || true", returnStdout: true).trim()
+                def zipExists = sh(script: "ls testes/ui/allure-results-*.zip 2>/dev/null || true", returnStdout: true).trim()
                 if (zipExists) {
-                    archiveArtifacts artifacts: 'testes/allure-results-*.zip', fingerprint: true
+                    archiveArtifacts artifacts: 'testes/ui/allure-results-*.zip', fingerprint: true
                 } else {
                     echo "⚠️ Nenhum .zip de Allure encontrado para arquivamento."
                 }

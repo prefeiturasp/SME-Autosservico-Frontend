@@ -38,32 +38,36 @@ pipeline {
         stage('Executar') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: "${DOCKER_REGISTRY_CREDENTIAL_ID}", url: "https://${DOCKER_REGISTRY_URL}") {
-                        withCredentials([file(credentialsId: "${CYPRESS_ENV_CREDENTIAL_ID}", variable: 'env')]){
-                            sh '''
-                                touch ${TESTES_DIR}/.env
-                                cp "$env" "${TESTES_DIR}/.env"
-                                docker pull ${CYPRESS_AGENT_IMAGE}
-                                docker run \
-                                    --rm \
-                                    -v "$WORKSPACE/$TESTES_DIR:/app" \
-                                    -w /app \
-                                    ${CYPRESS_AGENT_IMAGE} \
-                                    sh -c "rm -rf ui/allure-results && \
-                                        npm install && \
-                                        npm install cypress@14.5.2 cypress-cloud@beta \
-                                        @shelex/cypress-allure-plugin allure-mocha crypto-js@4.1.1 --save-dev && \
-                                        npx cypress-cloud run \
-                                                --parallel \
-                                                --browser chrome \
-                                                --headed true \
-                                                --record \
-                                                --key ${CYPRESS_RECORD_KEY} \
-                                                --env allure=true \
-                                                --ci-build-id ${CI_BUILD_ID_PREFIX}_JENKINS-BUILD-${BUILD_NUMBER} && \
-                                        chown 1001:1001 * -R && \
-                                        chmod 777 * -R"
-                            '''
+                    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                        withDockerRegistry(credentialsId: "${DOCKER_REGISTRY_CREDENTIAL_ID}", url: "https://${DOCKER_REGISTRY_URL}") {
+                            withCredentials([file(credentialsId: "${CYPRESS_ENV_CREDENTIAL_ID}", variable: 'env')]){
+                                sh '''
+                                    touch ${TESTES_DIR}/.env
+                                    cp "$env" "${TESTES_DIR}/.env"
+                                    docker pull ${CYPRESS_AGENT_IMAGE}
+                                    docker run \
+                                        --rm \
+                                        -v "$WORKSPACE/$TESTES_DIR:/app" \
+                                        -w /app \
+                                        ${CYPRESS_AGENT_IMAGE} \
+                                        sh -c "rm -rf ui/allure-results && \
+                                            npm install && \
+                                            npm install cypress@14.5.2 cypress-cloud@beta \
+                                            @shelex/cypress-allure-plugin allure-mocha crypto-js@4.1.1 --save-dev && \
+                                            npx cypress-cloud run \
+                                                    --parallel \
+                                                    --browser chrome \
+                                                    --headed true \
+                                                    --record \
+                                                    --key ${CYPRESS_RECORD_KEY} \
+                                                    --env allure=true \
+                                                    --ci-build-id ${CI_BUILD_ID_PREFIX}_JENKINS-BUILD-${BUILD_NUMBER}; \
+                                            STATUS=\\$?; \
+                                            chown 1001:1001 * -R; \
+                                            chmod 777 * -R; \
+                                            exit \\$STATUS"
+                                '''
+                            }
                         }
                     }
                     echo "Testes Cypress finalizados."

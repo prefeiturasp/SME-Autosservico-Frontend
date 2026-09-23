@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
-import { usePrestacaoDeContas } from "./usePrestacaoDeContas";
+import { useSituacaoPatrimonial } from "./useSituacaoPatrimonial";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -29,11 +29,11 @@ beforeEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("usePrestacaoDeContas", () => {
+describe("useSituacaoPatrimonial", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
     const wrapper = createWrapper();
     const { result } = renderHook(
-      () => usePrestacaoDeContas({ systemName: "", filtros: BASE_FILTROS }),
+      () => useSituacaoPatrimonial({ systemName: "", filtros: BASE_FILTROS }),
       { wrapper },
     );
 
@@ -45,7 +45,7 @@ describe("usePrestacaoDeContas", () => {
     const wrapper = createWrapper();
     const { result } = renderHook(
       () =>
-        usePrestacaoDeContas({
+        useSituacaoPatrimonial({
           systemName: "SigEscola",
           filtros: BASE_FILTROS,
         }),
@@ -54,52 +54,26 @@ describe("usePrestacaoDeContas", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toEqual({
-      destaque: [
-        {
-          label: "UEs aptas a prestar contas pelo sistema",
-          value: 3683,
-          variant: "neutral",
-        },
-        {
-          label: "Devolução ao Tesouro",
-          value: 2340530,
-          variant: "neutral",
-          format: "currency",
-        },
-      ],
-      items: [
-        {
-          label: "PCs enviadas ou em andamento com as DREs",
-          value: 2490,
-          variant: "neutral",
-        },
-        {
-          label: "Créditos disponíveis para as UEs",
-          value: 197248412.27,
-          variant: "success",
-          format: "currency",
-        },
-        {
-          label: "Despesas registradas pelas UEs",
-          value: 90490083.76,
-          variant: "danger",
-          format: "currency",
-        },
-        {
-          label: "Demonstrativos financeiros gerados pelas UEs",
-          value: 3683,
-          variant: "neutral",
-        },
-      ],
-    });
+    expect(result.current.data?.items).toEqual([
+      {
+        label: "Quantidade de bens produzidos pelas UEs",
+        value: 318,
+        variant: "neutral",
+      },
+      {
+        label: "Valor dos bens produzidos",
+        value: 842212.85,
+        variant: "neutral",
+        format: "currency",
+      },
+    ]);
   });
 
   it("cenário intervalo (todas as DREs/UEs)", async () => {
     const wrapper = createWrapper();
     const { result } = renderHook(
       () =>
-        usePrestacaoDeContas({
+        useSituacaoPatrimonial({
           systemName: "SigEscola",
           filtros: { ...BASE_FILTROS, modo: "intervalo" },
         }),
@@ -107,16 +81,15 @@ describe("usePrestacaoDeContas", () => {
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.destaque[0].value).toBe(2983);
-    expect(result.current.data?.destaque[1].value).toBe(1699267.12);
-    expect(result.current.data?.items[3].value).toBe(2674);
+    expect(result.current.data?.items[0].value).toBe(286);
+    expect(result.current.data?.items[1].value).toBe(654231.13);
   });
 
   it("cenário intervalo + DRE Butantã", async () => {
     const wrapper = createWrapper();
     const { result } = renderHook(
       () =>
-        usePrestacaoDeContas({
+        useSituacaoPatrimonial({
           systemName: "SigEscola",
           filtros: { ...BASE_FILTROS, modo: "intervalo", dre: "butanta" },
         }),
@@ -124,23 +97,22 @@ describe("usePrestacaoDeContas", () => {
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.destaque[0].value).toBe(126);
-    expect(result.current.data?.destaque[1].value).toBe(104354.46);
-    expect(result.current.data?.items[3].value).toBe(166);
+    expect(result.current.data?.items[0].value).toBe(32);
+    expect(result.current.data?.items[1].value).toBe(14132.96);
   });
 
   it("cai no baseline pra uma combinação fora dos 3 cenários conhecidos", async () => {
     const wrapper = createWrapper();
     const { result } = renderHook(
       () =>
-        usePrestacaoDeContas({
+        useSituacaoPatrimonial({
           systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "intervalo", ue: "cemei-morumbi" },
+          filtros: { ...BASE_FILTROS, modo: "periodo", dre: "butanta" },
         }),
       { wrapper },
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.destaque[0].value).toBe(3683);
+    expect(result.current.data?.items[0].value).toBe(318);
   });
 });

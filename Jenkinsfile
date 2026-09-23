@@ -50,7 +50,7 @@ pipeline {
                                         -v "$WORKSPACE/$TESTES_DIR:/app" \
                                         -w /app \
                                         ${CYPRESS_AGENT_IMAGE} \
-                                        sh -c "rm -rf ui/allure-results ui/allure-report && \
+                                        sh -c "rm -rf ui/allure-results && \
                                             npm install && \
                                             npm install cypress@14.5.2 cypress-cloud@beta \
                                             @shelex/cypress-allure-plugin allure-mocha crypto-js@4.1.1 --save-dev && \
@@ -60,7 +60,8 @@ pipeline {
                                                     --headed true \
                                                     --record \
                                                     --key ${CYPRESS_RECORD_KEY} \
-                                                    --env allure=true \
+                                                    --reporter mocha-allure-reporter \
+                                                    --reporter-options reportDir=allure-results \
                                                     --ci-build-id ${CI_BUILD_ID_PREFIX}_JENKINS-BUILD-${BUILD_NUMBER}; \
                                             STATUS=\\$?; \
                                             chown 1001:1001 * -R; \
@@ -91,7 +92,7 @@ pipeline {
                             sh """
                                 export JAVA_HOME=\$(dirname \$(dirname \$(readlink -f \$(which java)))); \
                                 export PATH=\$JAVA_HOME/bin:/usr/local/bin:\$PATH; \
-                                allure generate ${ALLURE_RESULTS_PATH} --clean --output ${TESTES_DIR}/allure-report; \
+                                allure generate testes/ui/allure-results --clean --output testes/ui/allure-report; \
                                 cd ${TESTES_DIR}; \
                                 zip -r allure-results-${BUILD_NUMBER}-\$(date +"%d-%m-%Y").zip allure-results
                             """
@@ -138,7 +139,7 @@ pipeline {
         unstable { sendTelegram("<b>INSTÁVEL! ⚠️</b>") }
         failure { sendTelegram("<b>FALHA! ❌</b>\n") }
         aborted { sendTelegram("<b>CANCELADO! ✖️</b>\n") }
-
+        cleanup { cleanWs() }
     }
 }
 

@@ -60,6 +60,10 @@ import {
 } from "@/types/accessComparisonPeriod";
 import type { DashboardTab } from "@/types/analyticsPeriod";
 import type { DeployEnvironment } from "@/types/deployEnvironment";
+import { ALL_DRES_VALUE } from "@/types/dreOption";
+import { DEFAULT_PERIODO_LETIVO } from "@/types/periodoLetivoOption";
+import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
+import { ALL_UES_VALUE } from "@/types/ueOption";
 import { useEffect, useState } from "react";
 
 const SISTEMAS_COM_METRICAS = new Set([
@@ -130,6 +134,14 @@ export default function Dashboard() {
         useState<DeployEnvironment>("producao");
     const [accessComparisonPeriod, setAccessComparisonPeriod] =
         useState<AccessComparisonPeriod>(DEFAULT_ACCESS_COMPARISON_PERIOD);
+    const [sigEscolaFiltros, setSigEscolaFiltros] = useState<SigEscolaFiltros>({
+        modo: "periodo",
+        periodo: DEFAULT_PERIODO_LETIVO,
+        dataInicio: `${new Date().getFullYear()}-01-01`,
+        dataFim: new Date().toISOString().slice(0, 10),
+        dre: ALL_DRES_VALUE,
+        ue: ALL_UES_VALUE,
+    });
     const [activeTabValue, setActiveTabValue] = useState("operacional");
     const { triggerDeployTour } = useDeployHealthOnboarding();
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
@@ -170,7 +182,13 @@ export default function Dashboard() {
             </>
         ),
         "Bens Físicos": <BensFisicosSection systemName={projectName} />,
-        SigEscola: <SigEscolaSection systemName={projectName} />,
+        SigEscola: (
+            <SigEscolaSection
+                systemName={projectName}
+                filtros={sigEscolaFiltros}
+                onFiltrosChange={setSigEscolaFiltros}
+            />
+        ),
         Sigla: (
             <>
                 <div className="grid grid-cols-3 gap-4 mb-4">

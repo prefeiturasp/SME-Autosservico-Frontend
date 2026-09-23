@@ -2,17 +2,24 @@
 
 import MetricCard from "@/components/dashboard/MetricCard";
 import { useAcessoAtivoSigEscola } from "@/hooks/useAcessoAtivoSigEscola";
+import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 
 type Props = {
   readonly systemName?: string;
+  readonly filtros: SigEscolaFiltros;
   readonly className?: string;
 };
 
 const ptBrFormatter = new Intl.NumberFormat("pt-BR");
 
-export default function AcessoAtivoSigEscolaCard({ systemName, className }: Props) {
+export default function AcessoAtivoSigEscolaCard({
+  systemName,
+  filtros,
+  className,
+}: Props) {
   const { data, isLoading, isFetching, isError, refetch } = useAcessoAtivoSigEscola({
     systemName: systemName ?? "",
+    filtros,
   });
 
   return (

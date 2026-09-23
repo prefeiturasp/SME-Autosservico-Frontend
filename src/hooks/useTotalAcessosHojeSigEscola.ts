@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { UniqueUsersPerDayResponse } from "@/types/metricas";
+import type { TodayAccessResponse } from "@/types/metricas";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 import {
     resolveSigEscolaScenario,
@@ -11,25 +11,25 @@ type Options = {
     filtros: SigEscolaFiltros;
 };
 
-const UNIQUE_COUNT_BY_SCENARIO: Record<SigEscolaScenario, number> = {
-    baseline: 1560,
-    intervalo: 1133,
-    "intervalo-butanta": 70,
+const ACCESS_COUNT_BY_SCENARIO: Record<SigEscolaScenario, number> = {
+    baseline: 944,
+    intervalo: 231,
+    "intervalo-butanta": 23,
 };
 
-export function useUsuariosUnicosSigEscola({ systemName, filtros }: Options) {
+export function useTotalAcessosHojeSigEscola({ systemName, filtros }: Options) {
     const scenario = resolveSigEscolaScenario(filtros);
 
-    return useQuery<UniqueUsersPerDayResponse>({
-        queryKey: ["usuarios-unicos-sig-escola", systemName, scenario],
+    return useQuery<TodayAccessResponse>({
+        queryKey: ["total-acessos-hoje-sig-escola", systemName, scenario],
         enabled: !!systemName,
         refetchOnWindowFocus: false,
         queryFn: async () => {
             await new Promise((resolve) => setTimeout(resolve, 300));
             return {
-                uniqueCount: UNIQUE_COUNT_BY_SCENARIO[scenario],
+                accessCount: ACCESS_COUNT_BY_SCENARIO[scenario],
                 trend: "above",
-                trendLabel: "8% acima da média dos últimos 30 dias",
+                trendLabel: "13 novos nos últimos 30 dias",
             };
         },
     });

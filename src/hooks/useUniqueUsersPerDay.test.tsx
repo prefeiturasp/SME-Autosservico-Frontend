@@ -51,4 +51,15 @@ describe("useUniqueUsersPerDay", () => {
     expect(fetchSpy).toHaveBeenCalledWith("/api/sigpae/usuarios/unicos-por-dia");
     expect(result.current.data).toEqual(mockData);
   });
+
+  it("usa mock e não busca para sistemas não integrados", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch");
+    const { result } = renderHook(
+      () => useUniqueUsersPerDay({ systemName: "SigEscola" }),
+      { wrapper: createWrapper() }
+    );
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(result.current.data?.uniqueCount).toBe(3560);
+  });
 });

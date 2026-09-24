@@ -21,5 +21,5 @@ export const bffApi = axios.create({
 /** GET autenticado no BFF, devolvendo o corpo JSON já tipado. */
 export async function bffGet<T>(path: string): Promise<T> {
   const { data } = await bffApi.get<T>(path);
-  return data as T;
+  return data;
 }

@@ -16,6 +16,8 @@ import {
   fetchLayoutsEmbalagens,
   fetchComparativoAcessos,
   fetchUsuariosAcessoAtivo,
+  fetchUsuariosUnicosPorDia,
+  fetchAcessosHoje,
   fetchUsuariosPorTipoPerfil,
 } from "./sigpaeMetricas";
 
@@ -379,6 +381,26 @@ describe("fetchUsuariosAcessoAtivo", () => {
     expect(res.activeCount).toBe(12);
     expect(res.trend).toBe("above");
     expect(res.trendLabel).toBe("2 novos nos últimos 30 dias");
+  });
+});
+
+describe("fetchUsuariosUnicosPorDia", () => {
+  it("usa a média de únicos por dia (0 quando null)", async () => {
+    mockBffGet.mockResolvedValue({ usuarios: { unicos_por_dia: 5 } });
+    expect((await fetchUsuariosUnicosPorDia()).uniqueCount).toBe(5);
+
+    mockBffGet.mockResolvedValue({ usuarios: { unicos_por_dia: null } });
+    expect((await fetchUsuariosUnicosPorDia()).uniqueCount).toBe(0);
+  });
+});
+
+describe("fetchAcessosHoje", () => {
+  it("usa o total de acessos de hoje (0 quando null)", async () => {
+    mockBffGet.mockResolvedValue({ usuarios: { acessos_hoje: 7 } });
+    expect((await fetchAcessosHoje()).accessCount).toBe(7);
+
+    mockBffGet.mockResolvedValue({ usuarios: { acessos_hoje: null } });
+    expect((await fetchAcessosHoje()).accessCount).toBe(0);
   });
 });
 

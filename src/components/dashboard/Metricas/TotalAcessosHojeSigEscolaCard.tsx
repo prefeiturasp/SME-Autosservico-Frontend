@@ -1,7 +1,7 @@
 "use client";
 
 import MetricCard from "@/components/dashboard/MetricCard";
-import { useUsuariosUnicosSigEscola } from "@/hooks/useUsuariosUnicosSigEscola";
+import { useTotalAcessosHojeSigEscola } from "@/hooks/useTotalAcessosHojeSigEscola";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 
 type Props = {
@@ -12,25 +12,26 @@ type Props = {
 
 const ptBrFormatter = new Intl.NumberFormat("pt-BR");
 
-export default function UsuariosUnicosSigEscolaCard({
+export default function TotalAcessosHojeSigEscolaCard({
   systemName,
   filtros,
   className,
 }: Props) {
-  const { data, isLoading, isFetching, isError, refetch } = useUsuariosUnicosSigEscola({
-    systemName: systemName ?? "",
-    filtros,
-  });
+  const { data, isLoading, isFetching, isError, refetch } =
+    useTotalAcessosHojeSigEscola({
+      systemName: systemName ?? "",
+      filtros,
+    });
 
   return (
     <MetricCard
-      title="Usuários únicos por dia"
+      title="Total de acessos ao sistema hoje"
       systemName={systemName}
       isLoading={isLoading || isFetching}
       isError={isError}
       onRetry={() => refetch()}
-      errorMessage="Não foi possível carregar os usuários únicos por dia."
-      value={data ? ptBrFormatter.format(data.uniqueCount) : undefined}
+      errorMessage="Não foi possível carregar os acessos de hoje."
+      value={data ? ptBrFormatter.format(data.accessCount) : undefined}
       trend={data?.trend}
       trendLabel={data?.trendLabel}
       className={className}

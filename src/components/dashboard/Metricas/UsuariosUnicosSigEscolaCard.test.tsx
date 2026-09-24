@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { UniqueUsersPerDayResponse } from "@/types/metricas";
+import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 
 vi.mock("@/components/ui/skeleton", () => ({
   Skeleton: (props: Readonly<React.HTMLAttributes<HTMLDivElement>>) => (
@@ -43,6 +44,15 @@ vi.mock("@/hooks/useUsuariosUnicosSigEscola", () => ({
 
 import UsuariosUnicosSigEscolaCard from "./UsuariosUnicosSigEscolaCard";
 
+const BASE_FILTROS: SigEscolaFiltros = {
+  modo: "periodo",
+  periodo: "2026.2",
+  dataInicio: "2026-01-01",
+  dataFim: "2026-09-22",
+  dre: "all",
+  ue: "all",
+};
+
 describe("<UsuariosUnicosSigEscolaCard />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -56,20 +66,30 @@ describe("<UsuariosUnicosSigEscolaCard />", () => {
   });
 
   it("sem systemName mostra placeholder", () => {
-    render(<UsuariosUnicosSigEscolaCard />);
+    render(<UsuariosUnicosSigEscolaCard filtros={BASE_FILTROS} />);
     expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
   });
 
   it("loading mostra skeletons", () => {
     mockQueryResult = { ...mockQueryResult, isLoading: true };
-    render(<UsuariosUnicosSigEscolaCard systemName="SigEscola" />);
+    render(
+      <UsuariosUnicosSigEscolaCard
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+      />,
+    );
     expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(1);
   });
 
   it("erro mostra mensagem e botão de retry", async () => {
     const refetch = vi.fn();
     mockQueryResult = { ...mockQueryResult, isError: true, refetch };
-    render(<UsuariosUnicosSigEscolaCard systemName="SigEscola" />);
+    render(
+      <UsuariosUnicosSigEscolaCard
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+      />,
+    );
 
     expect(
       screen.getByText("Não foi possível carregar os usuários únicos por dia."),
@@ -88,7 +108,12 @@ describe("<UsuariosUnicosSigEscolaCard />", () => {
         trendLabel: "8% acima da média dos últimos 30 dias",
       },
     };
-    render(<UsuariosUnicosSigEscolaCard systemName="SigEscola" />);
+    render(
+      <UsuariosUnicosSigEscolaCard
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+      />,
+    );
 
     expect(screen.getByText("1.560")).toBeInTheDocument();
     expect(

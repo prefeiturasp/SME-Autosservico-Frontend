@@ -2,7 +2,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ActiveAccessUsersResponse } from "@/types/metricas";
+import type { StatsCardResponse } from "@/types/metricas";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 
 vi.mock("@/components/ui/skeleton", () => ({
@@ -23,7 +23,7 @@ vi.mock("@/components/ui/button", () => ({
 }));
 
 type MockQueryResult = {
-  data?: ActiveAccessUsersResponse;
+  data?: StatsCardResponse;
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;
@@ -38,11 +38,11 @@ let mockQueryResult: MockQueryResult = {
   refetch: vi.fn(),
 };
 
-vi.mock("@/hooks/useAcessoAtivoSigEscola", () => ({
-  useAcessoAtivoSigEscola: () => mockQueryResult,
+vi.mock("@/hooks/usePlanoAnualDeAtividades", () => ({
+  usePlanoAnualDeAtividades: () => mockQueryResult,
 }));
 
-import AcessoAtivoSigEscolaCard from "./AcessoAtivoSigEscolaCard";
+import PlanoAnualDeAtividadesCard from "./PlanoAnualDeAtividadesCard";
 
 const BASE_FILTROS: SigEscolaFiltros = {
   modo: "periodo",
@@ -53,7 +53,7 @@ const BASE_FILTROS: SigEscolaFiltros = {
   ue: "all",
 };
 
-describe("<AcessoAtivoSigEscolaCard />", () => {
+describe("<PlanoAnualDeAtividadesCard />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockQueryResult = {
@@ -66,14 +66,17 @@ describe("<AcessoAtivoSigEscolaCard />", () => {
   });
 
   it("sem systemName mostra placeholder", () => {
-    render(<AcessoAtivoSigEscolaCard filtros={BASE_FILTROS} />);
+    render(<PlanoAnualDeAtividadesCard filtros={BASE_FILTROS} />);
     expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
   });
 
   it("loading mostra skeletons", () => {
     mockQueryResult = { ...mockQueryResult, isLoading: true };
     render(
-      <AcessoAtivoSigEscolaCard systemName="SigEscola" filtros={BASE_FILTROS} />,
+      <PlanoAnualDeAtividadesCard
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+      />,
     );
     expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(1);
   });
@@ -82,31 +85,42 @@ describe("<AcessoAtivoSigEscolaCard />", () => {
     const refetch = vi.fn();
     mockQueryResult = { ...mockQueryResult, isError: true, refetch };
     render(
-      <AcessoAtivoSigEscolaCard systemName="SigEscola" filtros={BASE_FILTROS} />,
+      <PlanoAnualDeAtividadesCard
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+      />,
     );
 
     expect(
-      screen.getByText("Não foi possível carregar os usuários com acesso ativo."),
+      screen.getByText(
+        "Não foi possível carregar o plano anual de atividades.",
+      ),
     ).toBeInTheDocument();
 
     await userEvent.click(screen.getByTestId("retry-button"));
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 
-  it("formata valor em pt-BR e mostra o badge de tendência", () => {
+  it("sucesso renderiza os itens mockados", () => {
     mockQueryResult = {
       ...mockQueryResult,
       data: {
-        activeCount: 4645,
-        trend: "on-average",
-        trendLabel: "Média dos últimos 30 dias",
+        items: [
+          { label: "PAAs em andamento", value: 318, variant: "neutral" },
+          { label: "PAAs finalizados", value: 1204, variant: "success" },
+          { label: "PAAs em retificação", value: 42, variant: "warning" },
+        ],
       },
     };
     render(
-      <AcessoAtivoSigEscolaCard systemName="SigEscola" filtros={BASE_FILTROS} />,
+      <PlanoAnualDeAtividadesCard
+        systemName="SigEscola"
+        filtros={BASE_FILTROS}
+      />,
     );
 
-    expect(screen.getByText("4.645")).toBeInTheDocument();
-    expect(screen.getByText("Média dos últimos 30 dias")).toBeInTheDocument();
+    expect(screen.getByText("318")).toBeInTheDocument();
+    expect(screen.getByText("1.204")).toBeInTheDocument();
+    expect(screen.getByText("42")).toBeInTheDocument();
   });
 });

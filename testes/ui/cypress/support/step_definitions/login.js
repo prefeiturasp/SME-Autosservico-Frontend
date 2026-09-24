@@ -49,3 +49,54 @@ Then(
     }
   }
 )
+
+Then('devo visualizar o formulário de login', () => {
+  cy.contains('Boas vindas ao Autosserviço!', { timeout: 20000 })
+    .should('be.visible')
+  cy.get(login.campo_usuario()).should('be.visible')
+  cy.get(login.campo_senha()).should('be.visible')
+  cy.get('img[alt="Logo AutoServiço"]').should('be.visible')
+  cy.get('img[alt="Logo Prefeitura de São Paulo"]').should('be.visible')
+})
+
+Then('o botão de entrar deve estar desabilitado', () => {
+  cy.botao_acessar().should('be.disabled')
+})
+
+When('informo o RF {string} no formulário de login', (rf) => {
+  cy.get(login.campo_usuario())
+    .clear()
+    .type(rf)
+})
+
+Then('o campo de RF deve conter {string}', (rf) => {
+  cy.get(login.campo_usuario()).should('have.value', rf)
+})
+
+When('informo a senha {string} no formulário de login', (senha) => {
+  cy.get(login.campo_senha())
+    .clear()
+    .type(senha)
+})
+
+When('alterno a visibilidade da senha', () => {
+  cy.get('button[aria-label="Senha invisível."], button[aria-label="Senha visível"]')
+    .should('be.visible')
+    .click()
+})
+
+Then('o campo de senha deve estar visível e conter {string}', (senha) => {
+  cy.get(login.campo_senha())
+    .should('have.attr', 'type', 'text')
+    .and('have.value', senha)
+})
+
+Then('o campo de senha deve estar oculto e conter {string}', (senha) => {
+  cy.get(login.campo_senha())
+    .should('have.attr', 'type', 'password')
+    .and('have.value', senha)
+})
+
+Then('o campo de senha deve estar vazio', () => {
+  cy.get(login.campo_senha()).should('have.value', '')
+})

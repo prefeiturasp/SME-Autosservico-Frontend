@@ -10,4 +10,4 @@ export const PERIODO_LETIVO_OPTIONS: ReadonlyArray<PeriodoLetivoOption> = [
   { value: "2026.2", label: "Período 2026.2" },
 ];
 
-export const DEFAULT_PERIODO_LETIVO = "2026.1";
+export const DEFAULT_PERIODO_LETIVO = "2026.2";

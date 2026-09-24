@@ -1,48 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
-import type { StatItem } from "@/types/metricas";
 import {
-  DEFAULT_ACCESS_COMPARISON_PERIOD,
-  type AccessComparisonPeriod,
-} from "@/types/accessComparisonPeriod";
-import {
-  buildSolicitacaoStatItems,
+  useSolicitacoesPorPeriodo,
   type SolicitacaoStatsOptions,
 } from "./_helpers/solicitacaoStats";
 
-type Contagens = {
-  total: number;
-  autorizadas: number;
-  aguardando: number;
-  negadas: number;
-  canceladas: number;
-};
-
-type PorPeriodo = Record<AccessComparisonPeriod, Contagens>;
-
-export function useSolicitacoesAlimentacoes({
-  systemName,
-  period = DEFAULT_ACCESS_COMPARISON_PERIOD,
-}: SolicitacaoStatsOptions) {
-  return useQuery<PorPeriodo, Error, StatItem[]>({
-    queryKey: ["solicitacoes-alimentacoes", systemName],
-    enabled: !!systemName,
-    refetchOnWindowFocus: false,
-    queryFn: async () => {
-      const res = await fetch("/api/sigpae/alimentacoes");
-      if (!res.ok) {
-        throw new Error("Falha ao buscar as solicitações de alimentações");
-      }
-      return res.json();
-    },
-    select: (data) => {
-      const c = data[period];
-      return buildSolicitacaoStatItems(
-        c.total,
-        c.autorizadas,
-        c.aguardando,
-        c.negadas,
-        c.canceladas,
-      );
-    },
-  });
+export function useSolicitacoesAlimentacoes(options: SolicitacaoStatsOptions) {
+  return useSolicitacoesPorPeriodo(
+    "solicitacoes-alimentacoes",
+    "/api/sigpae/alimentacoes",
+    "Falha ao buscar as solicitações de alimentações",
+    options,
+  );
 }

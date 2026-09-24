@@ -5,20 +5,17 @@ type Options = {
   systemName: string;
 };
 
-const MOCK_RESPONSE: ActiveAccessUsersResponse = {
-  activeCount: 8398,
-  trend: "above",
-  trendLabel: "453 novos nos últimos 30 dias",
-};
-
 export function useActiveAccessUsers({ systemName }: Options) {
   return useQuery<ActiveAccessUsersResponse>({
     queryKey: ["active-access-users", systemName],
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return MOCK_RESPONSE;
+      const res = await fetch("/api/sigpae/usuarios/acesso-ativo");
+      if (!res.ok) {
+        throw new Error("Falha ao buscar usuários com acesso ativo");
+      }
+      return res.json();
     },
   });
 }

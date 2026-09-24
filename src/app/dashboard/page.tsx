@@ -148,6 +148,10 @@ export default function Dashboard() {
 
     const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
 
+    // Indicadores de participação (vivências) ainda usam mock e não têm
+    // fonte no banco; ocultar até definir a origem dos dados.
+    const MOSTRAR_INDICADORES_PARTICIPACAO = false;
+
     const metricasContentBySistema: Record<string, React.ReactNode> = {
         SigPAE: (
             <>
@@ -174,9 +178,11 @@ export default function Dashboard() {
         SGP: <SgpSection systemName={projectName} />,
         "Rolê Agroecológico": (
             <>
-                <IndicadoresParticipacaoLogisticaSection
-                    systemName={projectName}
-                />
+                {MOSTRAR_INDICADORES_PARTICIPACAO && (
+                    <IndicadoresParticipacaoLogisticaSection
+                        systemName={projectName}
+                    />
+                )}
                 <UnidadesProdutivasSection systemName={projectName} />
                 <AgendamentosRolesSection systemName={projectName} />
             </>

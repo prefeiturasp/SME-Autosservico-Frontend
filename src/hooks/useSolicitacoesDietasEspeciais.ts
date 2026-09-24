@@ -1,22 +1,48 @@
+import { useQuery } from "@tanstack/react-query";
 import type { StatItem } from "@/types/metricas";
-import type { AccessComparisonPeriod } from "@/types/accessComparisonPeriod";
+import {
+  DEFAULT_ACCESS_COMPARISON_PERIOD,
+  type AccessComparisonPeriod,
+} from "@/types/accessComparisonPeriod";
 import {
   buildSolicitacaoStatItems,
-  useSolicitacaoStats,
   type SolicitacaoStatsOptions,
 } from "./_helpers/solicitacaoStats";
 
-const MOCK_ITEMS_BY_PERIOD: Record<AccessComparisonPeriod, StatItem[]> = {
-  dia: buildSolicitacaoStatItems(12, 8, 2, 1, 1),
-  quinzena: buildSolicitacaoStatItems(58, 42, 9, 4, 3),
-  mes: buildSolicitacaoStatItems(110, 82, 16, 7, 5),
-  trimestre: buildSolicitacaoStatItems(310, 230, 45, 20, 15),
+type Contagens = {
+  total: number;
+  autorizadas: number;
+  aguardando: number;
+  negadas: number;
+  canceladas: number;
 };
 
-export function useSolicitacoesDietasEspeciais(options: SolicitacaoStatsOptions) {
-  return useSolicitacaoStats(
-    "solicitacoes-dietas-especiais",
-    MOCK_ITEMS_BY_PERIOD,
-    options,
-  );
+type PorPeriodo = Record<AccessComparisonPeriod, Contagens>;
+
+export function useSolicitacoesDietasEspeciais({
+  systemName,
+  period = DEFAULT_ACCESS_COMPARISON_PERIOD,
+}: SolicitacaoStatsOptions) {
+  return useQuery<PorPeriodo, Error, StatItem[]>({
+    queryKey: ["solicitacoes-dietas-especiais", systemName],
+    enabled: !!systemName,
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      const res = await fetch("/api/sigpae/dietas-especiais");
+      if (!res.ok) {
+        throw new Error("Falha ao buscar as solicitações de dietas especiais");
+      }
+      return res.json();
+    },
+    select: (data) => {
+      const c = data[period];
+      return buildSolicitacaoStatItems(
+        c.total,
+        c.autorizadas,
+        c.aguardando,
+        c.negadas,
+        c.canceladas,
+      );
+    },
+  });
 }

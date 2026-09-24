@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useLayoutsEmbalagens } from "./useLayoutsEmbalagens";
+import type { StatsCardResponse } from "@/types/metricas";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -21,29 +22,36 @@ beforeEach(() => {
 
 describe("useLayoutsEmbalagens", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useLayoutsEmbalagens({ systemName: "" }), {
-      wrapper,
-    });
-
+    const fetchSpy = vi.spyOn(global, "fetch");
+    const { result } = renderHook(
+      () => useLayoutsEmbalagens({ systemName: "" }),
+      { wrapper: createWrapper() }
+    );
     await waitFor(() => expect(result.current.isFetching).toBe(false));
-    expect(result.current.data).toBeUndefined();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it("retorna os itens mockados de layouts de embalagens", async () => {
-    const wrapper = createWrapper();
+  it("busca no endpoint e retorna os itens", async () => {
+    const mockData: StatsCardResponse = {
+      items: [
+        { label: "Cadastrados", value: 7, variant: "neutral" },
+        { label: "Aprovados", value: 4, variant: "success" },
+        { label: "Aguardando CODAE", value: 2, variant: "warning" },
+        { label: "Pendentes de correção", value: 1, variant: "danger" },
+      ],
+    };
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => mockData,
+    } as unknown as Response);
+
     const { result } = renderHook(
       () => useLayoutsEmbalagens({ systemName: "SigPAE" }),
-      { wrapper }
+      { wrapper: createWrapper() }
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
+    expect(fetchSpy).toHaveBeenCalledWith("/api/sigpae/layouts-embalagens");
     expect(result.current.data?.items).toHaveLength(4);
-    expect(result.current.data?.items[2]).toEqual({
-      label: "Aguardando CODAE",
-      value: 12,
-      variant: "warning",
-    });
   });
 });

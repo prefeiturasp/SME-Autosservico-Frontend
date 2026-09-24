@@ -1204,9 +1204,10 @@ describe("Dashboard page", () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
 
+        // Indicadores de participação (vivências) ocultos: sem fonte no SIGPAE.
         expect(
-            screen.getByTestId("indicadores-participacao-logistica-section"),
-        ).toHaveTextContent("Rolê Agroecológico");
+            screen.queryByTestId("indicadores-participacao-logistica-section"),
+        ).not.toBeInTheDocument();
         expect(
             screen.getByTestId("unidades-produtivas-section"),
         ).toHaveTextContent("Rolê Agroecológico");

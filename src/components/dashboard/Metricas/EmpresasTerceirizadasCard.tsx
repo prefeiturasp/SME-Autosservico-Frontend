@@ -15,7 +15,7 @@ export default function EmpresasTerceirizadasCard({ systemName, className }: Pro
 
   return (
     <StatsCard
-      title="Empresas Terceirizas"
+      title="Empresas Terceirizadas"
       systemName={systemName}
       isLoading={isLoading || isFetching}
       isError={isError}

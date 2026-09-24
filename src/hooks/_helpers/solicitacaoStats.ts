@@ -10,6 +10,16 @@ export type SolicitacaoStatsOptions = {
   period?: AccessComparisonPeriod;
 };
 
+type Contagens = {
+  total: number;
+  autorizadas: number;
+  aguardando: number;
+  negadas: number;
+  canceladas: number;
+};
+
+type SolicitacoesPorPeriodo = Record<AccessComparisonPeriod, Contagens>;
+
 export function buildSolicitacaoStatItems(
   total: number,
   autorizadas: number,
@@ -26,18 +36,36 @@ export function buildSolicitacaoStatItems(
   ];
 }
 
-export function useSolicitacaoStats(
+/**
+ * Busca uma solicitação (dietas/alimentações) com os 4 períodos de uma vez e
+ * seleciona o período atual no cliente, montando os itens do card.
+ */
+export function useSolicitacoesPorPeriodo(
   queryKeyPrefix: string,
-  mockItemsByPeriod: Record<AccessComparisonPeriod, StatItem[]>,
+  endpoint: string,
+  mensagemErro: string,
   { systemName, period = DEFAULT_ACCESS_COMPARISON_PERIOD }: SolicitacaoStatsOptions,
 ) {
-  return useQuery<StatItem[]>({
-    queryKey: [queryKeyPrefix, systemName, period],
+  return useQuery<SolicitacoesPorPeriodo, Error, StatItem[]>({
+    queryKey: [queryKeyPrefix, systemName],
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return mockItemsByPeriod[period];
+      const res = await fetch(endpoint);
+      if (!res.ok) {
+        throw new Error(mensagemErro);
+      }
+      return res.json();
+    },
+    select: (data) => {
+      const c = data[period];
+      return buildSolicitacaoStatItems(
+        c.total,
+        c.autorizadas,
+        c.aguardando,
+        c.negadas,
+        c.canceladas,
+      );
     },
   });
 }

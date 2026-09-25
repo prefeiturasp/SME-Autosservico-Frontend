@@ -26,3 +26,14 @@ Funcionalidade: Dashboard
   Cenário: Validar listagem de bugs
     Então o card de "Bugs" deve estar visível
     E a tabela de bugs deve conter registros
+
+  Cenário: Validar card de usuários com acesso
+    Então o card de "Usuários com acesso" deve estar visível
+
+  Cenário: Validar colunas da tabela de bugs
+    Então o card de "Bugs" deve estar visível
+    E a tabela de bugs deve exibir as colunas "Código", "Título", "Status" e "Classificação"
+
+  Cenário: Validar indicadores de contagem de bugs
+    Então o card de "Bugs" deve estar visível
+    E devo visualizar os indicadores "Bugs do Ciclo", "Abertos", "Em andamento", "Resolvidos" e "Tempo médio de atendimento"

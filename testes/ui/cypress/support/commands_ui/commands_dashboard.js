@@ -49,3 +49,35 @@ Cypress.Commands.add('card_bugs_visivel', () => {
 Cypress.Commands.add('tabela_bugs_deve_conter_registros', () => {
   cy.get(DASHBOARD.BUGS.LINHAS).its('length').should('be.greaterThan', 0)
 })
+
+Cypress.Commands.add('card_usuarios_com_acesso_visivel', () => {
+  cy.get(DASHBOARD.USUARIOS_COM_ACESSO.TITULO).should('be.visible')
+})
+
+Cypress.Commands.add('validar_colunas_tabela_bugs', (colunas) => {
+  cy.get(DASHBOARD.BUGS.ROOT).within(() => {
+    colunas.forEach((coluna) => {
+      cy.get(DASHBOARD.BUGS.CABECALHO).contains(coluna).should('be.visible')
+    })
+  })
+})
+
+Cypress.Commands.add('validar_indicadores_bugs', (indicadores) => {
+  cy.get(DASHBOARD.BUGS.ROOT).within(() => {
+    indicadores.forEach((indicador) => {
+      cy.contains(indicador).should('be.visible')
+    })
+  })
+})
+
+Cypress.Commands.add('tabela_bugs_possui_mais_registros', () => {
+  cy.get(DASHBOARD.BUGS.ROOT)
+    .find(DASHBOARD.BUGS.BOTAO_EXIBIR_MAIS)
+    .should('be.visible')
+})
+
+Cypress.Commands.add('clicar_exibir_mais_bugs', () => {
+  cy.get(DASHBOARD.BUGS.ROOT)
+    .find(DASHBOARD.BUGS.BOTAO_EXIBIR_MAIS)
+    .click()
+})

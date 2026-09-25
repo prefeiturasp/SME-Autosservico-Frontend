@@ -51,4 +51,15 @@ describe("useTodayAccessCount", () => {
     expect(fetchSpy).toHaveBeenCalledWith("/api/sigpae/usuarios/acessos-hoje");
     expect(result.current.data).toEqual(mockData);
   });
+
+  it("usa mock e não busca para sistemas não integrados", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch");
+    const { result } = renderHook(
+      () => useTodayAccessCount({ systemName: "SigEscola" }),
+      { wrapper: createWrapper() }
+    );
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(result.current.data?.accessCount).toBe(2453);
+  });
 });

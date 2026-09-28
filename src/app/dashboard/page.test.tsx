@@ -1102,12 +1102,11 @@ describe("Dashboard page", () => {
         expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
             "SGP",
         );
-        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
-            "SGP",
-        );
-        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
-            "SGP",
-        );
+        // SGP não tem log de acessos: únicos por dia e acessos por hora ficam ocultos.
+        expect(
+            screen.queryByTestId("unique-users-per-day-card"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
         expect(screen.getByTestId("sgp-section")).toHaveTextContent("SGP");
 
         expect(

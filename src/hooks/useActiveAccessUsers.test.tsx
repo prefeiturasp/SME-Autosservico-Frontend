@@ -52,6 +52,27 @@ describe("useActiveAccessUsers", () => {
     expect(result.current.data).toEqual(mockData);
   });
 
+  it("busca no endpoint do SGP quando o sistema é SGP", async () => {
+    const mockData: ActiveAccessUsersResponse = {
+      activeCount: 8398,
+      trend: "above",
+      trendLabel: "453 novos nos últimos 30 dias",
+    };
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => mockData,
+    } as unknown as Response);
+
+    const { result } = renderHook(
+      () => useActiveAccessUsers({ systemName: "SGP" }),
+      { wrapper: createWrapper() }
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fetchSpy).toHaveBeenCalledWith("/api/sgp/usuarios/acesso-ativo");
+    expect(result.current.data).toEqual(mockData);
+  });
+
   it("usa mock e não busca para sistemas não integrados", async () => {
     const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(

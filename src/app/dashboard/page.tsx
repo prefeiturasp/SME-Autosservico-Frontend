@@ -394,8 +394,17 @@ export default function Dashboard() {
                         {!SISTEMAS_SEM_KPIS_GENERICOS.has(projectName) && (
                             <div className="grid grid-cols-3 gap-4 mb-4">
                                 <ActiveUsersMetricCard systemName={projectName} />
-                                <UniqueUsersPerDayCard systemName={projectName} />
-                                <TodayAccessCard systemName={projectName} />
+                                {/* SGP não tem log de acessos: só "acesso ativo". */}
+                                {projectName !== "SGP" && (
+                                    <>
+                                        <UniqueUsersPerDayCard
+                                            systemName={projectName}
+                                        />
+                                        <TodayAccessCard
+                                            systemName={projectName}
+                                        />
+                                    </>
+                                )}
                             </div>
                         )}
                         {metricasContentBySistema[projectName]}

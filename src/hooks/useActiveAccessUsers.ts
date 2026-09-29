@@ -5,7 +5,12 @@ type Options = {
   systemName: string;
 };
 
-// Só o SigPAE está integrado ao banco; os demais sistemas seguem em mock.
+// Sistemas já integrados ao banco; os demais seguem em mock.
+const ROTAS_REAIS: Record<string, string> = {
+  SigPAE: "/api/sigpae/usuarios/acesso-ativo",
+  SGP: "/api/sgp/usuarios/acesso-ativo",
+};
+
 const MOCK_RESPONSE: ActiveAccessUsersResponse = {
   activeCount: 8398,
   trend: "above",
@@ -18,10 +23,11 @@ export function useActiveAccessUsers({ systemName }: Options) {
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      if (systemName !== "SigPAE") {
+      const rota = ROTAS_REAIS[systemName];
+      if (!rota) {
         return MOCK_RESPONSE;
       }
-      const res = await fetch("/api/sigpae/usuarios/acesso-ativo");
+      const res = await fetch(rota);
       if (!res.ok) {
         throw new Error("Falha ao buscar usuários com acesso ativo");
       }

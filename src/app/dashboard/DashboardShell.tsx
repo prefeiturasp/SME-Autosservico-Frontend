@@ -2,7 +2,6 @@
 
 import AnalyticsFilters from "@/components/dashboard/Analytics/AnalyticsFilters";
 import { AnalyticsTourOverlay } from "@/components/dashboard/Onboarding/AnalyticsTourOverlay";
-import { DeployHealthTourOverlay } from "@/components/dashboard/Onboarding/DeployHealthTourOverlay";
 import { TourOverlay } from "@/components/dashboard/Onboarding/TourOverlay";
 import { WelcomeModal } from "@/components/dashboard/Onboarding/WelcomeModal";
 import { PageHeader } from "@/components/dashboard/page-header";
@@ -43,7 +42,6 @@ export function DashboardShell({ children, session }: DashboardShellProps) {
                     </SidebarInset>
                     <WelcomeModal />
                     <TourOverlay />
-                    <DeployHealthTourOverlay />
                     <AnalyticsTourOverlay />
                 </SidebarProvider>
             </SessionGuard>

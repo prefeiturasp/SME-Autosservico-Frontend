@@ -4,11 +4,8 @@ import AverageSessionCard from "@/components/dashboard/AverageSessionCard";
 import AzureDevOpsBacklog from "@/components/dashboard/AzureDevOpsBacklog";
 import CardWrapperInfoAmbientes from "@/components/dashboard/CardWrapperInfoAmbientes";
 import DatabaseStatusCard from "@/components/dashboard/DatabaseStatusCard";
-import EnvironmentHeader from "@/components/dashboard/DeployHealth/EnvironmentHeader";
-import SonarQualityIndicatorsCard from "@/components/dashboard/DeployHealth/SonarQuality/SonarQualityIndicatorsCard";
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
-import JenkinsJob from "@/components/dashboard/JenkinsJob";
 import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparisonCard";
 import AcessoAtivoGipeCard from "@/components/dashboard/Metricas/AcessoAtivoGipeCard";
 import AcessoAtivoSiglaCard from "@/components/dashboard/Metricas/AcessoAtivoSiglaCard";
@@ -52,14 +49,12 @@ import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
 import UsersWithAccessCard from "@/components/dashboard/UsersWithAccessCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
-import { useDeployHealthOnboarding } from "@/hooks/useDeployHealthOnboarding";
 import useDashboardStore from "@/states/dashboard";
 import {
     DEFAULT_ACCESS_COMPARISON_PERIOD,
     type AccessComparisonPeriod,
 } from "@/types/accessComparisonPeriod";
 import type { DashboardTab } from "@/types/analyticsPeriod";
-import type { DeployEnvironment } from "@/types/deployEnvironment";
 import { ALL_DRES_VALUE } from "@/types/dreOption";
 import { DEFAULT_PERIODO_LETIVO } from "@/types/periodoLetivoOption";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
@@ -130,8 +125,6 @@ export default function Dashboard() {
     const projectNameFilasRabbitMQ =
         activeProject?.zabbixQueryFilasRabbitMQ?.trim() ?? "";
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
-    const [deployEnvironment, setDeployEnvironment] =
-        useState<DeployEnvironment>("producao");
     const [accessComparisonPeriod, setAccessComparisonPeriod] =
         useState<AccessComparisonPeriod>(DEFAULT_ACCESS_COMPARISON_PERIOD);
     const [sigEscolaFiltros, setSigEscolaFiltros] = useState<SigEscolaFiltros>({
@@ -143,7 +136,6 @@ export default function Dashboard() {
         ue: ALL_UES_VALUE,
     });
     const [activeTabValue, setActiveTabValue] = useState("operacional");
-    const { triggerDeployTour } = useDeployHealthOnboarding();
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
 
     const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
@@ -241,7 +233,6 @@ export default function Dashboard() {
                 onValueChange={(value) => {
                     setActiveTabValue(value);
                     setActiveTab(value as DashboardTab);
-                    if (value === "saude-deploy") triggerDeployTour();
                     if (value === "analytics") triggerAnalyticsTour();
                 }}
             >
@@ -251,9 +242,6 @@ export default function Dashboard() {
                         <TabsTrigger value="metricas">Métricas</TabsTrigger>
                     )}
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                    <TabsTrigger value="saude-deploy">
-                        Saúde do deploy
-                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="operacional">
@@ -469,37 +457,6 @@ export default function Dashboard() {
                     </FullWidthSection>
                 </TabsContent>
 
-                <TabsContent value="saude-deploy">
-                    <EnvironmentHeader
-                        value={deployEnvironment}
-                        onChange={setDeployEnvironment}
-                    />
-                    <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
-                        <div
-                            id="onboarding-lancamentos"
-                            className="lg:col-span-1"
-                        >
-                            <JenkinsJob
-                                project={projectName}
-                                subprojects={jenkinsSubprojects}
-                                environment={deployEnvironment}
-                            />
-                        </div>
-                        <div
-                            id="onboarding-sonar-quality"
-                            className="lg:col-span-3"
-                        >
-                            <SonarQualityIndicatorsCard
-                                projectName={projectName}
-                                sonarProjectKey={activeProject?.sonarProjectKey}
-                                zabbixQueryJenkinsJob={
-                                    activeProject?.zabbixQueryJenkinsJob
-                                }
-                                environment={deployEnvironment}
-                            />
-                        </div>
-                    </div>
-                </TabsContent>
             </Tabs>
         </div>
     );

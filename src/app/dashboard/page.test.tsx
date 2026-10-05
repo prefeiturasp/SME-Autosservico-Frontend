@@ -84,23 +84,6 @@ vi.mock("@/components/dashboard/SaudeDosServidores/Filas", () => ({
     }) => <div data-testid={`filas-${title ?? "Filas"}`}>{projectName}</div>,
 }));
 
-vi.mock("@/components/dashboard/JenkinsJob", () => ({
-    __esModule: true,
-    default: ({
-        title,
-        project,
-        subprojects,
-    }: {
-        title?: string;
-        project: string;
-        subprojects?: unknown[];
-    }) => (
-        <div data-testid={`jenkins-${title ?? "Jenkins - Branches e Builds"}`}>
-            {project}::{Array.isArray(subprojects) ? subprojects.length : 0}
-        </div>
-    ),
-}));
-
 vi.mock("@/components/dashboard/Releases", () => ({
     __esModule: true,
     default: ({
@@ -117,29 +100,6 @@ vi.mock("@/components/dashboard/Releases", () => ({
         </div>
     ),
 }));
-
-vi.mock("@/components/dashboard/DeployHealth/EnvironmentHeader", () => ({
-    __esModule: true,
-    default: () => <div data-testid="environment-header">Ambiente</div>,
-}));
-
-vi.mock(
-    "@/components/dashboard/DeployHealth/SonarQuality/SonarQualityIndicatorsCard",
-    () => ({
-        __esModule: true,
-        default: ({
-            projectName,
-            className,
-        }: {
-            projectName: string;
-            className?: string;
-        }) => (
-            <div data-testid="sonar-quality" className={className}>
-                {projectName}
-            </div>
-        ),
-    }),
-);
 
 vi.mock("@/components/dashboard/ActiveUsersCard", () => ({
     __esModule: true,
@@ -506,33 +466,18 @@ describe("Dashboard page", () => {
         );
     });
 
-    test("renderiza Jenkins - Branches e Builds na aba Saúde do deploy à esquerda do Sonar", () => {
+    test("não exibe a aba Saúde do deploy", () => {
         mockStoreState = {
             ...mockStoreState,
             activeItem: { title: "COPED" },
-            activeProject: {
-                nome: "Novo SGP",
-                zabbixQueryFrontend: "Portal SME",
-                zabbixQueryBackend: "API SME",
-                zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
-                jenkinsSubprojects: [
-                    { label: "Backend", key: "SME-NovoSGP/master" },
-                ],
-            },
+            activeProject: { nome: "Novo SGP" },
         };
 
         render(withClient(<Dashboard />));
 
-        fireEvent.click(screen.getByRole("tab", { name: "Saúde do deploy" }));
-
-        const jenkins = screen.getByTestId(
-            "jenkins-Jenkins - Branches e Builds",
-        );
-        const sonar = screen.getByTestId("sonar-quality");
-
-        expect(jenkins).toHaveTextContent("Novo SGP::1");
-        expect(jenkins.parentElement).toHaveClass("lg:col-span-1");
-        expect(sonar.parentElement).toHaveClass("lg:col-span-3");
+        expect(
+            screen.queryByRole("tab", { name: "Saúde do deploy" }),
+        ).not.toBeInTheDocument();
     });
 
     test("renderiza o card Lançamentos na aba Operacional", () => {

@@ -75,6 +75,10 @@ const SISTEMAS_COM_METRICAS = new Set([
     "Limpeza",
 ]);
 
+// Nenhum sistema tem integração com o Google Analytics ainda (os cards da aba
+// são mock); incluir o nome aqui conforme a integração de cada um for liberada.
+const SISTEMAS_COM_ANALYTICS = new Set<string>([]);
+
 const SISTEMAS_SEM_KPIS_GENERICOS = new Set([
     "Rolê Agroecológico",
     "Bens Físicos",
@@ -139,6 +143,7 @@ export default function Dashboard() {
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
 
     const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
+    const showAnalytics = SISTEMAS_COM_ANALYTICS.has(projectName);
 
     // Indicadores de participação (vivências) ainda usam mock e não têm
     // fonte no banco; ocultar até definir a origem dos dados.
@@ -225,6 +230,13 @@ export default function Dashboard() {
         }
     }, [showMetricas, activeTabValue]);
 
+    useEffect(() => {
+        if (!showAnalytics && activeTabValue === "analytics") {
+            setActiveTabValue("operacional");
+            setActiveTab("operacional");
+        }
+    }, [showAnalytics, activeTabValue, setActiveTab]);
+
     return (
         <div className="bg-background px-6 py-4">
             <Tabs
@@ -241,7 +253,9 @@ export default function Dashboard() {
                     {showMetricas && (
                         <TabsTrigger value="metricas">Métricas</TabsTrigger>
                     )}
-                    <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                    {showAnalytics && (
+                        <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                    )}
                 </TabsList>
 
                 <TabsContent value="operacional">
@@ -399,64 +413,65 @@ export default function Dashboard() {
                     </TabsContent>
                 )}
 
-                <TabsContent value="analytics">
-                    <div
-                        id="onboarding-analytics-kpis"
-                        className="grid grid-cols-3 gap-4 mb-4"
-                    >
-                        <ActiveUsersCard
-                            systemName={projectName}
-                            period={activePeriod}
-                        />
-                        <AverageSessionCard
-                            systemName={projectName}
-                            period={activePeriod}
-                        />
-                        <PeakUsageTodayCard
-                            systemName={projectName}
-                            period={activePeriod}
-                        />
-                    </div>
-                    <div className="grid grid-cols-4 gap-4 mb-4">
+                {showAnalytics && (
+                    <TabsContent value="analytics">
                         <div
-                            id="onboarding-analytics-users-by-page"
-                            className="col-span-2"
+                            id="onboarding-analytics-kpis"
+                            className="grid grid-cols-3 gap-4 mb-4"
                         >
-                            <UsersByPageCard
+                            <ActiveUsersCard
                                 systemName={projectName}
                                 period={activePeriod}
-                                coordenadoria={activeItem?.title}
                             />
-                        </div>
-                        <div
-                            id="onboarding-analytics-device-distribution"
-                            className="col-span-2"
-                        >
-                            <DeviceDistributionCard
+                            <AverageSessionCard
+                                systemName={projectName}
+                                period={activePeriod}
+                            />
+                            <PeakUsageTodayCard
                                 systemName={projectName}
                                 period={activePeriod}
                             />
                         </div>
-                    </div>
-                    <FullWidthSection
-                        id="onboarding-analytics-peak-hours"
-                        title="Horários de pico"
-                        tooltip={
-                            <p>
-                                Essa seção mostra os horários com maior volume
-                                de acessos ao sistema, permitindo identificar os
-                                picos de uso ao longo do dia.
-                            </p>
-                        }
-                    >
-                        <PeakHoursChart
-                            systemName={projectName}
-                            period={activePeriod}
-                            className="p-[2px]"
-                        />
-                    </FullWidthSection>
-                </TabsContent>
-
+                        <div className="grid grid-cols-4 gap-4 mb-4">
+                            <div
+                                id="onboarding-analytics-users-by-page"
+                                className="col-span-2"
+                            >
+                                <UsersByPageCard
+                                    systemName={projectName}
+                                    period={activePeriod}
+                                    coordenadoria={activeItem?.title}
+                                />
+                            </div>
+                            <div
+                                id="onboarding-analytics-device-distribution"
+                                className="col-span-2"
+                            >
+                                <DeviceDistributionCard
+                                    systemName={projectName}
+                                    period={activePeriod}
+                                />
+                            </div>
+                        </div>
+                        <FullWidthSection
+                            id="onboarding-analytics-peak-hours"
+                            title="Horários de pico"
+                            tooltip={
+                                <p>
+                                    Essa seção mostra os horários com maior
+                                    volume de acessos ao sistema, permitindo
+                                    identificar os picos de uso ao longo do dia.
+                                </p>
+                            }
+                        >
+                            <PeakHoursChart
+                                systemName={projectName}
+                                period={activePeriod}
+                                className="p-[2px]"
+                            />
+                        </FullWidthSection>
+                    </TabsContent>
+                )}
             </Tabs>
         </div>
     );

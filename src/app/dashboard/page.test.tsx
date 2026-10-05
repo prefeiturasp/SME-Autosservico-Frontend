@@ -543,49 +543,27 @@ describe("Dashboard page", () => {
         );
     });
 
-    test("deve renderizar os cards analytics ao clicar na aba Analytics", () => {
-        render(withClient(<Dashboard />));
+    test.each(["Novo SGP", "SigPAE", "Intranet", "GIPE"])(
+        "não exibe a aba Analytics nem os cards dela para %s",
+        (nome) => {
+            mockStoreState = {
+                ...mockStoreState,
+                activeProject: { ...mockStoreState.activeProject, nome },
+            };
 
-        fireEvent.click(screen.getByRole("tab", { name: "Analytics" }));
+            render(withClient(<Dashboard />));
 
-        expect(screen.getByTestId("active-users-card")).toHaveTextContent(
-            "Novo SGP",
-        );
-        expect(screen.getByTestId("average-session-card")).toHaveTextContent(
-            "Novo SGP",
-        );
-        expect(screen.getByTestId("peak-usage-today-card")).toHaveTextContent(
-            "Novo SGP",
-        );
-        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
-            "Novo SGP",
-        );
-        expect(
-            screen.getByTestId("device-distribution-card"),
-        ).toHaveTextContent("Novo SGP");
-        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
-            "COPED",
-        );
-        expect(screen.getByTestId("peak-hours-chart")).toHaveTextContent(
-            "Novo SGP",
-        );
-    });
-
-    test("propaga a coordenadoria CODAE pro UsersByPageCard", () => {
-        mockStoreState = {
-            ...mockStoreState,
-            activeItem: { title: "CODAE" },
-            activeProject: { ...mockStoreState.activeProject, nome: "SigPAE" },
-        };
-
-        render(withClient(<Dashboard />));
-
-        fireEvent.click(screen.getByRole("tab", { name: "Analytics" }));
-
-        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
-            "SigPAE::CODAE",
-        );
-    });
+            expect(
+                screen.queryByRole("tab", { name: "Analytics" }),
+            ).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("active-users-card"),
+            ).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("peak-hours-chart"),
+            ).not.toBeInTheDocument();
+        },
+    );
 
     test("quando um campo específico está undefined, cai no fallback vazio para aquele filho", () => {
         mockStoreState = {

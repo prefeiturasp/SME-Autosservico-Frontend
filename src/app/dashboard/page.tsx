@@ -6,10 +6,6 @@ import CardWrapperInfoAmbientes from "@/components/dashboard/CardWrapperInfoAmbi
 import DatabaseStatusCard from "@/components/dashboard/DatabaseStatusCard";
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
-import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparisonCard";
-import AcessoAtivoGipeCard from "@/components/dashboard/Metricas/AcessoAtivoGipeCard";
-import AcessoAtivoSiglaCard from "@/components/dashboard/Metricas/AcessoAtivoSiglaCard";
-import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
 import AgendamentosRolesSection from "@/components/dashboard/Metricas/AgendamentosRolesSection";
 import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
 import BensFisicosSection from "@/components/dashboard/Metricas/BensFisicosSection";
@@ -31,15 +27,8 @@ import RelatoriosSection from "@/components/dashboard/Metricas/RelatoriosSection
 import SgpSection from "@/components/dashboard/Metricas/SgpSection";
 import SigEscolaSection from "@/components/dashboard/Metricas/SigEscolaSection";
 import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
-import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
-import TotalAcessosHojeGipeCard from "@/components/dashboard/Metricas/TotalAcessosHojeGipeCard";
-import TotalAcessosHojeSiglaCard from "@/components/dashboard/Metricas/TotalAcessosHojeSiglaCard";
 import UnidadesProdutivasSection from "@/components/dashboard/Metricas/UnidadesProdutivasSection";
-import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
-import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
 import UsuariosSection from "@/components/dashboard/Metricas/UsuariosSection";
-import UsuariosUnicosGipeCard from "@/components/dashboard/Metricas/UsuariosUnicosGipeCard";
-import UsuariosUnicosSiglaCard from "@/components/dashboard/Metricas/UsuariosUnicosSiglaCard";
 import VagasSection from "@/components/dashboard/Metricas/VagasSection";
 import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
@@ -50,10 +39,6 @@ import UsersWithAccessCard from "@/components/dashboard/UsersWithAccessCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
 import useDashboardStore from "@/states/dashboard";
-import {
-    DEFAULT_ACCESS_COMPARISON_PERIOD,
-    type AccessComparisonPeriod,
-} from "@/types/accessComparisonPeriod";
 import type { DashboardTab } from "@/types/analyticsPeriod";
 import { ALL_DRES_VALUE } from "@/types/dreOption";
 import { DEFAULT_PERIODO_LETIVO } from "@/types/periodoLetivoOption";
@@ -69,15 +54,6 @@ const SISTEMAS_COM_METRICAS = new Set(["SigPAE", "Intranet", "SGP", "SigEscola"]
 // Nenhum sistema tem integração com o Google Analytics ainda (os cards da aba
 // são mock); incluir o nome aqui conforme a integração de cada um for liberada.
 const SISTEMAS_COM_ANALYTICS = new Set<string>([]);
-
-const SISTEMAS_SEM_KPIS_GENERICOS = new Set([
-    "Rolê Agroecológico",
-    "Bens Físicos",
-    "SigEscola",
-    "Sigla",
-    "GIPE",
-    "Limpeza",
-]);
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -120,8 +96,6 @@ export default function Dashboard() {
     const projectNameFilasRabbitMQ =
         activeProject?.zabbixQueryFilasRabbitMQ?.trim() ?? "";
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
-    const [accessComparisonPeriod, setAccessComparisonPeriod] =
-        useState<AccessComparisonPeriod>(DEFAULT_ACCESS_COMPARISON_PERIOD);
     const [sigEscolaFiltros, setSigEscolaFiltros] = useState<SigEscolaFiltros>({
         modo: "periodo",
         periodo: DEFAULT_PERIODO_LETIVO,
@@ -143,14 +117,6 @@ export default function Dashboard() {
     const metricasContentBySistema: Record<string, React.ReactNode> = {
         SigPAE: (
             <>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                    <UsersByProfileCard systemName={projectName} />
-                    <AccessComparisonCard
-                        systemName={projectName}
-                        period={accessComparisonPeriod}
-                        onPeriodChange={setAccessComparisonPeriod}
-                    />
-                </div>
                 <AlimentacaoTerceirizadaSection systemName={projectName} />
                 <LogisticaSection systemName={projectName} />
             </>
@@ -185,11 +151,6 @@ export default function Dashboard() {
         ),
         Sigla: (
             <>
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                    <AcessoAtivoSiglaCard systemName={projectName} />
-                    <UsuariosUnicosSiglaCard systemName={projectName} />
-                    <TotalAcessosHojeSiglaCard systemName={projectName} />
-                </div>
                 <ConvocacaoSection systemName={projectName} />
                 <CandidatosSection systemName={projectName} />
                 <VagasSection systemName={projectName} />
@@ -200,11 +161,6 @@ export default function Dashboard() {
         ),
         GIPE: (
             <>
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                    <AcessoAtivoGipeCard systemName={projectName} />
-                    <UsuariosUnicosGipeCard systemName={projectName} />
-                    <TotalAcessosHojeGipeCard systemName={projectName} />
-                </div>
                 <OcorrenciasSection systemName={projectName} />
                 <FluxoDeAtendimentoSection systemName={projectName} />
                 <DistribuicaoSection systemName={projectName} />
@@ -384,22 +340,6 @@ export default function Dashboard() {
 
                 {showMetricas && (
                     <TabsContent value="metricas">
-                        {!SISTEMAS_SEM_KPIS_GENERICOS.has(projectName) && (
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                                <ActiveUsersMetricCard systemName={projectName} />
-                                {/* SGP não tem log de acessos: só "acesso ativo". */}
-                                {projectName !== "SGP" && (
-                                    <>
-                                        <UniqueUsersPerDayCard
-                                            systemName={projectName}
-                                        />
-                                        <TodayAccessCard
-                                            systemName={projectName}
-                                        />
-                                    </>
-                                )}
-                            </div>
-                        )}
                         {metricasContentBySistema[projectName]}
                     </TabsContent>
                 )}

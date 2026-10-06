@@ -627,21 +627,19 @@ describe("Dashboard page", () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
 
-        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
-            "SigPAE",
-        );
-        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
-            "SigPAE",
-        );
-        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
-            "SigPAE",
-        );
-        expect(screen.getByTestId("users-by-profile-card")).toHaveTextContent(
-            "SigPAE",
-        );
-        expect(screen.getByTestId("access-comparison-card")).toHaveTextContent(
-            "SigPAE",
-        );
+        expect(
+            screen.queryByTestId("active-users-metric-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unique-users-per-day-card"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
         expect(
             screen.getByTestId("alimentacao-terceirizada-section"),
         ).toHaveTextContent("SigPAE");
@@ -732,15 +730,13 @@ describe("Dashboard page", () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
 
-        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
-            "Intranet",
-        );
-        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
-            "Intranet",
-        );
-        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
-            "Intranet",
-        );
+        expect(
+            screen.queryByTestId("active-users-metric-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unique-users-per-day-card"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
         expect(screen.getByTestId("sorteios-section")).toHaveTextContent(
             "Intranet",
         );
@@ -836,9 +832,9 @@ describe("Dashboard page", () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
 
-        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
-            "SGP",
-        );
+        expect(
+            screen.queryByTestId("active-users-metric-card"),
+        ).not.toBeInTheDocument();
         // SGP não tem log de acessos: únicos por dia e acessos por hora ficam ocultos.
         expect(
             screen.queryByTestId("unique-users-per-day-card"),

@@ -61,19 +61,10 @@ import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 import { ALL_UES_VALUE } from "@/types/ueOption";
 import { useEffect, useState } from "react";
 
-const SISTEMAS_COM_METRICAS = new Set([
-    "SigPAE",
-    "Intranet",
-    "Serap",
-    "Serap Estudantes",
-    "SGP",
-    "Rolê Agroecológico",
-    "Bens Físicos",
-    "SigEscola",
-    "Sigla",
-    "GIPE",
-    "Limpeza",
-]);
+// Só sistemas integrados ao banco ou com a integração em andamento; os demais
+// (com seção pronta em metricasContentBySistema, mas mock) entram aqui conforme
+// a integração de cada um for liberada.
+const SISTEMAS_COM_METRICAS = new Set(["SigPAE", "Intranet", "SGP", "SigEscola"]);
 
 // Nenhum sistema tem integração com o Google Analytics ainda (os cards da aba
 // são mock); incluir o nome aqui conforme a integração de cada um for liberada.

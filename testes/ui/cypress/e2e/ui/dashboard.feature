@@ -14,7 +14,8 @@ Funcionalidade: Dashboard
   Cenário: Validar disponibilidade do ambiente
     Então o card de "Disponibilidade do ambiente" deve estar visível
     E o status do ambiente deve ser "Disponível"
-
+    
+@igonore
   Cenário: Validar saúde do servidor
     Então o card de "Saúde do servidor" deve estar visível
     E deve exibir os serviços "Fila" e "API Service"

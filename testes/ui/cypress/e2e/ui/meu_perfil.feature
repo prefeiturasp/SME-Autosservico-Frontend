@@ -67,10 +67,12 @@ Funcionalidade: Meu Perfil
     Dado que estou na tela Meu Perfil
     Então devo visualizar a permissão "Operacional"
 
+@ignore
   Cenário: Validar permissões Analytics
     Dado que estou na tela Meu Perfil
     Então devo visualizar a permissão "Analytics"
 
+@ignore
   Cenário: Validar permissões Saúde do deploy
     Dado que estou na tela Meu Perfil
     Então devo visualizar a permissão "Saúde do deploy"

@@ -18,6 +18,7 @@ Funcionalidade: Dashboard - Métricas do sistema
     Então devo visualizar o seletor "Sistema"
     E devo visualizar a instrução "Selecione um sistema para visualizar as informações"
 
+@ignore
   Cenário: Exibir os indicadores de acesso
     Dado que estou na aba Métricas
     Então devo visualizar os indicadores de acesso

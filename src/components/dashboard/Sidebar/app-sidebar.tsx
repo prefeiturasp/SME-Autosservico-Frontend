@@ -20,7 +20,7 @@ import { useAllowedSquads } from "@/hooks/useAllowedSquads";
 import { CustomTrigger } from "./custom-trigger";
 import { COORDENADORIAS } from "./coordenadorias";
 
-// Coordenadorias liberadas para todo usuário do Autosserviço, além das que
+// Coordenadorias liberadas para qualquer usuário do Autosserviço, além das que
 // vêm do perfil: COPED (SERAp) e COPLAN (SIG-Escola).
 const COORDENADORIAS_LIBERADAS = new Set(["COPED", "COPLAN"]);
 

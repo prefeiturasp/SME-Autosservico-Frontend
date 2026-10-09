@@ -597,8 +597,6 @@ describe("Dashboard page", () => {
     });
 
     test.each([
-        "Serap",
-        "Serap Estudantes",
         "Rolê Agroecológico",
         "Bens Físicos",
         "Sigla",
@@ -921,6 +919,44 @@ describe("Dashboard page", () => {
             screen.queryByTestId("produtividade-section"),
         ).not.toBeInTheDocument();
         expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com a seção Provas quando o projeto ativo é o Serap", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "Serap" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("provas-section")).toHaveTextContent("Serap");
+        // SERAp não tem fonte de acessos: nenhum card de usuários.
+        expect(
+            screen.queryByTestId("active-users-metric-card"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas só com o acesso ativo quando o projeto ativo é o Serap Estudantes", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: {
+                ...mockStoreState.activeProject,
+                nome: "Serap Estudantes",
+            },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "Serap Estudantes",
+        );
+        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
+        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas com a seção do SigEscola quando o projeto ativo é o SigEscola", () => {

@@ -1,37 +1,10 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import {
-  fetchAcompanhamentoFechamento,
-  resolverPeriodo,
-} from "@/actions/_helpers/sgpMetricas";
+import { fetchAcompanhamentoFechamento } from "@/actions/_helpers/sgpMetricas";
+import { criarRotaMetricaPorPeriodo } from "@/actions/_helpers/rotaMetricaPorPeriodo";
 
 export const runtime = "nodejs";
 export const revalidate = 0;
 
-export async function GET(request: Request) {
-  const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const { anoLetivo, bimestre } = resolverPeriodo(
-      new URL(request.url).searchParams,
-    );
-    const data = await fetchAcompanhamentoFechamento(anoLetivo, bimestre);
-    return NextResponse.json(data);
-  } catch (e: unknown) {
-    const errorMessage =
-      typeof e === "object" && e !== null && "message" in e
-        ? (e as { message?: string }).message
-        : "Erro ao consultar acompanhamento de fechamento do SGP";
-    return NextResponse.json(
-      {
-        error:
-          errorMessage ??
-          "Erro ao consultar acompanhamento de fechamento do SGP",
-      },
-      { status: 500 },
-    );
-  }
-}
+export const GET = criarRotaMetricaPorPeriodo(
+  fetchAcompanhamentoFechamento,
+  "Erro ao consultar acompanhamento de fechamento do SGP",
+);

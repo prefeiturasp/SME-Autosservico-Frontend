@@ -167,6 +167,39 @@ describe("resolverPeriodo", () => {
   it("cai no período corrente quando a query está vazia", () => {
     expect(resolverPeriodo(new URLSearchParams())).toEqual(periodoCorrente());
   });
+
+  it("descarta bimestre fora de 1..4 e usa o bimestre corrente", () => {
+    const { bimestre } = periodoCorrente();
+
+    for (const invalido of ["9", "0", "-1", "2.5", "abc"]) {
+      const params = new URLSearchParams(`ano_letivo=2025&bimestre=${invalido}`);
+
+      expect(resolverPeriodo(params)).toEqual({ anoLetivo: 2025, bimestre });
+    }
+  });
+
+  it("descarta ano_letivo fora de 2020..ano corrente + 1 e usa o ano corrente", () => {
+    const { anoLetivo } = periodoCorrente();
+
+    for (const invalido of ["1999", "2019", String(anoLetivo + 2), "2025.5", "abc"]) {
+      const params = new URLSearchParams(`ano_letivo=${invalido}&bimestre=3`);
+
+      expect(resolverPeriodo(params)).toEqual({ anoLetivo, bimestre: 3 });
+    }
+  });
+
+  it("aceita os limites válidos de ano_letivo e bimestre", () => {
+    const { anoLetivo } = periodoCorrente();
+
+    expect(
+      resolverPeriodo(new URLSearchParams("ano_letivo=2020&bimestre=1")),
+    ).toEqual({ anoLetivo: 2020, bimestre: 1 });
+    expect(
+      resolverPeriodo(
+        new URLSearchParams(`ano_letivo=${anoLetivo + 1}&bimestre=4`),
+      ),
+    ).toEqual({ anoLetivo: anoLetivo + 1, bimestre: 4 });
+  });
 });
 
 describe("periodoCorrente", () => {

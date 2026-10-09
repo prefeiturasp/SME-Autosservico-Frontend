@@ -6,6 +6,7 @@ import CardWrapperInfoAmbientes from "@/components/dashboard/CardWrapperInfoAmbi
 import DatabaseStatusCard from "@/components/dashboard/DatabaseStatusCard";
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
+import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
 import AgendamentosRolesSection from "@/components/dashboard/Metricas/AgendamentosRolesSection";
 import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
 import BensFisicosSection from "@/components/dashboard/Metricas/BensFisicosSection";
@@ -49,7 +50,14 @@ import { useEffect, useState } from "react";
 // Só sistemas integrados ao banco ou com a integração em andamento; os demais
 // (com seção pronta em metricasContentBySistema, mas mock) entram aqui conforme
 // a integração de cada um for liberada.
-const SISTEMAS_COM_METRICAS = new Set(["SigPAE", "Intranet", "SGP", "SigEscola"]);
+const SISTEMAS_COM_METRICAS = new Set([
+    "SigPAE",
+    "Intranet",
+    "SGP",
+    "SigEscola",
+    "Serap",
+    "Serap Estudantes",
+]);
 
 // Nenhum sistema tem integração com o Google Analytics ainda (os cards da aba
 // são mock); incluir o nome aqui conforme a integração de cada um for liberada.
@@ -129,6 +137,12 @@ export default function Dashboard() {
             </>
         ),
         Serap: <ProvasSection systemName={projectName} />,
+        // Sem log de acessos: do Figma, só "acesso ativo" tem fonte.
+        "Serap Estudantes": (
+            <div className="grid grid-cols-3 gap-4 mb-4">
+                <ActiveUsersMetricCard systemName={projectName} />
+            </div>
+        ),
         SGP: <SgpSection systemName={projectName} />,
         "Rolê Agroecológico": (
             <>

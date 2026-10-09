@@ -75,15 +75,27 @@ export function periodoCorrente(): { anoLetivo: number; bimestre: number } {
   };
 }
 
-/** Lê ano_letivo/bimestre da query, caindo no período corrente se ausentes. */
+/**
+ * Lê ano_letivo/bimestre da query, caindo no período corrente se ausentes ou
+ * inválidos. Valida na borda para que um valor arbitrário não gere uma chave
+ * de cache nova (e uma task/consulta pesada) a cada requisição.
+ */
 export function resolverPeriodo(searchParams: URLSearchParams): {
   anoLetivo: number;
   bimestre: number;
 } {
   const corrente = periodoCorrente();
+  const ano = Number(searchParams.get("ano_letivo"));
+  const bimestre = Number(searchParams.get("bimestre"));
   return {
-    anoLetivo: Number(searchParams.get("ano_letivo")) || corrente.anoLetivo,
-    bimestre: Number(searchParams.get("bimestre")) || corrente.bimestre,
+    anoLetivo:
+      Number.isInteger(ano) && ano >= 2020 && ano <= corrente.anoLetivo + 1
+        ? ano
+        : corrente.anoLetivo,
+    bimestre:
+      Number.isInteger(bimestre) && bimestre >= 1 && bimestre <= 4
+        ? bimestre
+        : corrente.bimestre,
   };
 }
 

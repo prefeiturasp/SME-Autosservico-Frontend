@@ -1,8 +1,8 @@
 import React from "react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useOrdemInscricaoPorDre } from "./useOrdemInscricaoPorDre";
+import type { TableRow } from "@/types/metricas";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -15,59 +15,68 @@ const createWrapper = () => {
   return Wrapper;
 };
 
+const mockFetchOk = (body: unknown) =>
+  vi.spyOn(global, "fetch").mockResolvedValue({
+    ok: true,
+    json: async () => body,
+  } as unknown as Response);
+
 beforeEach(() => {
   vi.restoreAllMocks();
 });
 
+const RESPOSTA: TableRow[] = [
+  { label: "Servidores", value: 39 },
+  { label: "Estagiários", value: 27 },
+];
+
 describe("useOrdemInscricaoPorDre", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
+    const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(() => useOrdemInscricaoPorDre({ systemName: "" }), {
-      wrapper,
+      wrapper: createWrapper(),
     });
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(fetchSpy).not.toHaveBeenCalled();
     expect(result.current.data).toBeUndefined();
   });
 
-  it("usa 'Julho/2026' (2026-07) como mês padrão e retorna as 13 DREs", async () => {
-    const wrapper = createWrapper();
+  it("entra em erro quando a rota responde com falha", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: false,
+    } as unknown as Response);
+    const { result } = renderHook(() => useOrdemInscricaoPorDre({ systemName: "Intranet" }), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+
+  it("usa o mês padrão '2026-07' na query", async () => {
+    const fetchSpy = mockFetchOk(RESPOSTA);
     const { result } = renderHook(
       () => useOrdemInscricaoPorDre({ systemName: "Intranet" }),
-      { wrapper }
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    expect(result.current.data).toHaveLength(13);
-    expect(result.current.data?.slice(0, 5)).toEqual([
-      { label: "Capela do Socorro", value: 15 },
-      { label: "Freguesia/Brasilândia", value: 11 },
-      { label: "Ipiranga", value: 12 },
-      { label: "Butantã", value: 9 },
-      { label: "Guaianases", value: 8 },
-    ]);
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "/api/intranet/ordem-inscricao/por-dre?mes=2026-07",
+    );
+    expect(result.current.data).toEqual(RESPOSTA);
   });
 
-  it("retorna dados para outro mês selecionado", async () => {
-    const wrapper = createWrapper();
+  it("repassa o mês selecionado na query", async () => {
+    const fetchSpy = mockFetchOk(RESPOSTA);
     const { result } = renderHook(
       () => useOrdemInscricaoPorDre({ systemName: "Intranet", month: "2026-03" }),
-      { wrapper }
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toHaveLength(13);
-  });
-
-  it("retorna lista vazia para um mês sem dados mockados", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () => useOrdemInscricaoPorDre({ systemName: "Intranet", month: "2099-01" }),
-      { wrapper }
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "/api/intranet/ordem-inscricao/por-dre?mes=2026-03",
     );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual([]);
   });
 });

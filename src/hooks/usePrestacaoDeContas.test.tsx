@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 import { usePrestacaoDeContas } from "./usePrestacaoDeContas";
@@ -16,14 +16,30 @@ const createWrapper = () => {
   return Wrapper;
 };
 
-const BASE_FILTROS: SigEscolaFiltros = {
-  modo: "periodo",
-  periodo: "2026.2",
+const FILTROS: SigEscolaFiltros = {
+  modo: "intervalo",
+  periodo: "",
   dataInicio: "2026-01-01",
   dataFim: "2026-09-22",
-  dre: "all",
+  dre: "108100",
   ue: "all",
 };
+
+const BLOCO = {
+  destaque: [
+    { label: "UEs aptas a prestar contas pelo sistema", value: 102, variant: "neutral" },
+    { label: "Devolução ao Tesouro", value: 0, variant: "danger", format: "currency" },
+  ],
+  items: [
+    { label: "PCs enviadas ou em andamento com as DREs", value: 2, variant: "neutral" },
+    { label: "Créditos disponíveis para as UEs", value: 12598048, variant: "success", format: "currency" },
+    { label: "Despesas registradas pelas UEs", value: 121769.62, variant: "danger", format: "currency" },
+    { label: "Demonstrativos financeiros gerados pelas UEs", value: 4, variant: "neutral" },
+  ],
+};
+
+const resposta = (ok: boolean) =>
+  ({ ok, json: async () => ({ prestacaoDeContas: BLOCO }) }) as unknown as Response;
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -31,116 +47,48 @@ beforeEach(() => {
 
 describe("usePrestacaoDeContas", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
+    const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(
-      () => usePrestacaoDeContas({ systemName: "", filtros: BASE_FILTROS }),
-      { wrapper },
+      () => usePrestacaoDeContas({ systemName: "", filtros: FILTROS }),
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(fetchSpy).not.toHaveBeenCalled();
     expect(result.current.data).toBeUndefined();
   });
 
-  it("cenário baseline (modo período)", async () => {
-    const wrapper = createWrapper();
+  it("manda o intervalo e a DRE e devolve o bloco de prestação de contas", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(resposta(true));
     const { result } = renderHook(
-      () =>
-        usePrestacaoDeContas({
-          systemName: "SigEscola",
-          filtros: BASE_FILTROS,
-        }),
-      { wrapper },
+      () => usePrestacaoDeContas({ systemName: "SigEscola", filtros: FILTROS }),
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    expect(result.current.data).toEqual({
-      destaque: [
-        {
-          label: "UEs aptas a prestar contas pelo sistema",
-          value: 3683,
-          variant: "neutral",
-        },
-        {
-          label: "Devolução ao Tesouro",
-          value: 2340530,
-          variant: "neutral",
-          format: "currency",
-        },
-      ],
-      items: [
-        {
-          label: "PCs enviadas ou em andamento com as DREs",
-          value: 2490,
-          variant: "neutral",
-        },
-        {
-          label: "Créditos disponíveis para as UEs",
-          value: 197248412.27,
-          variant: "success",
-          format: "currency",
-        },
-        {
-          label: "Despesas registradas pelas UEs",
-          value: 90490083.76,
-          variant: "danger",
-          format: "currency",
-        },
-        {
-          label: "Demonstrativos financeiros gerados pelas UEs",
-          value: 3683,
-          variant: "neutral",
-        },
-      ],
-    });
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "/api/sigescola/metricas?data_inicio=2026-01-01&data_fim=2026-09-22&dre=108100",
+    );
+    expect(result.current.data).toEqual(BLOCO);
   });
 
-  it("cenário intervalo (todas as DREs/UEs)", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () =>
-        usePrestacaoDeContas({
-          systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "intervalo" },
-        }),
-      { wrapper },
-    );
+  it("expõe erro quando a rota falha", async () => {
+    // A rota é retentada por ~30 s (cache frio do BFF): avança o relógio.
+    vi.useFakeTimers();
+    try {
+      vi.spyOn(global, "fetch").mockResolvedValue(resposta(false));
+      const { result } = renderHook(
+        () => usePrestacaoDeContas({ systemName: "SigEscola", filtros: FILTROS }),
+        { wrapper: createWrapper() },
+      );
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.destaque[0].value).toBe(2983);
-    expect(result.current.data?.destaque[1].value).toBe(1699267.12);
-    expect(result.current.data?.items[3].value).toBe(2674);
-  });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(32_000);
+      });
 
-  it("cenário intervalo + DRE Butantã", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () =>
-        usePrestacaoDeContas({
-          systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "intervalo", dre: "butanta" },
-        }),
-      { wrapper },
-    );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.destaque[0].value).toBe(126);
-    expect(result.current.data?.destaque[1].value).toBe(104354.46);
-    expect(result.current.data?.items[3].value).toBe(166);
-  });
-
-  it("cai no baseline pra uma combinação fora dos 3 cenários conhecidos", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () =>
-        usePrestacaoDeContas({
-          systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "intervalo", ue: "cemei-morumbi" },
-        }),
-      { wrapper },
-    );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.destaque[0].value).toBe(3683);
+      expect(result.current.isError).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

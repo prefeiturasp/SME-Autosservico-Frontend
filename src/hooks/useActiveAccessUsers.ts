@@ -10,6 +10,7 @@ const ROTAS_REAIS: Record<string, string> = {
   SigPAE: "/api/sigpae/usuarios/acesso-ativo",
   SGP: "/api/sgp/usuarios/acesso-ativo",
   "Serap Estudantes": "/api/serap/usuarios/acesso-ativo",
+  SigEscola: "/api/sigescola/usuarios/acesso-ativo",
 };
 
 const MOCK_RESPONSE: ActiveAccessUsersResponse = {

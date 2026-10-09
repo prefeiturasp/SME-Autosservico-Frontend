@@ -2,6 +2,7 @@ import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { UniqueUsersPerDayResponse } from "@/types/metricas";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 import { useUsuariosUnicosSigEscola } from "./useUsuariosUnicosSigEscola";
 
@@ -16,13 +17,19 @@ const createWrapper = () => {
   return Wrapper;
 };
 
-const BASE_FILTROS: SigEscolaFiltros = {
+const FILTROS: SigEscolaFiltros = {
   modo: "periodo",
-  periodo: "2026.2",
+  periodo: "",
   dataInicio: "2026-01-01",
   dataFim: "2026-09-22",
   dre: "all",
   ue: "all",
+};
+
+const KPI: UniqueUsersPerDayResponse = {
+  uniqueCount: 2,
+  trend: "below",
+  trendLabel: "23% abaixo da média dos últimos 30 dias",
 };
 
 beforeEach(() => {
@@ -31,79 +38,28 @@ beforeEach(() => {
 
 describe("useUsuariosUnicosSigEscola", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
+    const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(
-      () =>
-        useUsuariosUnicosSigEscola({ systemName: "", filtros: BASE_FILTROS }),
-      { wrapper },
+      () => useUsuariosUnicosSigEscola({ systemName: "", filtros: FILTROS }),
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
-    expect(result.current.data).toBeUndefined();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it("cenário baseline (modo período)", async () => {
-    const wrapper = createWrapper();
+  it("devolve o KPI da rota de métricas do SIG-Escola", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ usuariosUnicos: KPI }),
+    } as unknown as Response);
     const { result } = renderHook(
-      () =>
-        useUsuariosUnicosSigEscola({
-          systemName: "SigEscola",
-          filtros: BASE_FILTROS,
-        }),
-      { wrapper },
+      () => useUsuariosUnicosSigEscola({ systemName: "SigEscola", filtros: FILTROS }),
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    expect(result.current.data).toEqual({
-      uniqueCount: 1560,
-      trend: "above",
-      trendLabel: "8% acima da média dos últimos 30 dias",
-    });
-  });
-
-  it("cenário intervalo (todas as DREs/UEs)", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () =>
-        useUsuariosUnicosSigEscola({
-          systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "intervalo" },
-        }),
-      { wrapper },
-    );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.uniqueCount).toBe(1133);
-  });
-
-  it("cenário intervalo + DRE Butantã", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () =>
-        useUsuariosUnicosSigEscola({
-          systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "intervalo", dre: "butanta" },
-        }),
-      { wrapper },
-    );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.uniqueCount).toBe(70);
-  });
-
-  it("cai no baseline pra uma combinação fora dos 3 cenários conhecidos", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () =>
-        useUsuariosUnicosSigEscola({
-          systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "periodo", dre: "butanta" },
-        }),
-      { wrapper },
-    );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.uniqueCount).toBe(1560);
+    expect(fetchSpy).toHaveBeenCalledWith("/api/sigescola/metricas");
+    expect(result.current.data).toEqual(KPI);
   });
 });

@@ -94,10 +94,31 @@ describe("useActiveAccessUsers", () => {
     expect(result.current.data).toEqual(mockData);
   });
 
+  it("busca no endpoint do SIG-Escola quando o sistema é SigEscola", async () => {
+    const mockData: ActiveAccessUsersResponse = {
+      activeCount: 28,
+      trend: "above",
+      trendLabel: "2 novos nos últimos 30 dias",
+    };
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => mockData,
+    } as unknown as Response);
+
+    const { result } = renderHook(
+      () => useActiveAccessUsers({ systemName: "SigEscola" }),
+      { wrapper: createWrapper() }
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fetchSpy).toHaveBeenCalledWith("/api/sigescola/usuarios/acesso-ativo");
+    expect(result.current.data).toEqual(mockData);
+  });
+
   it("usa mock e não busca para sistemas não integrados", async () => {
     const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(
-      () => useActiveAccessUsers({ systemName: "SigEscola" }),
+      () => useActiveAccessUsers({ systemName: "GIPE" }),
       { wrapper: createWrapper() }
     );
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

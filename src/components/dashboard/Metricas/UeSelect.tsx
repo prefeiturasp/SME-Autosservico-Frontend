@@ -8,15 +8,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { UE_OPTIONS } from "@/types/ueOption";
+import { ALL_UES_VALUE, type UeOption } from "@/types/ueOption";
 
 type Props = {
   readonly value: string;
+  readonly options: ReadonlyArray<UeOption>;
   readonly onChange: (next: string) => void;
   readonly className?: string;
 };
 
-export default function UeSelect({ value, onChange, className }: Props) {
+const TODAS_AS_UES: UeOption = { value: ALL_UES_VALUE, label: "Todas as UEs" };
+
+export default function UeSelect({ value, options, onChange, className }: Props) {
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger
@@ -29,7 +32,7 @@ export default function UeSelect({ value, onChange, className }: Props) {
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {UE_OPTIONS.map((ue) => (
+        {[TODAS_AS_UES, ...options].map((ue) => (
           <SelectItem key={ue.value} value={ue.value}>
             {ue.label}
           </SelectItem>

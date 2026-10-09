@@ -1,8 +1,8 @@
 import React from "react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSorteiosPorDre } from "./useSorteiosPorDre";
+import type { TableRow } from "@/types/metricas";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -15,37 +15,66 @@ const createWrapper = () => {
   return Wrapper;
 };
 
+const mockFetchOk = (body: unknown) =>
+  vi.spyOn(global, "fetch").mockResolvedValue({
+    ok: true,
+    json: async () => body,
+  } as unknown as Response);
+
 beforeEach(() => {
   vi.restoreAllMocks();
 });
 
+const RESPOSTA: TableRow[] = [
+  { label: "Servidores", value: 39 },
+  { label: "Estagiários", value: 27 },
+];
+
 describe("useSorteiosPorDre", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
+    const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(() => useSorteiosPorDre({ systemName: "" }), {
-      wrapper,
+      wrapper: createWrapper(),
     });
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(fetchSpy).not.toHaveBeenCalled();
     expect(result.current.data).toBeUndefined();
   });
 
-  it("retorna as 13 DREs mockadas, com as 5 primeiras batendo com o Figma", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () => useSorteiosPorDre({ systemName: "Intranet" }),
-      { wrapper }
-    );
+  it("entra em erro quando a rota responde com falha", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: false,
+    } as unknown as Response);
+    const { result } = renderHook(() => useSorteiosPorDre({ systemName: "Intranet" }), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+
+  it("usa 'dia' como período padrão", async () => {
+    const fetchSpy = mockFetchOk(RESPOSTA);
+    const { result } = renderHook(() => useSorteiosPorDre({ systemName: "Intranet" }), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    expect(result.current.data).toHaveLength(13);
-    expect(result.current.data?.slice(0, 5)).toEqual([
-      { label: "Capela do Socorro", value: 15 },
-      { label: "Freguesia/Brasilândia", value: 11 },
-      { label: "Ipiranga", value: 12 },
-      { label: "Butantã", value: 9 },
-      { label: "Guaianases", value: 8 },
-    ]);
+    expect(fetchSpy).toHaveBeenCalledWith("/api/intranet/sorteios/por-dre?periodo=dia");
+    expect(result.current.data).toEqual(RESPOSTA);
   });
+
+  it.each(["quinzena", "mes", "trimestre"] as const)(
+    "repassa o período '%s' na query",
+    async (period) => {
+      const fetchSpy = mockFetchOk(RESPOSTA);
+      const { result } = renderHook(
+        () => useSorteiosPorDre({ systemName: "Intranet", period }),
+        { wrapper: createWrapper() },
+      );
+
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+      expect(fetchSpy).toHaveBeenCalledWith(`/api/intranet/sorteios/por-dre?periodo=${period}`);
+    },
+  );
 });

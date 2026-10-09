@@ -73,6 +73,27 @@ describe("useActiveAccessUsers", () => {
     expect(result.current.data).toEqual(mockData);
   });
 
+  it("busca no endpoint do SERAp quando o sistema é Serap Estudantes", async () => {
+    const mockData: ActiveAccessUsersResponse = {
+      activeCount: 387153,
+      trend: "above",
+      trendLabel: "1200 novos nos últimos 30 dias",
+    };
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => mockData,
+    } as unknown as Response);
+
+    const { result } = renderHook(
+      () => useActiveAccessUsers({ systemName: "Serap Estudantes" }),
+      { wrapper: createWrapper() }
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fetchSpy).toHaveBeenCalledWith("/api/serap/usuarios/acesso-ativo");
+    expect(result.current.data).toEqual(mockData);
+  });
+
   it("usa mock e não busca para sistemas não integrados", async () => {
     const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(

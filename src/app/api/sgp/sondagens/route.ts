@@ -1,33 +1,10 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import {
-  fetchSondagens,
-  resolverPeriodo,
-} from "@/actions/_helpers/sgpMetricas";
+import { fetchSondagens } from "@/actions/_helpers/sgpMetricas";
+import { criarRotaMetricaPorPeriodo } from "@/actions/_helpers/rotaMetricaPorPeriodo";
 
 export const runtime = "nodejs";
 export const revalidate = 0;
 
-export async function GET(request: Request) {
-  const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const { anoLetivo, bimestre } = resolverPeriodo(
-      new URL(request.url).searchParams,
-    );
-    const data = await fetchSondagens(anoLetivo, bimestre);
-    return NextResponse.json(data);
-  } catch (e: unknown) {
-    const errorMessage =
-      typeof e === "object" && e !== null && "message" in e
-        ? (e as { message?: string }).message
-        : "Erro ao consultar sondagens do SGP";
-    return NextResponse.json(
-      { error: errorMessage ?? "Erro ao consultar sondagens do SGP" },
-      { status: 500 },
-    );
-  }
-}
+export const GET = criarRotaMetricaPorPeriodo(
+  fetchSondagens,
+  "Erro ao consultar sondagens do SGP",
+);

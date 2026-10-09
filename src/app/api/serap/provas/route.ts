@@ -1,31 +1,10 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { fetchProvas } from "@/actions/_helpers/serapMetricas";
-import { resolverPeriodo } from "@/actions/_helpers/sgpMetricas";
+import { criarRotaMetricaPorPeriodo } from "@/actions/_helpers/rotaMetricaPorPeriodo";
 
 export const runtime = "nodejs";
 export const revalidate = 0;
 
-export async function GET(request: Request) {
-  const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const { anoLetivo, bimestre } = resolverPeriodo(
-      new URL(request.url).searchParams,
-    );
-    const data = await fetchProvas(anoLetivo, bimestre);
-    return NextResponse.json(data);
-  } catch (e: unknown) {
-    const errorMessage =
-      typeof e === "object" && e !== null && "message" in e
-        ? (e as { message?: string }).message
-        : "Erro ao consultar provas do SERAp";
-    return NextResponse.json(
-      { error: errorMessage ?? "Erro ao consultar provas do SERAp" },
-      { status: 500 },
-    );
-  }
-}
+export const GET = criarRotaMetricaPorPeriodo(
+  fetchProvas,
+  "Erro ao consultar provas do SERAp",
+);

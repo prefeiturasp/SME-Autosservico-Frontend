@@ -1,35 +1,10 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { fetchUsuariosAcessoAtivo } from "@/actions/_helpers/serapMetricas";
-import { resolverPeriodo } from "@/actions/_helpers/sgpMetricas";
+import { criarRotaMetricaPorPeriodo } from "@/actions/_helpers/rotaMetricaPorPeriodo";
 
 export const runtime = "nodejs";
 export const revalidate = 0;
 
-export async function GET(request: Request) {
-  const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const { anoLetivo, bimestre } = resolverPeriodo(
-      new URL(request.url).searchParams,
-    );
-    const data = await fetchUsuariosAcessoAtivo(anoLetivo, bimestre);
-    return NextResponse.json(data);
-  } catch (e: unknown) {
-    const errorMessage =
-      typeof e === "object" && e !== null && "message" in e
-        ? (e as { message?: string }).message
-        : "Erro ao consultar usuários com acesso ativo do SERAp";
-    return NextResponse.json(
-      {
-        error:
-          errorMessage ??
-          "Erro ao consultar usuários com acesso ativo do SERAp",
-      },
-      { status: 500 },
-    );
-  }
-}
+export const GET = criarRotaMetricaPorPeriodo(
+  fetchUsuariosAcessoAtivo,
+  "Erro ao consultar usuários com acesso ativo do SERAp",
+);

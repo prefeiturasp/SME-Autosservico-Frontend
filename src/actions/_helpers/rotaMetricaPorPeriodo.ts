@@ -3,17 +3,18 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { resolverPeriodo } from "@/actions/_helpers/sgpMetricas";
 
+type FetcherDeRota<T> = (searchParams: URLSearchParams) => Promise<T>;
 type FetcherPorPeriodo<T> = (anoLetivo: number, bimestre: number) => Promise<T>;
 
 /**
- * Monta o handler GET de uma rota de métrica por ano letivo + bimestre.
+ * Monta o handler GET de uma rota de métrica.
  *
- * Exige sessão (401 sem login), lê o período da query (com fallback para o
- * período corrente) e devolve o resultado do fetcher; em erro, 500 com a
- * mensagem do erro ou a mensagem padrão da rota.
+ * Exige sessão (401 sem login), entrega a query string ao fetcher e devolve
+ * o resultado; em erro, 500 com a mensagem do erro ou a mensagem padrão da
+ * rota.
  */
-export function criarRotaMetricaPorPeriodo<T>(
-  fetcher: FetcherPorPeriodo<T>,
+export function criarRotaMetrica<T>(
+  fetcher: FetcherDeRota<T>,
   mensagemPadrao: string,
 ) {
   return async function GET(request: Request) {
@@ -23,10 +24,9 @@ export function criarRotaMetricaPorPeriodo<T>(
     }
 
     try {
-      const { anoLetivo, bimestre } = resolverPeriodo(
-        new URL(request.url).searchParams,
+      return NextResponse.json(
+        await fetcher(new URL(request.url).searchParams),
       );
-      return NextResponse.json(await fetcher(anoLetivo, bimestre));
     } catch (e: unknown) {
       const errorMessage =
         typeof e === "object" && e !== null && "message" in e
@@ -38,4 +38,18 @@ export function criarRotaMetricaPorPeriodo<T>(
       );
     }
   };
+}
+
+/**
+ * Rota de métrica por ano letivo + bimestre: lê o período da query (com
+ * fallback para o período corrente) e repassa ao fetcher.
+ */
+export function criarRotaMetricaPorPeriodo<T>(
+  fetcher: FetcherPorPeriodo<T>,
+  mensagemPadrao: string,
+) {
+  return criarRotaMetrica((searchParams) => {
+    const { anoLetivo, bimestre } = resolverPeriodo(searchParams);
+    return fetcher(anoLetivo, bimestre);
+  }, mensagemPadrao);
 }

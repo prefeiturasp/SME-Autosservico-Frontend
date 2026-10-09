@@ -1,7 +1,9 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
+import type { SigEscolaOpcoes } from "@/types/metricas";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
+import { ALL_UES_VALUE } from "@/types/ueOption";
 import DreSelect from "./DreSelect";
 import FiltrarPorSwitcher from "./FiltrarPorSwitcher";
 import IntervaloDeDatasInput from "./IntervaloDeDatasInput";
@@ -11,6 +13,8 @@ import UeSelect from "./UeSelect";
 type Props = {
   readonly value: SigEscolaFiltros;
   readonly onChange: Dispatch<SetStateAction<SigEscolaFiltros>>;
+  // Opções reais vindas do contrato: períodos do PTRF e UEs da DRE.
+  readonly opcoes?: SigEscolaOpcoes;
   readonly className?: string;
 };
 
@@ -19,6 +23,7 @@ const LABEL_CLASSNAME = "text-xs font-bold text-[#6B7280]";
 export default function SigEscolaFiltrosBar({
   value,
   onChange,
+  opcoes,
   className,
 }: Props) {
   return (
@@ -33,7 +38,8 @@ export default function SigEscolaFiltrosBar({
             />
             {value.modo === "periodo" && (
               <PeriodoLetivoSelect
-                value={value.periodo}
+                value={value.periodo || opcoes?.periodo || ""}
+                options={opcoes?.periodos ?? []}
                 onChange={(periodo) =>
                   onChange((prev) => ({ ...prev, periodo }))
                 }
@@ -59,7 +65,10 @@ export default function SigEscolaFiltrosBar({
           <span className={LABEL_CLASSNAME}>DRE</span>
           <DreSelect
             value={value.dre}
-            onChange={(dre) => onChange((prev) => ({ ...prev, dre }))}
+            onChange={(dre) =>
+              // A UE escolhida pertence à DRE anterior: volta para "Todas".
+              onChange((prev) => ({ ...prev, dre, ue: ALL_UES_VALUE }))
+            }
           />
         </div>
 
@@ -67,6 +76,7 @@ export default function SigEscolaFiltrosBar({
           <span className={LABEL_CLASSNAME}>UE</span>
           <UeSelect
             value={value.ue}
+            options={opcoes?.unidades ?? []}
             onChange={(ue) => onChange((prev) => ({ ...prev, ue }))}
           />
         </div>

@@ -36,33 +36,37 @@ vi.mock("@/components/ui/select", () => ({
 
 import UeSelect from "./UeSelect";
 
+const UNIDADES = [
+  { value: "019715", label: "EMEF ADALGIZA SEGURADO DA SILVEIRA, PROFA." },
+  { value: "019749", label: "EMEF ADOLFINO DE ARRUDA CASTANHO, PROF." },
+];
+
 describe("<UeSelect />", () => {
-  it("renderiza a opção 'Todas as UEs' e as 7 UEs", () => {
-    render(<UeSelect value="all" onChange={vi.fn()} />);
+  it("renderiza a opção 'Todas as UEs' e as UEs recebidas", () => {
+    render(<UeSelect value="all" options={UNIDADES} onChange={vi.fn()} />);
 
     expect(
       screen.getByRole("option", { name: "Todas as UEs" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("option", { name: "CEMEI MORUMBI" }),
+      screen.getByRole("option", {
+        name: "EMEF ADALGIZA SEGURADO DA SILVEIRA, PROFA.",
+      }),
     ).toBeInTheDocument();
-    expect(screen.getAllByRole("option")).toHaveLength(8);
+    expect(screen.getAllByRole("option")).toHaveLength(3);
   });
 
   it("mostra o valor selecionado", () => {
-    render(<UeSelect value="cemei-morumbi" onChange={vi.fn()} />);
-    expect(screen.getByTestId("select-native")).toHaveValue("cemei-morumbi");
+    render(<UeSelect value="019715" options={UNIDADES} onChange={vi.fn()} />);
+    expect(screen.getByTestId("select-native")).toHaveValue("019715");
   });
 
   it("chama onChange com o valor correto ao selecionar outra UE", async () => {
     const onChange = vi.fn();
-    render(<UeSelect value="all" onChange={onChange} />);
+    render(<UeSelect value="all" options={UNIDADES} onChange={onChange} />);
 
-    await userEvent.selectOptions(
-      screen.getByTestId("select-native"),
-      "emef-vila-nova",
-    );
+    await userEvent.selectOptions(screen.getByTestId("select-native"), "019749");
 
-    expect(onChange).toHaveBeenCalledWith("emef-vila-nova");
+    expect(onChange).toHaveBeenCalledWith("019749");
   });
 });

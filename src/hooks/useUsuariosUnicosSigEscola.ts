@@ -1,36 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import type { UniqueUsersPerDayResponse } from "@/types/metricas";
-import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
+import type { SigEscolaMetricasResponse } from "@/types/metricas";
 import {
-    resolveSigEscolaScenario,
-    type SigEscolaScenario,
-} from "./_helpers/sigEscolaMetricasScenario";
+  useSigEscolaMetricas,
+  type SigEscolaQueryOptions,
+} from "./_helpers/sigEscolaMetricasQuery";
 
-type Options = {
-    systemName: string;
-    filtros: SigEscolaFiltros;
-};
+// KPI global: lê o mesmo contrato dos cards (uma requisição por filtro).
+const selecionar = (dados: SigEscolaMetricasResponse) => dados.usuariosUnicos;
 
-const UNIQUE_COUNT_BY_SCENARIO: Record<SigEscolaScenario, number> = {
-    baseline: 1560,
-    intervalo: 1133,
-    "intervalo-butanta": 70,
-};
-
-export function useUsuariosUnicosSigEscola({ systemName, filtros }: Options) {
-    const scenario = resolveSigEscolaScenario(filtros);
-
-    return useQuery<UniqueUsersPerDayResponse>({
-        queryKey: ["usuarios-unicos-sig-escola", systemName, scenario],
-        enabled: !!systemName,
-        refetchOnWindowFocus: false,
-        queryFn: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 300));
-            return {
-                uniqueCount: UNIQUE_COUNT_BY_SCENARIO[scenario],
-                trend: "above",
-                trendLabel: "8% acima da média dos últimos 30 dias",
-            };
-        },
-    });
+export function useUsuariosUnicosSigEscola(options: SigEscolaQueryOptions) {
+  return useSigEscolaMetricas(options, selecionar);
 }

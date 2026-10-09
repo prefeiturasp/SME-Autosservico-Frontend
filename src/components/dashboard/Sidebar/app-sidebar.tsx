@@ -20,6 +20,10 @@ import { useAllowedSquads } from "@/hooks/useAllowedSquads";
 import { CustomTrigger } from "./custom-trigger";
 import { COORDENADORIAS } from "./coordenadorias";
 
+// Coordenadorias liberadas para todo usuário do Autosserviço, além das que
+// vêm do perfil: COPED (SERAp) e COPLAN (SIG-Escola).
+const COORDENADORIAS_LIBERADAS = new Set(["COPED", "COPLAN"]);
+
 import LogoutIcon from "@/assets/icons/Logout";
 import SignOutButton from "@/components/login/SignOutButton";
 import ProfileLink from "@/components/perfil/ProfileLink";
@@ -35,10 +39,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     const allowedSquads = useAllowedSquads();
 
-    const allowedItems = useMemo(
-        () => COORDENADORIAS.filter((item) => allowedSquads.includes(item.title)),
-        [allowedSquads]
-    );
+    const allowedItems = useMemo(() => {
+        // Sem squads a sessão ainda não carregou: não libera nada antes disso,
+        // para não trocar a coordenadoria inicial do usuário.
+        if (allowedSquads.length === 0) return [];
+        return COORDENADORIAS.filter(
+            (item) =>
+                allowedSquads.includes(item.title) ||
+                COORDENADORIAS_LIBERADAS.has(item.title),
+        );
+    }, [allowedSquads]);
 
     useEffect(() => {
         if (!activeItem && allowedItems.length > 0) {

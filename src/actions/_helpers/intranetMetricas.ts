@@ -140,8 +140,8 @@ const DRES = DRE_OPTIONS.filter(({ value }) => value !== ALL_DRES_VALUE);
 const chaveDre = (label: string) =>
   label
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, "")
+    .replaceAll(/[\u0300-\u036f]/g, "")
+    .replaceAll(/\s+/g, "")
     .toLowerCase();
 
 /** Mantém as linhas do BFF e acrescenta, com 0, as DREs sem inscrição. */

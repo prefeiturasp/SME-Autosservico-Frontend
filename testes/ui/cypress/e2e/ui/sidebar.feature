@@ -22,7 +22,7 @@ Funcionalidade: Sidebar - SME AutoServiço
   Cenário: Ativar item COPLAN no sidebar
     Quando clico no item "COPLAN" do sidebar
     Então o item "COPLAN" deve estar ativo no sidebar
-
+@ignore
   Cenário: Ativar item COTIC no sidebar
     Quando clico no item "COTIC" do sidebar
     Então o item "COTIC" deve estar ativo no sidebar

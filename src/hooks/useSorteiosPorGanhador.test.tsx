@@ -1,8 +1,8 @@
 import React from "react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSorteiosPorGanhador } from "./useSorteiosPorGanhador";
+import type { TableRow } from "@/types/metricas";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -15,48 +15,66 @@ const createWrapper = () => {
   return Wrapper;
 };
 
+const mockFetchOk = (body: unknown) =>
+  vi.spyOn(global, "fetch").mockResolvedValue({
+    ok: true,
+    json: async () => body,
+  } as unknown as Response);
+
 beforeEach(() => {
   vi.restoreAllMocks();
 });
 
+const RESPOSTA: TableRow[] = [
+  { label: "Servidores", value: 39 },
+  { label: "Estagiários", value: 27 },
+];
+
 describe("useSorteiosPorGanhador", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
+    const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(() => useSorteiosPorGanhador({ systemName: "" }), {
-      wrapper,
+      wrapper: createWrapper(),
     });
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(fetchSpy).not.toHaveBeenCalled();
     expect(result.current.data).toBeUndefined();
   });
 
-  it("usa 'dia' como período padrão", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () => useSorteiosPorGanhador({ systemName: "Intranet" }),
-      { wrapper }
-    );
+  it("entra em erro quando a rota responde com falha", async () => {
+    vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: false,
+    } as unknown as Response);
+    const { result } = renderHook(() => useSorteiosPorGanhador({ systemName: "Intranet" }), {
+      wrapper: createWrapper(),
+    });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    expect(result.current.data).toEqual([
-      { label: "Servidores", value: 483 },
-      { label: "Estagiários", value: 122 },
-      { label: "Parceiros", value: 138 },
-    ]);
+    await waitFor(() => expect(result.current.isError).toBe(true));
   });
 
-  it.each(["dia", "quinzena", "mes", "trimestre"] as const)(
-    "retorna 3 linhas para o período '%s'",
+  it("usa 'dia' como período padrão", async () => {
+    const fetchSpy = mockFetchOk(RESPOSTA);
+    const { result } = renderHook(() => useSorteiosPorGanhador({ systemName: "Intranet" }), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(fetchSpy).toHaveBeenCalledWith("/api/intranet/sorteios/por-ganhador?periodo=dia");
+    expect(result.current.data).toEqual(RESPOSTA);
+  });
+
+  it.each(["quinzena", "mes", "trimestre"] as const)(
+    "repassa o período '%s' na query",
     async (period) => {
-      const wrapper = createWrapper();
+      const fetchSpy = mockFetchOk(RESPOSTA);
       const { result } = renderHook(
         () => useSorteiosPorGanhador({ systemName: "Intranet", period }),
-        { wrapper }
+        { wrapper: createWrapper() },
       );
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(result.current.data).toHaveLength(3);
-    }
+      expect(fetchSpy).toHaveBeenCalledWith(`/api/intranet/sorteios/por-ganhador?periodo=${period}`);
+    },
   );
 });

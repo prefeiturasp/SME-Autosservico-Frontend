@@ -24,15 +24,23 @@ describe("criarRotaMetrica", () => {
     vi.mocked(auth).mockResolvedValueOnce(null as never);
     const fetcher = vi.fn();
 
-    const res = await criarRotaMetrica(fetcher, "Erro padrão")(req);
+    const res = await criarRotaMetrica(
+      (searchParams) => searchParams,
+      fetcher,
+      "Erro padrão",
+    )(req);
 
     expect(res.status).toBe(401);
     expect(fetcher).not.toHaveBeenCalled();
   });
 
-  it("entrega a query string ao fetcher e devolve o corpo", async () => {
+  it("converte a query com o resolvedor e devolve o corpo", async () => {
     const fetcher = vi.fn().mockResolvedValue({ ok: true });
-    const GET = criarRotaMetrica(fetcher, "Erro padrão");
+    const GET = criarRotaMetrica(
+      (searchParams) => searchParams.get("dre"),
+      fetcher,
+      "Erro padrão",
+    );
 
     const res = await GET({
       url: "http://localhost/api/x?dre=108100",
@@ -40,11 +48,12 @@ describe("criarRotaMetrica", () => {
 
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true });
-    expect(fetcher.mock.calls[0][0].get("dre")).toBe("108100");
+    expect(fetcher).toHaveBeenCalledWith("108100");
   });
 
   it("retorna 500 com a mensagem do erro", async () => {
     const GET = criarRotaMetrica(
+      () => undefined,
       () => Promise.reject(new Error("boom")),
       "Erro padrão",
     );

@@ -3,18 +3,18 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { resolverPeriodo } from "@/actions/_helpers/sgpMetricas";
 
-type FetcherDeRota<T> = (searchParams: URLSearchParams) => Promise<T>;
 type FetcherPorPeriodo<T> = (anoLetivo: number, bimestre: number) => Promise<T>;
 
 /**
  * Monta o handler GET de uma rota de métrica.
  *
- * Exige sessão (401 sem login), entrega a query string ao fetcher e devolve
- * o resultado; em erro, 500 com a mensagem do erro ou a mensagem padrão da
- * rota.
+ * Exige sessão (401 sem login), converte a query nos parâmetros do fetcher
+ * via `resolverParametros` e devolve o resultado; em erro, 500 com a
+ * mensagem do erro ou a mensagem padrão da rota.
  */
-export function criarRotaMetrica<T>(
-  fetcher: FetcherDeRota<T>,
+export function criarRotaMetrica<P, T>(
+  resolverParametros: (searchParams: URLSearchParams) => P,
+  fetcher: (parametros: P) => Promise<T>,
   mensagemPadrao: string,
 ) {
   return async function GET(request: Request) {
@@ -24,9 +24,8 @@ export function criarRotaMetrica<T>(
     }
 
     try {
-      return NextResponse.json(
-        await fetcher(new URL(request.url).searchParams),
-      );
+      const parametros = resolverParametros(new URL(request.url).searchParams);
+      return NextResponse.json(await fetcher(parametros));
     } catch (e: unknown) {
       const errorMessage =
         typeof e === "object" && e !== null && "message" in e
@@ -41,15 +40,16 @@ export function criarRotaMetrica<T>(
 }
 
 /**
- * Rota de métrica por ano letivo + bimestre: lê o período da query (com
- * fallback para o período corrente) e repassa ao fetcher.
+ * Rota de métrica por ano letivo + bimestre (com fallback para o período
+ * corrente quando ausentes na query).
  */
 export function criarRotaMetricaPorPeriodo<T>(
   fetcher: FetcherPorPeriodo<T>,
   mensagemPadrao: string,
 ) {
-  return criarRotaMetrica((searchParams) => {
-    const { anoLetivo, bimestre } = resolverPeriodo(searchParams);
-    return fetcher(anoLetivo, bimestre);
-  }, mensagemPadrao);
+  return criarRotaMetrica(
+    resolverPeriodo,
+    ({ anoLetivo, bimestre }) => fetcher(anoLetivo, bimestre),
+    mensagemPadrao,
+  );
 }

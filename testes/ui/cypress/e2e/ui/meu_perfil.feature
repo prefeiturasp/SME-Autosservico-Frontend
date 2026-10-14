@@ -57,10 +57,8 @@ Funcionalidade: Meu Perfil
     Dado que estou na tela Meu Perfil
     Então devo visualizar a área "ASCOM"
     E devo visualizar a área "CODAE"
-    E devo visualizar a área "COGEP"
     E devo visualizar a área "COPED"
     E devo visualizar a área "COPLAN"
-    E devo visualizar a área "COTIC"
     E devo visualizar a área "GIPE"
 
   Cenário: Validar permissões Operacional

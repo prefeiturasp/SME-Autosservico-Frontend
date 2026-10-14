@@ -35,7 +35,7 @@ vi.mock("./PeriodoLetivoSelect", () => ({
     <button
       type="button"
       data-testid="periodo-letivo-select"
-      onClick={() => onChange("2025.1")}
+      onClick={() => onChange("2026.2")}
     >
       {value}
     </button>
@@ -80,7 +80,7 @@ vi.mock("./DreSelect", () => ({
     <button
       type="button"
       data-testid="dre-select"
-      onClick={() => onChange("butanta")}
+      onClick={() => onChange("108100")}
     >
       {value}
     </button>
@@ -99,7 +99,7 @@ vi.mock("./UeSelect", () => ({
     <button
       type="button"
       data-testid="ue-select"
-      onClick={() => onChange("cemei-morumbi")}
+      onClick={() => onChange("019715")}
     >
       {value}
     </button>
@@ -157,13 +157,17 @@ describe("<SigEscolaFiltrosBar />", () => {
     expect(updater(BASE_FILTROS)).toEqual({ ...BASE_FILTROS, modo: "intervalo" });
   });
 
-  it("propaga a troca de DRE mesclando o restante dos filtros", async () => {
+  it("trocar a DRE volta a UE para 'Todas'", async () => {
     render(<SigEscolaFiltrosBar value={BASE_FILTROS} onChange={onChange} />);
 
     await userEvent.click(screen.getByTestId("dre-select"));
 
     const updater = onChange.mock.calls[0][0];
-    expect(updater(BASE_FILTROS)).toEqual({ ...BASE_FILTROS, dre: "butanta" });
+    expect(updater({ ...BASE_FILTROS, ue: "019715" })).toEqual({
+      ...BASE_FILTROS,
+      dre: "108100",
+      ue: "all",
+    });
   });
 
   it("propaga a troca de UE mesclando o restante dos filtros", async () => {
@@ -172,9 +176,20 @@ describe("<SigEscolaFiltrosBar />", () => {
     await userEvent.click(screen.getByTestId("ue-select"));
 
     const updater = onChange.mock.calls[0][0];
-    expect(updater(BASE_FILTROS)).toEqual({
-      ...BASE_FILTROS,
-      ue: "cemei-morumbi",
-    });
+    expect(updater(BASE_FILTROS)).toEqual({ ...BASE_FILTROS, ue: "019715" });
+  });
+
+  it("com o período vazio, mostra o período resolvido pelo Backend", () => {
+    render(
+      <SigEscolaFiltrosBar
+        value={{ ...BASE_FILTROS, periodo: "" }}
+        onChange={onChange}
+        opcoes={{ periodo: "2026.3", periodos: ["2026.3"], unidades: [] }}
+      />,
+    );
+
+    expect(screen.getByTestId("periodo-letivo-select")).toHaveTextContent(
+      "2026.3",
+    );
   });
 });

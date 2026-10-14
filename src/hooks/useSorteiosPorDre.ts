@@ -1,18 +1,17 @@
 import type { TableRow } from "@/types/metricas";
 import type { AccessComparisonPeriod } from "@/types/accessComparisonPeriod";
-import { DRE_MOCK_ROWS } from "./_helpers/dreMockRows";
-import {
-  useTableStatsByPeriod,
-  type TableStatsByPeriodOptions,
-} from "./_helpers/tableStatsByPeriod";
+import { useIntranetMetricaQuery } from "./_helpers/intranetMetricaQuery";
 
-const MOCK_ROWS_BY_PERIOD: Record<AccessComparisonPeriod, TableRow[]> = {
-  dia: DRE_MOCK_ROWS,
-  quinzena: DRE_MOCK_ROWS,
-  mes: DRE_MOCK_ROWS,
-  trimestre: DRE_MOCK_ROWS,
+type Options = {
+  systemName: string;
+  period?: AccessComparisonPeriod;
 };
 
-export function useSorteiosPorDre(options: TableStatsByPeriodOptions) {
-  return useTableStatsByPeriod("sorteios-por-dre", MOCK_ROWS_BY_PERIOD, options);
+export function useSorteiosPorDre({ systemName, period = "dia" }: Options) {
+  return useIntranetMetricaQuery<TableRow[]>(
+    "sorteios-por-dre",
+    "/api/intranet/sorteios/por-dre",
+    systemName,
+    { periodo: period },
+  );
 }

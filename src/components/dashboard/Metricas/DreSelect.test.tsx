@@ -50,16 +50,16 @@ describe("<DreSelect />", () => {
   });
 
   it("mostra o valor selecionado", () => {
-    render(<DreSelect value="butanta" onChange={vi.fn()} />);
-    expect(screen.getByTestId("select-native")).toHaveValue("butanta");
+    render(<DreSelect value="108100" onChange={vi.fn()} />);
+    expect(screen.getByTestId("select-native")).toHaveValue("108100");
   });
 
   it("chama onChange com o valor correto ao selecionar outra DRE", async () => {
     const onChange = vi.fn();
     render(<DreSelect value="all" onChange={onChange} />);
 
-    await userEvent.selectOptions(screen.getByTestId("select-native"), "ipiranga");
+    await userEvent.selectOptions(screen.getByTestId("select-native"), "108600");
 
-    expect(onChange).toHaveBeenCalledWith("ipiranga");
+    expect(onChange).toHaveBeenCalledWith("108600");
   });
 });

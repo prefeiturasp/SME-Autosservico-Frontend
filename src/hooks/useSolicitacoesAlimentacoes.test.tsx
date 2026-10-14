@@ -4,6 +4,25 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useSolicitacoesAlimentacoes } from "./useSolicitacoesAlimentacoes";
 
+const PAYLOAD = {
+  dia: { total: 0, autorizadas: 0, aguardando: 0, negadas: 0, canceladas: 0 },
+  quinzena: {
+    total: 19,
+    autorizadas: 10,
+    aguardando: 0,
+    negadas: 9,
+    canceladas: 0,
+  },
+  mes: { total: 19, autorizadas: 10, aguardando: 0, negadas: 9, canceladas: 0 },
+  trimestre: {
+    total: 360,
+    autorizadas: 285,
+    aguardando: 32,
+    negadas: 14,
+    canceladas: 8,
+  },
+};
+
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
     const client = new QueryClient({
@@ -21,25 +40,30 @@ beforeEach(() => {
 
 describe("useSolicitacoesAlimentacoes", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
+    const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(
       () => useSolicitacoesAlimentacoes({ systemName: "" }),
-      { wrapper }
+      { wrapper: createWrapper() }
     );
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(fetchSpy).not.toHaveBeenCalled();
     expect(result.current.data).toBeUndefined();
   });
 
-  it("usa 'trimestre' como período padrão", async () => {
-    const wrapper = createWrapper();
+  it("busca no endpoint e usa 'trimestre' como período padrão", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => PAYLOAD,
+    } as unknown as Response);
+
     const { result } = renderHook(
       () => useSolicitacoesAlimentacoes({ systemName: "SigPAE" }),
-      { wrapper }
+      { wrapper: createWrapper() }
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
+    expect(fetchSpy).toHaveBeenCalledWith("/api/sigpae/alimentacoes");
     expect(result.current.data).toEqual([
       { label: "Total", value: 360, variant: "neutral" },
       { label: "Autorizadas", value: 285, variant: "success" },
@@ -50,16 +74,25 @@ describe("useSolicitacoesAlimentacoes", () => {
   });
 
   it.each(["dia", "quinzena", "mes", "trimestre"] as const)(
-    "retorna 5 itens para o período '%s'",
+    "seleciona o período '%s' com 5 itens",
     async (period) => {
-      const wrapper = createWrapper();
+      vi.spyOn(global, "fetch").mockResolvedValue({
+        ok: true,
+        json: async () => PAYLOAD,
+      } as unknown as Response);
+
       const { result } = renderHook(
         () => useSolicitacoesAlimentacoes({ systemName: "SigPAE", period }),
-        { wrapper }
+        { wrapper: createWrapper() }
       );
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(result.current.data).toHaveLength(5);
+      expect(result.current.data?.[0]).toEqual({
+        label: "Total",
+        value: PAYLOAD[period].total,
+        variant: "neutral",
+      });
     }
   );
 });

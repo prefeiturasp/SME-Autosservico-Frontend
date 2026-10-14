@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFichasTecnicasProdutos } from "./useFichasTecnicasProdutos";
+import type { StatsCardResponse } from "@/types/metricas";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -21,30 +22,42 @@ beforeEach(() => {
 
 describe("useFichasTecnicasProdutos", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
+    const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(
       () => useFichasTecnicasProdutos({ systemName: "" }),
-      { wrapper }
+      { wrapper: createWrapper() }
     );
-
     await waitFor(() => expect(result.current.isFetching).toBe(false));
-    expect(result.current.data).toBeUndefined();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it("retorna os itens mockados de fichas técnicas de produtos", async () => {
-    const wrapper = createWrapper();
+  it("busca no endpoint e retorna os itens", async () => {
+    const mockData: StatsCardResponse = {
+      items: [
+        {
+          label: "Cadastradas pelos fornecedores",
+          value: 10,
+          variant: "neutral",
+        },
+        { label: "Aprovadas", value: 6, variant: "success" },
+        { label: "Em análise", value: 3, variant: "warning" },
+        { label: "Pendentes de correção", value: 1, variant: "danger" },
+      ],
+    };
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => mockData,
+    } as unknown as Response);
+
     const { result } = renderHook(
       () => useFichasTecnicasProdutos({ systemName: "SigPAE" }),
-      { wrapper }
+      { wrapper: createWrapper() }
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "/api/sigpae/fichas-tecnicas-produtos"
+    );
     expect(result.current.data?.items).toHaveLength(4);
-    expect(result.current.data?.items[3]).toEqual({
-      label: "Pendentes de correção",
-      value: 7,
-      variant: "danger",
-    });
   });
 });

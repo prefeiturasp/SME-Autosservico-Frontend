@@ -84,23 +84,6 @@ vi.mock("@/components/dashboard/SaudeDosServidores/Filas", () => ({
     }) => <div data-testid={`filas-${title ?? "Filas"}`}>{projectName}</div>,
 }));
 
-vi.mock("@/components/dashboard/JenkinsJob", () => ({
-    __esModule: true,
-    default: ({
-        title,
-        project,
-        subprojects,
-    }: {
-        title?: string;
-        project: string;
-        subprojects?: unknown[];
-    }) => (
-        <div data-testid={`jenkins-${title ?? "Jenkins - Branches e Builds"}`}>
-            {project}::{Array.isArray(subprojects) ? subprojects.length : 0}
-        </div>
-    ),
-}));
-
 vi.mock("@/components/dashboard/Releases", () => ({
     __esModule: true,
     default: ({
@@ -117,29 +100,6 @@ vi.mock("@/components/dashboard/Releases", () => ({
         </div>
     ),
 }));
-
-vi.mock("@/components/dashboard/DeployHealth/EnvironmentHeader", () => ({
-    __esModule: true,
-    default: () => <div data-testid="environment-header">Ambiente</div>,
-}));
-
-vi.mock(
-    "@/components/dashboard/DeployHealth/SonarQuality/SonarQualityIndicatorsCard",
-    () => ({
-        __esModule: true,
-        default: ({
-            projectName,
-            className,
-        }: {
-            projectName: string;
-            className?: string;
-        }) => (
-            <div data-testid="sonar-quality" className={className}>
-                {projectName}
-            </div>
-        ),
-    }),
-);
 
 vi.mock("@/components/dashboard/ActiveUsersCard", () => ({
     __esModule: true,
@@ -506,33 +466,18 @@ describe("Dashboard page", () => {
         );
     });
 
-    test("renderiza Jenkins - Branches e Builds na aba Saúde do deploy à esquerda do Sonar", () => {
+    test("não exibe a aba Saúde do deploy", () => {
         mockStoreState = {
             ...mockStoreState,
             activeItem: { title: "COPED" },
-            activeProject: {
-                nome: "Novo SGP",
-                zabbixQueryFrontend: "Portal SME",
-                zabbixQueryBackend: "API SME",
-                zabbixQueryFilasRabbitMQ: "Filas RabbitMQ",
-                jenkinsSubprojects: [
-                    { label: "Backend", key: "SME-NovoSGP/master" },
-                ],
-            },
+            activeProject: { nome: "Novo SGP" },
         };
 
         render(withClient(<Dashboard />));
 
-        fireEvent.click(screen.getByRole("tab", { name: "Saúde do deploy" }));
-
-        const jenkins = screen.getByTestId(
-            "jenkins-Jenkins - Branches e Builds",
-        );
-        const sonar = screen.getByTestId("sonar-quality");
-
-        expect(jenkins).toHaveTextContent("Novo SGP::1");
-        expect(jenkins.parentElement).toHaveClass("lg:col-span-1");
-        expect(sonar.parentElement).toHaveClass("lg:col-span-3");
+        expect(
+            screen.queryByRole("tab", { name: "Saúde do deploy" }),
+        ).not.toBeInTheDocument();
     });
 
     test("renderiza o card Lançamentos na aba Operacional", () => {
@@ -598,49 +543,27 @@ describe("Dashboard page", () => {
         );
     });
 
-    test("deve renderizar os cards analytics ao clicar na aba Analytics", () => {
-        render(withClient(<Dashboard />));
+    test.each(["Novo SGP", "SigPAE", "Intranet", "GIPE"])(
+        "não exibe a aba Analytics nem os cards dela para %s",
+        (nome) => {
+            mockStoreState = {
+                ...mockStoreState,
+                activeProject: { ...mockStoreState.activeProject, nome },
+            };
 
-        fireEvent.click(screen.getByRole("tab", { name: "Analytics" }));
+            render(withClient(<Dashboard />));
 
-        expect(screen.getByTestId("active-users-card")).toHaveTextContent(
-            "Novo SGP",
-        );
-        expect(screen.getByTestId("average-session-card")).toHaveTextContent(
-            "Novo SGP",
-        );
-        expect(screen.getByTestId("peak-usage-today-card")).toHaveTextContent(
-            "Novo SGP",
-        );
-        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
-            "Novo SGP",
-        );
-        expect(
-            screen.getByTestId("device-distribution-card"),
-        ).toHaveTextContent("Novo SGP");
-        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
-            "COPED",
-        );
-        expect(screen.getByTestId("peak-hours-chart")).toHaveTextContent(
-            "Novo SGP",
-        );
-    });
-
-    test("propaga a coordenadoria CODAE pro UsersByPageCard", () => {
-        mockStoreState = {
-            ...mockStoreState,
-            activeItem: { title: "CODAE" },
-            activeProject: { ...mockStoreState.activeProject, nome: "SigPAE" },
-        };
-
-        render(withClient(<Dashboard />));
-
-        fireEvent.click(screen.getByRole("tab", { name: "Analytics" }));
-
-        expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
-            "SigPAE::CODAE",
-        );
-    });
+            expect(
+                screen.queryByRole("tab", { name: "Analytics" }),
+            ).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("active-users-card"),
+            ).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("peak-hours-chart"),
+            ).not.toBeInTheDocument();
+        },
+    );
 
     test("quando um campo específico está undefined, cai no fallback vazio para aquele filho", () => {
         mockStoreState = {
@@ -673,6 +596,25 @@ describe("Dashboard page", () => {
         ).not.toBeInTheDocument();
     });
 
+    test.each([
+        "Rolê Agroecológico",
+        "Bens Físicos",
+        "Sigla",
+        "GIPE",
+        "Limpeza",
+    ])("não exibe a aba Métricas para %s, ainda sem integração", (nome) => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome },
+        };
+
+        render(withClient(<Dashboard />));
+
+        expect(
+            screen.queryByRole("tab", { name: "Métricas" }),
+        ).not.toBeInTheDocument();
+    });
+
     test("exibe a aba Métricas com os cards mockados quando o projeto ativo é o SigPAE", () => {
         mockStoreState = {
             ...mockStoreState,
@@ -683,21 +625,19 @@ describe("Dashboard page", () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
 
-        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
-            "SigPAE",
-        );
-        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
-            "SigPAE",
-        );
-        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
-            "SigPAE",
-        );
-        expect(screen.getByTestId("users-by-profile-card")).toHaveTextContent(
-            "SigPAE",
-        );
-        expect(screen.getByTestId("access-comparison-card")).toHaveTextContent(
-            "SigPAE",
-        );
+        expect(
+            screen.queryByTestId("active-users-metric-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unique-users-per-day-card"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("users-by-profile-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("access-comparison-card"),
+        ).not.toBeInTheDocument();
         expect(
             screen.getByTestId("alimentacao-terceirizada-section"),
         ).toHaveTextContent("SigPAE");
@@ -788,15 +728,13 @@ describe("Dashboard page", () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
 
-        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
-            "Intranet",
-        );
-        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
-            "Intranet",
-        );
-        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
-            "Intranet",
-        );
+        expect(
+            screen.queryByTestId("active-users-metric-card"),
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByTestId("unique-users-per-day-card"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
         expect(screen.getByTestId("sorteios-section")).toHaveTextContent(
             "Intranet",
         );
@@ -882,213 +820,6 @@ describe("Dashboard page", () => {
         expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
     });
 
-    test("exibe a aba Métricas com a seção Provas quando o projeto ativo é o Serap", () => {
-        mockStoreState = {
-            ...mockStoreState,
-            activeProject: { ...mockStoreState.activeProject, nome: "Serap" },
-        };
-
-        render(withClient(<Dashboard />));
-
-        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
-
-        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
-            "Serap",
-        );
-        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
-            "Serap",
-        );
-        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
-            "Serap",
-        );
-        expect(screen.getByTestId("provas-section")).toHaveTextContent("Serap");
-
-        expect(
-            screen.queryByTestId("users-by-profile-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("access-comparison-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("alimentacao-terceirizada-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ordem-inscricao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("oportunidades-recrutamento-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("indicadores-participacao-logistica-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unidades-produtivas-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("agendamentos-roles-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("bens-fisicos-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("sig-escola-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("convocacao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("candidatos-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("vagas-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("escolhas-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("gestao-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("relatorios-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ocorrencias-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("fluxo-de-atendimento-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("distribuicao-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("usuarios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("produtividade-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
-    });
-
-    test("exibe a aba Métricas apenas com os KPIs genéricos quando o projeto ativo é o Serap Estudantes", () => {
-        mockStoreState = {
-            ...mockStoreState,
-            activeProject: {
-                ...mockStoreState.activeProject,
-                nome: "Serap Estudantes",
-            },
-        };
-
-        render(withClient(<Dashboard />));
-
-        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
-
-        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
-            "Serap Estudantes",
-        );
-        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
-            "Serap Estudantes",
-        );
-        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
-            "Serap Estudantes",
-        );
-
-        expect(
-            screen.queryByTestId("users-by-profile-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("access-comparison-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("alimentacao-terceirizada-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ordem-inscricao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("oportunidades-recrutamento-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("indicadores-participacao-logistica-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unidades-produtivas-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("agendamentos-roles-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("bens-fisicos-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("sig-escola-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("convocacao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("candidatos-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("vagas-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("escolhas-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("gestao-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("relatorios-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ocorrencias-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("fluxo-de-atendimento-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("distribuicao-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("usuarios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("produtividade-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
-    });
-
     test("exibe a aba Métricas com a seção SGP quando o projeto ativo é o SGP", () => {
         mockStoreState = {
             ...mockStoreState,
@@ -1099,15 +830,14 @@ describe("Dashboard page", () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
 
-        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
-            "SGP",
-        );
-        expect(screen.getByTestId("unique-users-per-day-card")).toHaveTextContent(
-            "SGP",
-        );
-        expect(screen.getByTestId("today-access-card")).toHaveTextContent(
-            "SGP",
-        );
+        expect(
+            screen.queryByTestId("active-users-metric-card"),
+        ).not.toBeInTheDocument();
+        // SGP não tem log de acessos: únicos por dia e acessos por hora ficam ocultos.
+        expect(
+            screen.queryByTestId("unique-users-per-day-card"),
+        ).not.toBeInTheDocument();
+        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
         expect(screen.getByTestId("sgp-section")).toHaveTextContent("SGP");
 
         expect(
@@ -1191,115 +921,30 @@ describe("Dashboard page", () => {
         expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
     });
 
-    test("exibe a aba Métricas com as seções do Rolê Agroecológico quando o projeto ativo é o Rolê Agroecológico", () => {
+    test("exibe a aba Métricas com a seção Provas quando o projeto ativo é o Serap", () => {
         mockStoreState = {
             ...mockStoreState,
-            activeProject: {
-                ...mockStoreState.activeProject,
-                nome: "Rolê Agroecológico",
-            },
+            activeProject: { ...mockStoreState.activeProject, nome: "Serap" },
         };
 
         render(withClient(<Dashboard />));
 
         fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
 
-        expect(
-            screen.getByTestId("indicadores-participacao-logistica-section"),
-        ).toHaveTextContent("Rolê Agroecológico");
-        expect(
-            screen.getByTestId("unidades-produtivas-section"),
-        ).toHaveTextContent("Rolê Agroecológico");
-        expect(
-            screen.getByTestId("agendamentos-roles-section"),
-        ).toHaveTextContent("Rolê Agroecológico");
-
+        expect(screen.getByTestId("provas-section")).toHaveTextContent("Serap");
+        // SERAp não tem fonte de acessos: nenhum card de usuários.
         expect(
             screen.queryByTestId("active-users-metric-card"),
         ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unique-users-per-day-card"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("users-by-profile-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("access-comparison-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("alimentacao-terceirizada-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ordem-inscricao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("oportunidades-recrutamento-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("bens-fisicos-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("sig-escola-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("convocacao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("candidatos-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("vagas-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("escolhas-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("gestao-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("relatorios-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ocorrencias-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("fluxo-de-atendimento-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("distribuicao-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("usuarios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("produtividade-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
     });
 
-    test("exibe a aba Métricas com a seção do Bens Físicos quando o projeto ativo é o Bens Físicos", () => {
+    test("exibe a aba Métricas só com o acesso ativo quando o projeto ativo é o Serap Estudantes", () => {
         mockStoreState = {
             ...mockStoreState,
             activeProject: {
                 ...mockStoreState.activeProject,
-                nome: "Bens Físicos",
+                nome: "Serap Estudantes",
             },
         };
 
@@ -1307,94 +952,11 @@ describe("Dashboard page", () => {
 
         fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
 
-        expect(screen.getByTestId("bens-fisicos-section")).toHaveTextContent(
-            "Bens Físicos",
+        expect(screen.getByTestId("active-users-metric-card")).toHaveTextContent(
+            "Serap Estudantes",
         );
-
-        expect(
-            screen.queryByTestId("active-users-metric-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unique-users-per-day-card"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("users-by-profile-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("access-comparison-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("alimentacao-terceirizada-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ordem-inscricao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("oportunidades-recrutamento-section"),
-        ).not.toBeInTheDocument();
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("indicadores-participacao-logistica-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unidades-produtivas-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("agendamentos-roles-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("sig-escola-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("convocacao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("candidatos-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("vagas-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("escolhas-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("gestao-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("relatorios-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ocorrencias-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("fluxo-de-atendimento-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("distribuicao-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("usuarios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("produtividade-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
     });
 
     test("exibe a aba Métricas com a seção do SigEscola quando o projeto ativo é o SigEscola", () => {
@@ -1498,319 +1060,6 @@ describe("Dashboard page", () => {
             screen.queryByTestId("produtividade-section"),
         ).not.toBeInTheDocument();
         expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
-    });
-
-    test("exibe a aba Métricas com as seções do Sigla quando o projeto ativo é o Sigla", () => {
-        mockStoreState = {
-            ...mockStoreState,
-            activeProject: {
-                ...mockStoreState.activeProject,
-                nome: "Sigla",
-            },
-        };
-
-        render(withClient(<Dashboard />));
-
-        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
-
-        expect(screen.getByTestId("acesso-ativo-sigla-card")).toHaveTextContent(
-            "Sigla",
-        );
-        expect(
-            screen.getByTestId("usuarios-unicos-sigla-card"),
-        ).toHaveTextContent("Sigla");
-        expect(
-            screen.getByTestId("total-acessos-hoje-sigla-card"),
-        ).toHaveTextContent("Sigla");
-        expect(screen.getByTestId("convocacao-section")).toHaveTextContent(
-            "Sigla",
-        );
-        expect(screen.getByTestId("candidatos-section")).toHaveTextContent(
-            "Sigla",
-        );
-        expect(screen.getByTestId("vagas-section")).toHaveTextContent("Sigla");
-        expect(screen.getByTestId("escolhas-section")).toHaveTextContent(
-            "Sigla",
-        );
-        expect(screen.getByTestId("gestao-section")).toHaveTextContent("Sigla");
-        expect(screen.getByTestId("relatorios-section")).toHaveTextContent(
-            "Sigla",
-        );
-
-        expect(
-            screen.queryByTestId("active-users-metric-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unique-users-per-day-card"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("users-by-profile-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("access-comparison-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("alimentacao-terceirizada-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ordem-inscricao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("oportunidades-recrutamento-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("indicadores-participacao-logistica-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unidades-produtivas-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("agendamentos-roles-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("bens-fisicos-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("sig-escola-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ocorrencias-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("fluxo-de-atendimento-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("distribuicao-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("usuarios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("produtividade-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
-    });
-
-    test("exibe a aba Métricas com as seções do GIPE quando o projeto ativo é o GIPE", () => {
-        mockStoreState = {
-            ...mockStoreState,
-            activeProject: {
-                ...mockStoreState.activeProject,
-                nome: "GIPE",
-            },
-        };
-
-        render(withClient(<Dashboard />));
-
-        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
-
-        expect(screen.getByTestId("acesso-ativo-gipe-card")).toHaveTextContent(
-            "GIPE",
-        );
-        expect(
-            screen.getByTestId("usuarios-unicos-gipe-card"),
-        ).toHaveTextContent("GIPE");
-        expect(
-            screen.getByTestId("total-acessos-hoje-gipe-card"),
-        ).toHaveTextContent("GIPE");
-        expect(screen.getByTestId("ocorrencias-section")).toHaveTextContent(
-            "GIPE",
-        );
-        expect(
-            screen.getByTestId("fluxo-de-atendimento-section"),
-        ).toHaveTextContent("GIPE");
-        expect(screen.getByTestId("distribuicao-section")).toHaveTextContent(
-            "GIPE",
-        );
-        expect(screen.getByTestId("usuarios-section")).toHaveTextContent(
-            "GIPE",
-        );
-        expect(screen.getByTestId("produtividade-section")).toHaveTextContent(
-            "GIPE",
-        );
-
-        expect(
-            screen.queryByTestId("active-users-metric-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unique-users-per-day-card"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("users-by-profile-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("access-comparison-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("alimentacao-terceirizada-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ordem-inscricao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("oportunidades-recrutamento-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("indicadores-participacao-logistica-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unidades-produtivas-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("agendamentos-roles-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("bens-fisicos-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("sig-escola-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("convocacao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("candidatos-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("vagas-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("escolhas-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("gestao-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("relatorios-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("limpeza-section")).not.toBeInTheDocument();
-    });
-
-    test("exibe a aba Métricas com a seção do Limpeza quando o projeto ativo é o Limpeza", () => {
-        mockStoreState = {
-            ...mockStoreState,
-            activeProject: {
-                ...mockStoreState.activeProject,
-                nome: "Limpeza",
-            },
-        };
-
-        render(withClient(<Dashboard />));
-
-        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
-
-        expect(screen.getByTestId("limpeza-section")).toHaveTextContent(
-            "Limpeza",
-        );
-
-        expect(
-            screen.queryByTestId("active-users-metric-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unique-users-per-day-card"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("today-access-card")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("users-by-profile-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("access-comparison-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("alimentacao-terceirizada-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("logistica-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sorteios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ordem-inscricao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("oportunidades-recrutamento-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
-        expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("indicadores-participacao-logistica-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("unidades-produtivas-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("agendamentos-roles-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("bens-fisicos-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("sig-escola-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-sigla-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("convocacao-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("candidatos-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("vagas-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("escolhas-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("gestao-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("relatorios-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("acesso-ativo-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("usuarios-unicos-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("total-acessos-hoje-gipe-card"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("ocorrencias-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("fluxo-de-atendimento-section"),
-        ).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("distribuicao-section"),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId("usuarios-section")).not.toBeInTheDocument();
-        expect(
-            screen.queryByTestId("produtividade-section"),
-        ).not.toBeInTheDocument();
     });
 
     test("volta para a aba Operacional se o projeto mudar para um sistema sem Métricas", () => {

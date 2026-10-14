@@ -5,21 +5,17 @@ type Options = {
   systemName: string;
 };
 
-const MOCK_RESPONSE: StatsCardResponse = {
-  items: [
-    { label: "Total de empresas terceirizadas cadastradas", value: 54, variant: "neutral" },
-    { label: "Total de empresas terceirizadas ativas", value: 23, variant: "success" },
-  ],
-};
-
 export function useEmpresasTerceirizadas({ systemName }: Options) {
   return useQuery<StatsCardResponse>({
     queryKey: ["empresas-terceirizadas", systemName],
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return MOCK_RESPONSE;
+      const res = await fetch("/api/sigpae/empresas-terceirizadas");
+      if (!res.ok) {
+        throw new Error("Falha ao buscar as empresas terceirizadas");
+      }
+      return res.json();
     },
   });
 }

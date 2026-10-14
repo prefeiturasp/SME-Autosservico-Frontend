@@ -4,14 +4,8 @@ import AverageSessionCard from "@/components/dashboard/AverageSessionCard";
 import AzureDevOpsBacklog from "@/components/dashboard/AzureDevOpsBacklog";
 import CardWrapperInfoAmbientes from "@/components/dashboard/CardWrapperInfoAmbientes";
 import DatabaseStatusCard from "@/components/dashboard/DatabaseStatusCard";
-import EnvironmentHeader from "@/components/dashboard/DeployHealth/EnvironmentHeader";
-import SonarQualityIndicatorsCard from "@/components/dashboard/DeployHealth/SonarQuality/SonarQualityIndicatorsCard";
 import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
-import JenkinsJob from "@/components/dashboard/JenkinsJob";
-import AccessComparisonCard from "@/components/dashboard/Metricas/AccessComparisonCard";
-import AcessoAtivoGipeCard from "@/components/dashboard/Metricas/AcessoAtivoGipeCard";
-import AcessoAtivoSiglaCard from "@/components/dashboard/Metricas/AcessoAtivoSiglaCard";
 import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
 import AgendamentosRolesSection from "@/components/dashboard/Metricas/AgendamentosRolesSection";
 import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
@@ -34,15 +28,8 @@ import RelatoriosSection from "@/components/dashboard/Metricas/RelatoriosSection
 import SgpSection from "@/components/dashboard/Metricas/SgpSection";
 import SigEscolaSection from "@/components/dashboard/Metricas/SigEscolaSection";
 import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
-import TodayAccessCard from "@/components/dashboard/Metricas/TodayAccessCard";
-import TotalAcessosHojeGipeCard from "@/components/dashboard/Metricas/TotalAcessosHojeGipeCard";
-import TotalAcessosHojeSiglaCard from "@/components/dashboard/Metricas/TotalAcessosHojeSiglaCard";
 import UnidadesProdutivasSection from "@/components/dashboard/Metricas/UnidadesProdutivasSection";
-import UniqueUsersPerDayCard from "@/components/dashboard/Metricas/UniqueUsersPerDayCard";
-import UsersByProfileCard from "@/components/dashboard/Metricas/UsersByProfileCard";
 import UsuariosSection from "@/components/dashboard/Metricas/UsuariosSection";
-import UsuariosUnicosGipeCard from "@/components/dashboard/Metricas/UsuariosUnicosGipeCard";
-import UsuariosUnicosSiglaCard from "@/components/dashboard/Metricas/UsuariosUnicosSiglaCard";
 import VagasSection from "@/components/dashboard/Metricas/VagasSection";
 import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
 import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
@@ -52,42 +39,29 @@ import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
 import UsersWithAccessCard from "@/components/dashboard/UsersWithAccessCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
-import { useDeployHealthOnboarding } from "@/hooks/useDeployHealthOnboarding";
 import useDashboardStore from "@/states/dashboard";
-import {
-    DEFAULT_ACCESS_COMPARISON_PERIOD,
-    type AccessComparisonPeriod,
-} from "@/types/accessComparisonPeriod";
 import type { DashboardTab } from "@/types/analyticsPeriod";
-import type { DeployEnvironment } from "@/types/deployEnvironment";
 import { ALL_DRES_VALUE } from "@/types/dreOption";
 import { DEFAULT_PERIODO_LETIVO } from "@/types/periodoLetivoOption";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 import { ALL_UES_VALUE } from "@/types/ueOption";
 import { useEffect, useState } from "react";
 
+// Só sistemas integrados ao banco ou com a integração em andamento; os demais
+// (com seção pronta em metricasContentBySistema, mas mock) entram aqui conforme
+// a integração de cada um for liberada.
 const SISTEMAS_COM_METRICAS = new Set([
     "SigPAE",
     "Intranet",
+    "SGP",
+    "SigEscola",
     "Serap",
     "Serap Estudantes",
-    "SGP",
-    "Rolê Agroecológico",
-    "Bens Físicos",
-    "SigEscola",
-    "Sigla",
-    "GIPE",
-    "Limpeza",
 ]);
 
-const SISTEMAS_SEM_KPIS_GENERICOS = new Set([
-    "Rolê Agroecológico",
-    "Bens Físicos",
-    "SigEscola",
-    "Sigla",
-    "GIPE",
-    "Limpeza",
-]);
+// Nenhum sistema tem integração com o Google Analytics ainda (os cards da aba
+// são mock); incluir o nome aqui conforme a integração de cada um for liberada.
+const SISTEMAS_COM_ANALYTICS = new Set<string>([]);
 
 type FullWidthSectionProps = {
     readonly id?: string;
@@ -130,10 +104,6 @@ export default function Dashboard() {
     const projectNameFilasRabbitMQ =
         activeProject?.zabbixQueryFilasRabbitMQ?.trim() ?? "";
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
-    const [deployEnvironment, setDeployEnvironment] =
-        useState<DeployEnvironment>("producao");
-    const [accessComparisonPeriod, setAccessComparisonPeriod] =
-        useState<AccessComparisonPeriod>(DEFAULT_ACCESS_COMPARISON_PERIOD);
     const [sigEscolaFiltros, setSigEscolaFiltros] = useState<SigEscolaFiltros>({
         modo: "periodo",
         periodo: DEFAULT_PERIODO_LETIVO,
@@ -143,22 +113,18 @@ export default function Dashboard() {
         ue: ALL_UES_VALUE,
     });
     const [activeTabValue, setActiveTabValue] = useState("operacional");
-    const { triggerDeployTour } = useDeployHealthOnboarding();
     const { triggerAnalyticsTour } = useAnalyticsOnboarding();
 
     const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
+    const showAnalytics = SISTEMAS_COM_ANALYTICS.has(projectName);
+
+    // Indicadores de participação (vivências) ainda usam mock e não têm
+    // fonte no banco; ocultar até definir a origem dos dados.
+    const MOSTRAR_INDICADORES_PARTICIPACAO = false;
 
     const metricasContentBySistema: Record<string, React.ReactNode> = {
         SigPAE: (
             <>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                    <UsersByProfileCard systemName={projectName} />
-                    <AccessComparisonCard
-                        systemName={projectName}
-                        period={accessComparisonPeriod}
-                        onPeriodChange={setAccessComparisonPeriod}
-                    />
-                </div>
                 <AlimentacaoTerceirizadaSection systemName={projectName} />
                 <LogisticaSection systemName={projectName} />
             </>
@@ -171,12 +137,20 @@ export default function Dashboard() {
             </>
         ),
         Serap: <ProvasSection systemName={projectName} />,
+        // Sem log de acessos: do Figma, só "acesso ativo" tem fonte.
+        "Serap Estudantes": (
+            <div className="grid grid-cols-3 gap-4 mb-4">
+                <ActiveUsersMetricCard systemName={projectName} />
+            </div>
+        ),
         SGP: <SgpSection systemName={projectName} />,
         "Rolê Agroecológico": (
             <>
-                <IndicadoresParticipacaoLogisticaSection
-                    systemName={projectName}
-                />
+                {MOSTRAR_INDICADORES_PARTICIPACAO && (
+                    <IndicadoresParticipacaoLogisticaSection
+                        systemName={projectName}
+                    />
+                )}
                 <UnidadesProdutivasSection systemName={projectName} />
                 <AgendamentosRolesSection systemName={projectName} />
             </>
@@ -191,11 +165,6 @@ export default function Dashboard() {
         ),
         Sigla: (
             <>
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                    <AcessoAtivoSiglaCard systemName={projectName} />
-                    <UsuariosUnicosSiglaCard systemName={projectName} />
-                    <TotalAcessosHojeSiglaCard systemName={projectName} />
-                </div>
                 <ConvocacaoSection systemName={projectName} />
                 <CandidatosSection systemName={projectName} />
                 <VagasSection systemName={projectName} />
@@ -206,11 +175,6 @@ export default function Dashboard() {
         ),
         GIPE: (
             <>
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                    <AcessoAtivoGipeCard systemName={projectName} />
-                    <UsuariosUnicosGipeCard systemName={projectName} />
-                    <TotalAcessosHojeGipeCard systemName={projectName} />
-                </div>
                 <OcorrenciasSection systemName={projectName} />
                 <FluxoDeAtendimentoSection systemName={projectName} />
                 <DistribuicaoSection systemName={projectName} />
@@ -227,6 +191,13 @@ export default function Dashboard() {
         }
     }, [showMetricas, activeTabValue]);
 
+    useEffect(() => {
+        if (!showAnalytics && activeTabValue === "analytics") {
+            setActiveTabValue("operacional");
+            setActiveTab("operacional");
+        }
+    }, [showAnalytics, activeTabValue, setActiveTab]);
+
     return (
         <div className="bg-background px-6 py-4">
             <Tabs
@@ -235,7 +206,6 @@ export default function Dashboard() {
                 onValueChange={(value) => {
                     setActiveTabValue(value);
                     setActiveTab(value as DashboardTab);
-                    if (value === "saude-deploy") triggerDeployTour();
                     if (value === "analytics") triggerAnalyticsTour();
                 }}
             >
@@ -244,10 +214,9 @@ export default function Dashboard() {
                     {showMetricas && (
                         <TabsTrigger value="metricas">Métricas</TabsTrigger>
                     )}
-                    <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                    <TabsTrigger value="saude-deploy">
-                        Saúde do deploy
-                    </TabsTrigger>
+                    {showAnalytics && (
+                        <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                    )}
                 </TabsList>
 
                 <TabsContent value="operacional">
@@ -385,106 +354,69 @@ export default function Dashboard() {
 
                 {showMetricas && (
                     <TabsContent value="metricas">
-                        {!SISTEMAS_SEM_KPIS_GENERICOS.has(projectName) && (
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                                <ActiveUsersMetricCard systemName={projectName} />
-                                <UniqueUsersPerDayCard systemName={projectName} />
-                                <TodayAccessCard systemName={projectName} />
-                            </div>
-                        )}
                         {metricasContentBySistema[projectName]}
                     </TabsContent>
                 )}
 
-                <TabsContent value="analytics">
-                    <div
-                        id="onboarding-analytics-kpis"
-                        className="grid grid-cols-3 gap-4 mb-4"
-                    >
-                        <ActiveUsersCard
-                            systemName={projectName}
-                            period={activePeriod}
-                        />
-                        <AverageSessionCard
-                            systemName={projectName}
-                            period={activePeriod}
-                        />
-                        <PeakUsageTodayCard
-                            systemName={projectName}
-                            period={activePeriod}
-                        />
-                    </div>
-                    <div className="grid grid-cols-4 gap-4 mb-4">
+                {showAnalytics && (
+                    <TabsContent value="analytics">
                         <div
-                            id="onboarding-analytics-users-by-page"
-                            className="col-span-2"
+                            id="onboarding-analytics-kpis"
+                            className="grid grid-cols-3 gap-4 mb-4"
                         >
-                            <UsersByPageCard
+                            <ActiveUsersCard
                                 systemName={projectName}
                                 period={activePeriod}
-                                coordenadoria={activeItem?.title}
                             />
-                        </div>
-                        <div
-                            id="onboarding-analytics-device-distribution"
-                            className="col-span-2"
-                        >
-                            <DeviceDistributionCard
+                            <AverageSessionCard
+                                systemName={projectName}
+                                period={activePeriod}
+                            />
+                            <PeakUsageTodayCard
                                 systemName={projectName}
                                 period={activePeriod}
                             />
                         </div>
-                    </div>
-                    <FullWidthSection
-                        id="onboarding-analytics-peak-hours"
-                        title="Horários de pico"
-                        tooltip={
-                            <p>
-                                Essa seção mostra os horários com maior volume
-                                de acessos ao sistema, permitindo identificar os
-                                picos de uso ao longo do dia.
-                            </p>
-                        }
-                    >
-                        <PeakHoursChart
-                            systemName={projectName}
-                            period={activePeriod}
-                            className="p-[2px]"
-                        />
-                    </FullWidthSection>
-                </TabsContent>
-
-                <TabsContent value="saude-deploy">
-                    <EnvironmentHeader
-                        value={deployEnvironment}
-                        onChange={setDeployEnvironment}
-                    />
-                    <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
-                        <div
-                            id="onboarding-lancamentos"
-                            className="lg:col-span-1"
-                        >
-                            <JenkinsJob
-                                project={projectName}
-                                subprojects={jenkinsSubprojects}
-                                environment={deployEnvironment}
-                            />
+                        <div className="grid grid-cols-4 gap-4 mb-4">
+                            <div
+                                id="onboarding-analytics-users-by-page"
+                                className="col-span-2"
+                            >
+                                <UsersByPageCard
+                                    systemName={projectName}
+                                    period={activePeriod}
+                                    coordenadoria={activeItem?.title}
+                                />
+                            </div>
+                            <div
+                                id="onboarding-analytics-device-distribution"
+                                className="col-span-2"
+                            >
+                                <DeviceDistributionCard
+                                    systemName={projectName}
+                                    period={activePeriod}
+                                />
+                            </div>
                         </div>
-                        <div
-                            id="onboarding-sonar-quality"
-                            className="lg:col-span-3"
+                        <FullWidthSection
+                            id="onboarding-analytics-peak-hours"
+                            title="Horários de pico"
+                            tooltip={
+                                <p>
+                                    Essa seção mostra os horários com maior
+                                    volume de acessos ao sistema, permitindo
+                                    identificar os picos de uso ao longo do dia.
+                                </p>
+                            }
                         >
-                            <SonarQualityIndicatorsCard
-                                projectName={projectName}
-                                sonarProjectKey={activeProject?.sonarProjectKey}
-                                zabbixQueryJenkinsJob={
-                                    activeProject?.zabbixQueryJenkinsJob
-                                }
-                                environment={deployEnvironment}
+                            <PeakHoursChart
+                                systemName={projectName}
+                                period={activePeriod}
+                                className="p-[2px]"
                             />
-                        </div>
-                    </div>
-                </TabsContent>
+                        </FullWidthSection>
+                    </TabsContent>
+                )}
             </Tabs>
         </div>
     );

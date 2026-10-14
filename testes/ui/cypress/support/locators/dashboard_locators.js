@@ -29,6 +29,12 @@ export const DASHBOARD = {
   BUGS: {
     ROOT: '#onboarding-bugs',
     TABELA: 'table',
-    LINHAS: 'tbody tr'
+    LINHAS: 'tbody tr',
+    CABECALHO: 'thead th',
+    BOTAO_EXIBIR_MAIS: 'button:contains("Exibir mais")'
+  },
+
+  USUARIOS_COM_ACESSO: {
+    TITULO: 'div:contains("Usuários com acesso")'
   }
 }

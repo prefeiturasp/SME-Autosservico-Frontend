@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useProdutosHomologados } from "./useProdutosHomologados";
+import type { StatsCardResponse } from "@/types/metricas";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -21,30 +22,39 @@ beforeEach(() => {
 
 describe("useProdutosHomologados", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
+    const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(
       () => useProdutosHomologados({ systemName: "" }),
-      { wrapper }
+      { wrapper: createWrapper() }
     );
-
     await waitFor(() => expect(result.current.isFetching).toBe(false));
-    expect(result.current.data).toBeUndefined();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it("retorna os itens mockados de produtos homologados", async () => {
-    const wrapper = createWrapper();
+  it("busca no endpoint e retorna os itens", async () => {
+    const mockData: StatsCardResponse = {
+      items: [
+        { label: "Total de produtos cadastrados", value: 6, variant: "neutral" },
+        { label: "Produtos homologados", value: 0, variant: "success" },
+        { label: "Solicitações de homologação no mês", value: 0, variant: "neutral" },
+        { label: "Solicitações de homologação no ano", value: 0, variant: "neutral" },
+      ],
+    };
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => mockData,
+    } as unknown as Response);
+
     const { result } = renderHook(
       () => useProdutosHomologados({ systemName: "SigPAE" }),
-      { wrapper }
+      { wrapper: createWrapper() }
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
+    expect(fetchSpy).toHaveBeenCalledWith("/api/sigpae/produtos-homologados");
     expect(result.current.data?.items).toHaveLength(4);
-    expect(result.current.data?.items[0]).toEqual({
-      label: "Total de produtos cadastrados",
-      value: 8398,
-      variant: "neutral",
-    });
+    expect(result.current.data?.items[0].label).toBe(
+      "Total de produtos cadastrados"
+    );
   });
 });

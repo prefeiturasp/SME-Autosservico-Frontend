@@ -1,37 +1,17 @@
 import type { TableRow } from "@/types/metricas";
 import type { AccessComparisonPeriod } from "@/types/accessComparisonPeriod";
-import {
-  useTableStatsByPeriod,
-  type TableStatsByPeriodOptions,
-} from "./_helpers/tableStatsByPeriod";
+import { useIntranetMetricaQuery } from "./_helpers/intranetMetricaQuery";
 
-const MOCK_ROWS_BY_PERIOD: Record<AccessComparisonPeriod, TableRow[]> = {
-  dia: [
-    { label: "Servidores", value: 234 },
-    { label: "Estagiários", value: 53 },
-    { label: "Parceiros", value: 34 },
-  ],
-  quinzena: [
-    { label: "Servidores", value: 560 },
-    { label: "Estagiários", value: 125 },
-    { label: "Parceiros", value: 80 },
-  ],
-  mes: [
-    { label: "Servidores", value: 1050 },
-    { label: "Estagiários", value: 240 },
-    { label: "Parceiros", value: 150 },
-  ],
-  trimestre: [
-    { label: "Servidores", value: 2900 },
-    { label: "Estagiários", value: 650 },
-    { label: "Parceiros", value: 420 },
-  ],
+type Options = {
+  systemName: string;
+  period?: AccessComparisonPeriod;
 };
 
-export function useOrdemInscricaoPorGanhador(options: TableStatsByPeriodOptions) {
-  return useTableStatsByPeriod(
+export function useOrdemInscricaoPorGanhador({ systemName, period = "dia" }: Options) {
+  return useIntranetMetricaQuery<TableRow[]>(
     "ordem-inscricao-por-ganhador",
-    MOCK_ROWS_BY_PERIOD,
-    options,
+    "/api/intranet/ordem-inscricao/por-ganhador",
+    systemName,
+    { periodo: period },
   );
 }

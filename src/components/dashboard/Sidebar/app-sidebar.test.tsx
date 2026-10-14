@@ -120,6 +120,7 @@ vi.mock("next-auth/react", () => {
 
 
 import useDashboardStore from "@/states/dashboard";
+import { useSession } from "next-auth/react";
 import { SidebarProvider } from "../../ui/sidebar";
 
 const mockSetActiveItem = vi.fn();
@@ -146,6 +147,34 @@ describe("<AppSidebar />", () => {
         expect(screen.getByText("COPED")).toBeInTheDocument();
         expect(screen.getByText("COPLAN")).toBeInTheDocument();
         expect(screen.getByText("Sair")).toBeInTheDocument();
+    });
+
+    it("libera COPED e COPLAN para quem tem outra coordenadoria no perfil", () => {
+        vi.mocked(useSession).mockReturnValueOnce({
+            data: {
+                user: { perfis_por_sistema: [{ sistema: 1008, perfis: ["CODAE"] }] },
+            },
+            status: "authenticated",
+        } as never);
+
+        renderWithSidebarProvider(<AppSidebar />);
+
+        expect(screen.getByText("CODAE")).toBeInTheDocument();
+        expect(screen.getByText("COPED")).toBeInTheDocument();
+        expect(screen.getByText("COPLAN")).toBeInTheDocument();
+        expect(screen.queryByText("ASCOM")).not.toBeInTheDocument();
+    });
+
+    it("não libera coordenadorias enquanto a sessão carrega", () => {
+        vi.mocked(useSession).mockReturnValueOnce({
+            data: null,
+            status: "loading",
+        } as never);
+
+        renderWithSidebarProvider(<AppSidebar />);
+
+        expect(screen.queryByText("COPED")).not.toBeInTheDocument();
+        expect(mockSetActiveItem).not.toHaveBeenCalled();
     });
 
     it("deve chamar setActiveItem ao clicar em um item permitido", () => {

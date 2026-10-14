@@ -5,10 +5,11 @@ type Options = {
   systemName: string;
 };
 
+// Só o SigPAE está integrado ao banco; os demais sistemas seguem em mock.
 const MOCK_RESPONSE: TodayAccessResponse = {
   accessCount: 2453,
-  trend: "on-average",
-  trendLabel: "Dentro da média diária",
+  trend: "below",
+  trendLabel: "12% abaixo da média diária",
 };
 
 export function useTodayAccessCount({ systemName }: Options) {
@@ -17,8 +18,14 @@ export function useTodayAccessCount({ systemName }: Options) {
     enabled: !!systemName,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return MOCK_RESPONSE;
+      if (systemName !== "SigPAE") {
+        return MOCK_RESPONSE;
+      }
+      const res = await fetch("/api/sigpae/usuarios/acessos-hoje");
+      if (!res.ok) {
+        throw new Error("Falha ao buscar acessos de hoje");
+      }
+      return res.json();
     },
   });
 }

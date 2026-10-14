@@ -1,36 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import type { TodayAccessResponse } from "@/types/metricas";
-import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
+import type { SigEscolaMetricasResponse } from "@/types/metricas";
 import {
-    resolveSigEscolaScenario,
-    type SigEscolaScenario,
-} from "./_helpers/sigEscolaMetricasScenario";
+  useSigEscolaMetricas,
+  type SigEscolaQueryOptions,
+} from "./_helpers/sigEscolaMetricasQuery";
 
-type Options = {
-    systemName: string;
-    filtros: SigEscolaFiltros;
-};
+// KPI global: lê o mesmo contrato dos cards (uma requisição por filtro).
+const selecionar = (dados: SigEscolaMetricasResponse) => dados.acessosHoje;
 
-const ACCESS_COUNT_BY_SCENARIO: Record<SigEscolaScenario, number> = {
-    baseline: 944,
-    intervalo: 231,
-    "intervalo-butanta": 23,
-};
-
-export function useTotalAcessosHojeSigEscola({ systemName, filtros }: Options) {
-    const scenario = resolveSigEscolaScenario(filtros);
-
-    return useQuery<TodayAccessResponse>({
-        queryKey: ["total-acessos-hoje-sig-escola", systemName, scenario],
-        enabled: !!systemName,
-        refetchOnWindowFocus: false,
-        queryFn: async () => {
-            await new Promise((resolve) => setTimeout(resolve, 300));
-            return {
-                accessCount: ACCESS_COUNT_BY_SCENARIO[scenario],
-                trend: "above",
-                trendLabel: "13 novos nos últimos 30 dias",
-            };
-        },
-    });
+export function useTotalAcessosHojeSigEscola(options: SigEscolaQueryOptions) {
+  return useSigEscolaMetricas(options, selecionar);
 }

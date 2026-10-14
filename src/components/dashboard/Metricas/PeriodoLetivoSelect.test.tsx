@@ -37,26 +37,41 @@ vi.mock("@/components/ui/select", () => ({
 import PeriodoLetivoSelect from "./PeriodoLetivoSelect";
 
 describe("<PeriodoLetivoSelect />", () => {
-  it("renderiza todas as opções de período", () => {
-    render(<PeriodoLetivoSelect value="2026.1" onChange={vi.fn()} />);
+  it("renderiza os períodos recebidos", () => {
+    render(
+      <PeriodoLetivoSelect
+        value="2026.3"
+        options={["2026.3", "2026.2"]}
+        onChange={vi.fn()}
+      />,
+    );
 
     expect(
-      screen.getByRole("option", { name: "Período 2026.1" }),
+      screen.getByRole("option", { name: "Período 2026.3" }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("option", { name: "Período 2025.1" }),
-    ).toBeInTheDocument();
-    expect(screen.getAllByRole("option")).toHaveLength(4);
+    expect(screen.getAllByRole("option")).toHaveLength(2);
   });
 
   it("mostra o valor selecionado", () => {
-    render(<PeriodoLetivoSelect value="2025.2" onChange={vi.fn()} />);
-    expect(screen.getByTestId("select-native")).toHaveValue("2025.2");
+    render(
+      <PeriodoLetivoSelect
+        value="2026.2"
+        options={["2026.3", "2026.2"]}
+        onChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId("select-native")).toHaveValue("2026.2");
   });
 
   it("chama onChange com o valor correto ao selecionar outro período", async () => {
     const onChange = vi.fn();
-    render(<PeriodoLetivoSelect value="2026.1" onChange={onChange} />);
+    render(
+      <PeriodoLetivoSelect
+        value="2026.3"
+        options={["2026.3", "2026.2"]}
+        onChange={onChange}
+      />,
+    );
 
     await userEvent.selectOptions(screen.getByTestId("select-native"), "2026.2");
 

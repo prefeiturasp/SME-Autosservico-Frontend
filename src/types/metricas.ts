@@ -1,4 +1,5 @@
 import type { MetricTrend } from "@/types/metric";
+import type { UeOption } from "@/types/ueOption";
 
 export type ActiveAccessUsersResponse = {
     activeCount: number;
@@ -100,4 +101,23 @@ export type AnalistaTableRow = {
     analista: string;
     ocorrenciasTratadas: number;
     tempoMedio: string;
+};
+
+// Opções reais dos filtros do SIG-Escola: o período resolvido pelo Backend
+// (útil quando a tela pede o "período corrente"), os períodos do PTRF e as
+// UEs da DRE filtrada.
+export type SigEscolaOpcoes = {
+    periodo: string | null;
+    periodos: string[];
+    unidades: UeOption[];
+};
+
+export type SigEscolaMetricasResponse = {
+    opcoes: SigEscolaOpcoes;
+    acessoAtivo: ActiveAccessUsersResponse;
+    usuariosUnicos: UniqueUsersPerDayResponse;
+    acessosHoje: TodayAccessResponse;
+    planoAnual: StatsCardResponse;
+    prestacaoDeContas: PrestacaoDeContasResponse;
+    situacaoPatrimonial: StatsCardResponse;
 };

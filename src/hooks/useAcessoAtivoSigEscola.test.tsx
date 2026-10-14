@@ -2,6 +2,7 @@ import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ActiveAccessUsersResponse } from "@/types/metricas";
 import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
 import { useAcessoAtivoSigEscola } from "./useAcessoAtivoSigEscola";
 
@@ -16,13 +17,19 @@ const createWrapper = () => {
   return Wrapper;
 };
 
-const BASE_FILTROS: SigEscolaFiltros = {
+const FILTROS: SigEscolaFiltros = {
   modo: "periodo",
-  periodo: "2026.2",
+  periodo: "",
   dataInicio: "2026-01-01",
   dataFim: "2026-09-22",
   dre: "all",
   ue: "all",
+};
+
+const KPI: ActiveAccessUsersResponse = {
+  activeCount: 28,
+  trend: "above",
+  trendLabel: "2 novos nos últimos 30 dias",
 };
 
 beforeEach(() => {
@@ -31,78 +38,28 @@ beforeEach(() => {
 
 describe("useAcessoAtivoSigEscola", () => {
   it("não dispara fetch quando systemName é vazio", async () => {
-    const wrapper = createWrapper();
+    const fetchSpy = vi.spyOn(global, "fetch");
     const { result } = renderHook(
-      () => useAcessoAtivoSigEscola({ systemName: "", filtros: BASE_FILTROS }),
-      { wrapper },
+      () => useAcessoAtivoSigEscola({ systemName: "", filtros: FILTROS }),
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
-    expect(result.current.data).toBeUndefined();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it("cenário baseline (modo período)", async () => {
-    const wrapper = createWrapper();
+  it("devolve o KPI da rota de métricas do SIG-Escola", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ acessoAtivo: KPI }),
+    } as unknown as Response);
     const { result } = renderHook(
-      () =>
-        useAcessoAtivoSigEscola({
-          systemName: "SigEscola",
-          filtros: BASE_FILTROS,
-        }),
-      { wrapper },
+      () => useAcessoAtivoSigEscola({ systemName: "SigEscola", filtros: FILTROS }),
+      { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    expect(result.current.data).toEqual({
-      activeCount: 4645,
-      trend: "on-average",
-      trendLabel: "Média dos últimos 30 dias",
-    });
-  });
-
-  it("cenário intervalo (todas as DREs/UEs)", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () =>
-        useAcessoAtivoSigEscola({
-          systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "intervalo" },
-        }),
-      { wrapper },
-    );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.activeCount).toBe(3372);
-  });
-
-  it("cenário intervalo + DRE Butantã", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () =>
-        useAcessoAtivoSigEscola({
-          systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "intervalo", dre: "butanta" },
-        }),
-      { wrapper },
-    );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.activeCount).toBe(209);
-  });
-
-  it("cai no baseline pra uma combinação fora dos 3 cenários conhecidos", async () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(
-      () =>
-        useAcessoAtivoSigEscola({
-          systemName: "SigEscola",
-          filtros: { ...BASE_FILTROS, modo: "intervalo", ue: "cemei-morumbi" },
-        }),
-      { wrapper },
-    );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data?.activeCount).toBe(4645);
+    expect(fetchSpy).toHaveBeenCalledWith("/api/sigescola/metricas");
+    expect(result.current.data).toEqual(KPI);
   });
 });

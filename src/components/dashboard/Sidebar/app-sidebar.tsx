@@ -1,5 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 import {
     Sidebar,
@@ -19,22 +20,35 @@ import { useAllowedSquads } from "@/hooks/useAllowedSquads";
 import { CustomTrigger } from "./custom-trigger";
 import { COORDENADORIAS } from "./coordenadorias";
 
+// Coordenadorias liberadas para qualquer usuário do Autosserviço, além das que
+// vêm do perfil: COPED (SERAp) e COPLAN (SIG-Escola).
+const COORDENADORIAS_LIBERADAS = new Set(["COPED", "COPLAN"]);
+
 import LogoutIcon from "@/assets/icons/Logout";
 import SignOutButton from "@/components/login/SignOutButton";
+import ProfileLink from "@/components/perfil/ProfileLink";
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { open } = useSidebar();
+    const router = useRouter();
+    const pathname = usePathname();
 
     const activeItem = useDashboardStore((state) => state.activeItem);
     const setActiveItem = useDashboardStore((state) => state.setActiveItem);
 
     const allowedSquads = useAllowedSquads();
 
-    const allowedItems = useMemo(
-        () => COORDENADORIAS.filter((item) => allowedSquads.includes(item.title)),
-        [allowedSquads]
-    );
+    const allowedItems = useMemo(() => {
+        // Sem squads a sessão ainda não carregou: não libera nada antes disso,
+        // para não trocar a coordenadoria inicial do usuário.
+        if (allowedSquads.length === 0) return [];
+        return COORDENADORIAS.filter(
+            (item) =>
+                allowedSquads.includes(item.title) ||
+                COORDENADORIAS_LIBERADAS.has(item.title),
+        );
+    }, [allowedSquads]);
 
     useEffect(() => {
         if (!activeItem && allowedItems.length > 0) {
@@ -49,15 +63,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: item.url,
             icon: item.icon
         });
-    }, [setActiveItem]);
+        if (!pathname?.startsWith("/dashboard")) {
+            router.push("/dashboard");
+        }
+    }, [setActiveItem, pathname, router]);
 
-    // Mostrar loading enquanto não tem dados
     if (allowedItems.length === 0) {
         return (
             <Sidebar collapsible="icon" data-testid="sidebar-root" {...props} className="m-2">
                 <SidebarContent>
-                    <div className="p-4">Carregando...</div>
+                    <div className="p-4 text-sm text-gray-500">
+                        Nenhuma coordenadoria disponível para o seu perfil.
+                    </div>
                 </SidebarContent>
+                <SidebarFooter>
+                    <ProfileLink className="justify-start px-4" />
+                    <SignOutButton
+                        variant="link"
+                        className="[&_svg]:size-7 text-white no-underline hover:no-underline justify-start px-4"
+                    >
+                        <LogoutIcon /> <span>Sair</span>
+                    </SignOutButton>
+                    <p className="text-center text-[10px] text-white/60 pb-1">
+                        Licença AGPL V3
+                    </p>
+                </SidebarFooter>
             </Sidebar>
         );
     }
@@ -89,7 +119,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         }
                                         data-testid={`sidebar-button-${item.title.toLowerCase()}`}
                                         onClick={() => handleItemClick(item)}
-                                        className={`px-4 rounded-sm h-auto transition-colors
+                                        className={`px-4 rounded-sm h-[55px] transition-colors
                                             ${
                                                 activeItem?.title === item.title
                                                     ? "bg-[#3B82F6] text-white"
@@ -98,17 +128,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         `}
                                     >
                                         <span
-                                            className={`${open ? "!items-start" : ""} flex gap-3 cursor-pointer [&_svg]:!size-6`}
+                                            className="flex items-center gap-3 cursor-pointer [&_svg]:!size-6"
                                         >
-                                            <item.icon className="mt-1 flex-shrink-0" />
-                                            <div className="flex flex-col gap-0.5 min-w-0 items-start">
+                                            <item.icon className="flex-shrink-0" />
+                                            {open && (
                                                 <span className="font-semibold text-sm leading-tight">
                                                     {item.title}
                                                 </span>
-                                                <span className="text-xs leading-tight">
-                                                    {item.subTitle}
-                                                </span>
-                                            </div>
+                                            )}
                                         </span>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -118,14 +145,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
+                <ProfileLink
+                    className={open ? "justify-start px-4" : "justify-center"}
+                    showLabel={open}
+                />
                 <SignOutButton
                     variant="link"
                     className={`${
-                        open && "justify-end"
-                    } [&_svg]:size-7 text-white no-underline hover:no-underline text-right`}
+                        open ? "justify-start px-4" : "justify-center"
+                    } [&_svg]:size-7 text-white no-underline hover:no-underline`}
                 >
-                    {open && <span>Sair</span>} <LogoutIcon />
+                    <LogoutIcon /> {open && <span>Sair</span>}
                 </SignOutButton>
+                {open && (
+                    <p className="text-center text-[10px] text-white/60 pb-1">
+                        Licença AGPL V3
+                    </p>
+                )}
             </SidebarFooter>
         </Sidebar>
     );

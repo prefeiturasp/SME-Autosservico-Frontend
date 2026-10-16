@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { jenkinsJobSummaryFromLastvalue } from "./jenkinsJob";
 import { formatDDMMYYYY_HHMM_FromMillis } from "@/lib/utils";
+import { describe, expect, it } from "vitest";
+import { jenkinsJobSummaryFromLastvalue } from "./jenkinsJob";
 
 describe("jenkinsJobSummaryFromLastvalue", () => {
     it("retorna objeto vazio quando lastvalue é undefined", () => {
@@ -12,7 +12,102 @@ describe("jenkinsJobSummaryFromLastvalue", () => {
     });
 
     it("lança erro quando lastvalue não é JSON válido", () => {
-        expect(() => jenkinsJobSummaryFromLastvalue("not-json")).toThrow(/lastvalue inválido/i);
+        expect(() => jenkinsJobSummaryFromLastvalue("not-json")).toThrow(
+            /lastvalue inválido/i,
+        );
+    });
+
+    it("retorna objeto vazio quando primeiro elemento do array não é um objeto", () => {
+        expect(jenkinsJobSummaryFromLastvalue("[42]")).toEqual({});
+    });
+
+    it("build com building=true → status IN_PROGRESS", () => {
+        const lastvalue = JSON.stringify([
+            {
+                lastBuild: {
+                    timestamp: 1706266134892,
+                    number: 5,
+                    building: true,
+                    duration: 1000,
+                },
+            },
+        ]);
+
+        const res = jenkinsJobSummaryFromLastvalue(lastvalue);
+
+        expect(res.lastBuild?.status).toBe("IN_PROGRESS");
+        expect(res.lastBuild?.number).toBe(5);
+    });
+
+    it("build com number inválido → lastBuild omitido do resultado", () => {
+        const lastvalue = JSON.stringify([
+            {
+                lastBuild: {
+                    timestamp: 1706266134892,
+                    number: "nao-numero",
+                    duration: 1000,
+                },
+            },
+        ]);
+
+        const res = jenkinsJobSummaryFromLastvalue(lastvalue);
+
+        expect(res.lastBuild).toBeUndefined();
+    });
+
+    it("build com timestamp inválido → lastBuild omitido do resultado", () => {
+        const lastvalue = JSON.stringify([
+            {
+                lastBuild: {
+                    timestamp: "invalido",
+                    number: 1,
+                    duration: 1000,
+                },
+            },
+        ]);
+
+        const res = jenkinsJobSummaryFromLastvalue(lastvalue);
+
+        expect(res.lastBuild).toBeUndefined();
+    });
+
+    it("build com duration inválida → lastBuild omitido do resultado", () => {
+        const lastvalue = JSON.stringify([
+            {
+                lastBuild: {
+                    timestamp: 1706266134892,
+                    number: 1,
+                    duration: "invalido",
+                },
+            },
+        ]);
+
+        const res = jenkinsJobSummaryFromLastvalue(lastvalue);
+
+        expect(res.lastBuild).toBeUndefined();
+    });
+
+    it("lastSuccessfulBuild omitido quando parseBuild retorna undefined", () => {
+        const lastvalue = JSON.stringify([
+            {
+                lastBuild: {
+                    timestamp: 1706266134892,
+                    number: 11,
+                    result: "SUCCESS",
+                    duration: 88873,
+                },
+                lastSuccessfulBuild: {
+                    timestamp: "invalido",
+                    number: 2,
+                    duration: 500,
+                },
+            },
+        ]);
+
+        const res = jenkinsJobSummaryFromLastvalue(lastvalue);
+
+        expect(res.lastBuild).toBeDefined();
+        expect(res.lastSuccessfulBuild).toBeUndefined();
     });
 
     it("extrai última build, última com sucesso e última com falha", () => {
@@ -66,4 +161,3 @@ describe("jenkinsJobSummaryFromLastvalue", () => {
         });
     });
 });
-

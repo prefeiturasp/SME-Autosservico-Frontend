@@ -1,0 +1,32 @@
+import type { PeakHoursResponse } from "@/types/peakHours";
+
+export const PEAK_HOURS_MOCK: PeakHoursResponse = {
+  system: "mock",
+  peakHour: "15h",
+  data: [
+    { hour: "01h", desktop: 320, mobile: 85, tablet: 22, total: 427 },
+    { hour: "02h", desktop: 180, mobile: 52, tablet: 15, total: 247 },
+    { hour: "03h", desktop: 120, mobile: 35, tablet: 10, total: 165 },
+    { hour: "04h", desktop: 450, mobile: 110, tablet: 40, total: 600 },
+    { hour: "05h", desktop: 890, mobile: 205, tablet: 58, total: 1153 },
+    { hour: "06h", desktop: 1450, mobile: 320, tablet: 85, total: 1855 },
+    { hour: "07h", desktop: 2800, mobile: 480, tablet: 110, total: 3390 },
+    { hour: "08h", desktop: 3950, mobile: 580, tablet: 140, total: 4670 },
+    { hour: "09h", desktop: 4800, mobile: 650, tablet: 165, total: 5615 },
+    { hour: "10h", desktop: 5200, mobile: 710, tablet: 180, total: 6090 },
+    { hour: "11h", desktop: 5500, mobile: 740, tablet: 190, total: 6430 },
+    { hour: "12h", desktop: 4200, mobile: 620, tablet: 155, total: 4975 },
+    { hour: "13h", desktop: 5800, mobile: 780, tablet: 200, total: 6780 },
+    { hour: "14h", desktop: 6200, mobile: 850, tablet: 220, total: 7270 },
+    { hour: "15h", desktop: 6935, mobile: 921, tablet: 246, total: 8102 },
+    { hour: "16h", desktop: 5900, mobile: 800, tablet: 210, total: 6910 },
+    { hour: "17h", desktop: 5100, mobile: 720, tablet: 185, total: 6005 },
+    { hour: "18h", desktop: 4300, mobile: 610, tablet: 160, total: 5070 },
+    { hour: "19h", desktop: 3200, mobile: 480, tablet: 120, total: 3800 },
+    { hour: "20h", desktop: 2400, mobile: 380, tablet: 95, total: 2875 },
+    { hour: "21h", desktop: 1800, mobile: 290, tablet: 72, total: 2162 },
+    { hour: "22h", desktop: 1200, mobile: 210, tablet: 55, total: 1465 },
+    { hour: "23h", desktop: 680, mobile: 140, tablet: 38, total: 858 },
+    { hour: "24h", desktop: 420, mobile: 95, tablet: 25, total: 540 },
+  ],
+};

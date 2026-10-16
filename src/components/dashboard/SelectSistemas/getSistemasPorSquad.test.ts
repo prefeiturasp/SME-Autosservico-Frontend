@@ -11,7 +11,7 @@ describe("getSistemasPorSquad", () => {
         // ✅ Verifica o primeiro item como exemplo
         expect(sistemas[0]).toMatchObject({
             id: "10",
-            nome: "Novo SGP",
+            nome: "SGP",
         });
 
         // ✅ Verifica se contém todos os sistemas esperados
@@ -33,11 +33,18 @@ describe("getSistemasPorSquad", () => {
 
     it("não deve mutar o array original dos squads", () => {
         const sistemas = getSistemasPorSquad("ASCOM");
-        sistemas.push({ id: "99", nome: "Teste" });
+        const novoSistema = {
+            id: "99",
+            nome: "Teste",
+            zabbixQueryFrontend: "",
+            zabbixQueryBackend: "",
+            zabbixQueryFilasRabbitMQ: "",
+            zabbixQueryJenkinsJob: "",
+        };
+        sistemas.push(novoSistema);
 
-        // ✅ Chamada subsequente não deve conter o item mutado
         const sistemasNovos = getSistemasPorSquad("ASCOM");
-        expect(sistemasNovos).not.toContainEqual({ id: "99", nome: "Teste" });
+        expect(sistemasNovos).not.toContainEqual(novoSistema);
     });
 
     it("inclui subprojetos de releases quando existir mapeamento", () => {
@@ -53,6 +60,22 @@ describe("getSistemasPorSquad", () => {
         const sistemas = getSistemasPorSquad("COGEP");
         const escolhas = sistemas.find((s) => s.nome === "Escolhas");
         expect(escolhas?.jenkinsSubprojects).toEqual([]);
+        expect(escolhas?.sonarProjectKey).toBeUndefined();
+    });
+
+    it("inclui chaves explícitas do SonarQube para projetos mapeados", () => {
+        const coped = getSistemasPorSquad("COPED");
+        const ascom = getSistemasPorSquad("ASCOM");
+        const coplan = getSistemasPorSquad("COPLAN");
+        const emforpef = getSistemasPorSquad("EMFORPEF");
+
+        expect(coped.find((s) => s.nome === "SGP")?.sonarProjectKey).toBe("SME-NovoSGP-WebClient");
+        expect(emforpef.find((s) => s.nome === "CDEP")?.sonarProjectKey).toBe("SME-CDEP-FRONTEND");
+        expect(coped.find((s) => s.nome === "Curriculo da Cidade")?.sonarProjectKey).toBe(
+            "SME-plataforma-curriculo-interface"
+        );
+        expect(ascom.find((s) => s.nome === "Portal Educação")?.sonarProjectKey).toBe("SME-EDUCACAO");
+        expect(coplan.find((s) => s.nome === "SigEscola")?.sonarProjectKey).toBe("SME-PTRF-FrontEnd");
     });
 
     it("inclui subprojeto para Portal Educação (php-fpm-prod)", () => {
@@ -73,10 +96,10 @@ describe("getSistemasPorSquad", () => {
         expect(portal?.jenkinsSubprojects).toEqual([{ label: "CEU", key: "CEU/php-fpm-prod" }]);
     });
 
-    it("inclui subprojeto para Rolê Agroecológico (main)", () => {
+    it("inclui subprojeto para Rolê Agroecológico (job no root)", () => {
         const sistemas = getSistemasPorSquad("CODAE");
         const role = sistemas.find((s) => s.nome === "Rolê Agroecológico");
-        expect(role?.jenkinsSubprojects).toEqual([{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO/main" }]);
+        expect(role?.jenkinsSubprojects).toEqual([{ label: "ROLE-AGROECOLOGICO", key: "ROLE-AGROECOLOGICO" }]);
     });
 
     it("inclui subprojeto para Autosserviço", () => {
@@ -85,6 +108,27 @@ describe("getSistemasPorSquad", () => {
         expect(autosservico?.jenkinsSubprojects).toEqual([
             { label: "SME-Autosservico-Frontend", key: "SME-Autosservico-Frontend" },
         ]);
+    });
+
+    it("mapeia as descrições de homologação (frontend) para os sistemas monitorados em HOM", () => {
+        const ascom = getSistemasPorSquad("ASCOM");
+        const codae = getSistemasPorSquad("CODAE");
+        const coped = getSistemasPorSquad("COPED");
+        const coplan = getSistemasPorSquad("COPLAN");
+
+        expect(coped.find((s) => s.nome === "Serap")?.zabbixQueryFrontendHomolog).toBe("HOM - Serap");
+        expect(coped.find((s) => s.nome === "Serap Estudantes")?.zabbixQueryFrontendHomolog).toBe("HOM - Serap Estudantes");
+        expect(coped.find((s) => s.nome === "SGP")?.zabbixQueryFrontendHomolog).toBe("HOM - NovoSGP");
+        expect(codae.find((s) => s.nome === "SigPAE")?.zabbixQueryFrontendHomolog).toBe("HOM - SIGPAE");
+        expect(coplan.find((s) => s.nome === "SigEscola")?.zabbixQueryFrontendHomolog).toBe("HOM - PTRF - SIG Escola");
+        expect(ascom.find((s) => s.nome === "Intranet")?.zabbixQueryFrontendHomolog).toBe("HOM - Intranet");
+        expect(ascom.find((s) => s.nome === "Portal Educação")?.zabbixQueryFrontendHomolog).toBe("HOM - Educacao");
+        expect(ascom.find((s) => s.nome === "Portal CEU")?.zabbixQueryFrontendHomolog).toBe("HOM - Portal CEU");
+    });
+
+    it("sistemas sem monitoramento HOM ficam com o frontend de homologação vazio", () => {
+        const cotic = getSistemasPorSquad("COTIC");
+        expect(cotic.find((s) => s.nome === "Autosserviço")?.zabbixQueryFrontendHomolog).toBe("");
     });
 
     it("inclui lista de projetos para GIPE", () => {

@@ -29,7 +29,7 @@ export default async function Navbar() {
                                 </Link>
                                 <span className="text-gray-700 text-sm">
                                     Olá,{" "}
-                                    {session.user?.name || session.user?.email}
+                                    {session.user?.name ?? session.user?.email}
                                 </span>
                                 <SignOutButton />
                             </>

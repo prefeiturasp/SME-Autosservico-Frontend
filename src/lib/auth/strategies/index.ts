@@ -1,7 +1,7 @@
 import { autenticaCoreSSO, autenticaKeycloak } from "@/lib/axios";
-import { AxiosError } from "axios";
 import { LoginData, LoginResponse } from "@/types/login";
-import { decodeJwt } from "../../utils";
+import { AxiosError } from "axios";
+import { createRemoteJWKSet, jwtVerify, type JWTPayload } from "jose";
 
 export async function loginCoreSSO(data: LoginData): Promise<LoginResponse> {
     if (!process.env.AUTENTICA_CORESSO_API_URL) {
@@ -16,7 +16,9 @@ export async function loginCoreSSO(data: LoginData): Promise<LoginResponse> {
         Authorization: `Token ${token}`,
     };
     try {
-        const response = await autenticaCoreSSO.post("/autenticacao/", data, { headers });
+        const response = await autenticaCoreSSO.post("/autenticacao/", data, {
+            headers,
+        });
         return response.data;
     } catch (e) {
         if (e instanceof AxiosError && e.response) {
@@ -30,12 +32,45 @@ export async function loginCoreSSO(data: LoginData): Promise<LoginResponse> {
     }
 }
 
+type KeycloakAccessTokenPayload = JWTPayload & {
+    resource_access?: Record<string, { roles?: string[] }>;
+};
+
+async function verifyKeycloakJwt(
+    token: string,
+    keycloakUrl: string,
+    realm: string,
+): Promise<KeycloakAccessTokenPayload> {
+    const jwksUrl = new URL(
+        `/realms/${realm}/protocol/openid-connect/certs`,
+        keycloakUrl,
+    );
+    const jwks = createRemoteJWKSet(jwksUrl);
+    const { payload } = await jwtVerify(token, jwks);
+    return payload;
+}
+
 export async function loginKeycloak(data: LoginData): Promise<LoginResponse> {
-    // Parâmetros fixos ou de env
-    const clientId = process.env.KEYCLOAK_CLIENT_ID ?? "nome-do-projeto";
-    const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET ?? "secret-key";
+    if (!process.env.KEYCLOAK_URL) {
+        throw new Error("KEYCLOAK_URL não está definida");
+    }
+    if (!process.env.KEYCLOAK_CLIENT_ID) {
+        throw new Error("KEYCLOAK_CLIENT_ID não está definida");
+    }
+    if (!process.env.KEYCLOAK_CLIENT_SECRET) {
+        throw new Error("KEYCLOAK_CLIENT_SECRET não está definida");
+    }
+    if (!process.env.KEYCLOAK_REALM) {
+        throw new Error("KEYCLOAK_REALM não está definida");
+    }
+
+    const keycloakUrl = process.env.KEYCLOAK_URL;
+    const clientId = process.env.KEYCLOAK_CLIENT_ID;
     const grantType = process.env.KEYCLOAK_GRANT_TYPE ?? "password";
-    const realm = process.env.KEYCLOAK_REALM ?? "SQUAD";
+    const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET;
+    const realm = process.env.KEYCLOAK_REALM;
+    const resourceClientId =
+        process.env.KEYCLOAK_RESOURCE_CLIENT_ID ?? "auto-servico-hom";
     const password = data.senha;
     const username = data.login;
 
@@ -48,25 +83,36 @@ export async function loginKeycloak(data: LoginData): Promise<LoginResponse> {
     });
 
     try {
-
         const headersKeycloak = {
             "Content-Type": "application/x-www-form-urlencoded",
         };
 
-        const keycloakResponse = await autenticaKeycloak.post(`/realms/${realm}/protocol/openid-connect/token`, dataKeycloak, { headers: headersKeycloak });
-        // Decodifica o payload do token se necessário
+        const keycloakResponse = await autenticaKeycloak.post(
+            `/realms/${realm}/protocol/openid-connect/token`,
+            dataKeycloak,
+            { headers: headersKeycloak },
+        );
+
         const accessToken = keycloakResponse.data.access_token;
-        const payloadJson = decodeJwt(accessToken);
-        // Retorne o que for necessário para o LoginResponse
+        const payload = await verifyKeycloakJwt(
+            accessToken,
+            keycloakUrl,
+            realm,
+        );
+
+        const groups = payload.resource_access?.[resourceClientId]?.roles ?? [];
+
         return {
-            ...payloadJson,
+            ...payload,
+            groups,
             keycloakToken: accessToken,
         };
     } catch (e) {
         if (e instanceof AxiosError && e.response) {
             return {
                 status: e.response.status,
-                detail: e.response.data.error_description ?? e.response.data.detail,
+                detail:
+                    e.response.data.error_description ?? e.response.data.detail,
                 operation_id: e.response.data.operation_id,
             };
         }

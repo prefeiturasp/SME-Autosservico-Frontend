@@ -22,7 +22,11 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-ENV NEXT_PUBLIC_AUTH_VERSION=v2
+# v1 = CoreSSO (padrão do MVP); v2 = Keycloak/Identidade. Variáveis NEXT_PUBLIC_*
+# são gravadas no bundle durante o build — trocar só no runtime não tem efeito.
+# Para voltar ao Keycloak: --build-arg NEXT_PUBLIC_AUTH_VERSION=v2
+ARG NEXT_PUBLIC_AUTH_VERSION=v1
+ENV NEXT_PUBLIC_AUTH_VERSION=$NEXT_PUBLIC_AUTH_VERSION
 
 RUN yarn run build
 

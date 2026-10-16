@@ -5,10 +5,12 @@ import { describe, it, expect } from "vitest";
 // Importação dos ícones
 import SidebarAscom from "./SidebarAscom";
 import SidebarCodae from "./SidebarCodae";
+import SidebarCogep from "./SidebarCogep";
 import SidebarCoped from "./SidebarCoped";
 import SidebarCoplan from "./SidebarCoplan";
+import SidebarCoserv from "./SidebarCoserv";
 import SidebarCotic from "./SidebarCotic";
-import SidebarCogep from "./SidebarCogep";
+import SidebarEmforpef from "./SidebarEmforpef";
 import SidebarGipe from "./SidebarGipe";
 
 // 🔹 Lista genérica de ícones e suas props esperadas
@@ -42,6 +44,13 @@ const icons = [
         testId: "sidebar-coplan-icon",
     },
     {
+        name: "SidebarCoserv",
+        component: SidebarCoserv,
+        width: "24",
+        height: "24",
+        testId: "sidebar-coserv-icon",
+    },
+    {
         name: "SidebarCotic",
         component: SidebarCotic,
         width: "24",
@@ -54,6 +63,13 @@ const icons = [
         width: "24",
         height: "24",
         testId: "sidebar-cogep-icon",
+    },
+    {
+        name: "SidebarEmforpef",
+        component: SidebarEmforpef,
+        width: "24",
+        height: "24",
+        testId: "sidebar-emforpef-icon",
     },
     {
         name: "SidebarGipe",

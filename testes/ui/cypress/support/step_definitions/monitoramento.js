@@ -1,49 +1,38 @@
 import { Given, When, Then } from 'cypress-cucumber-preprocessor/steps'
-import Login_Auto_Servico_Localizadores from '../locators/login_locators'
 import Monitoramento_Auto_Servico_Localizadores from '../locators/monitoramento_locators'
 
-const locators = new Login_Auto_Servico_Localizadores()
-const locators_monitoramento = new Monitoramento_Auto_Servico_Localizadores()
+const locators = new Monitoramento_Auto_Servico_Localizadores()
 
-
-Given(/^que eu estou na página de login$/, () => {
-  cy.login_autoservico()
+Given('que eu acesso o sistema', () => {
+  cy.acessar_tela_login()
+  cy.fecharOverlaySeExistir()
 })
 
-When(/^eu insiro o RF "([^"]*)" e senha "([^"]*)"$/, (rf, senha) => {
-  if (rf) {
-    cy.get(locators.campo_usuario()).clear().type(rf)
-  } else {
-    cy.get(locators.campo_usuario()).clear()
-  }
 
-  if (senha) {
-    cy.get(locators.campo_senha()).clear().type(senha)
-  } else {
-    cy.get(locators.campo_senha()).clear()
-  }
-})
-
-When(/^clico no botão de Entrar$/, () => {
-  cy.get('button')
-    .filter((_, el) => el.innerText.trim() === 'Entrar')
-    .click()
-})
-
-Then(/^devo ter acesso ao dashboard$/, () => {
+Then('devo ter acesso ao dashboard', () => {
   cy.url().should('include', '/dashboard')
 })
 
-When(/^clico no menu Acom$/, () => {
-  cy.get(locators_monitoramento.botao_ascom()).click()
+When('clico no menu {string}', () => {
+
+  cy.fecharOverlaySeExistir()
+
+  cy.get(locators.botao_ascom, { timeout: 30000 })
+    .first()
+    .scrollIntoView()
+    .click({ force: true })
 })
 
-When(/^seleciono o sistema Portal Educação$/, () => {
-  cy.xpath(locators_monitoramento.botao_sistema()).click()
-  .click({ force: true });
+When('seleciono o sistema {string}', () => {
+
+  cy.fecharOverlaySeExistir()
+
+  cy.xpath(locators.botao_sistema)
+    .first()
+    .click({ force: true })
 })
 
-Then(/^devo ver se há algum incidente no sistema$/, () => {
-  cy.xpath(locators_monitoramento.status_sistema())
+Then('devo ver se há algum incidente no sistema', () => {
+  cy.xpath(locators.status_sistema)
+    .should('exist')
 })
-

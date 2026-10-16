@@ -9,7 +9,10 @@ export function PageHeader() {
 
     return (
         <div className="bg-background px-6 py-4">
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1
+                id="onboarding-page-title"
+                className="text-2xl font-bold text-foreground w-fit"
+            >
                 {activeItem.subTitle} [{activeItem.title}]
             </h1>
         </div>

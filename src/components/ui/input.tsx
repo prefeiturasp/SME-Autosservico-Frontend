@@ -43,9 +43,7 @@ const InputMask = React.forwardRef<HTMLInputElement, InputMaskProps>(
 )
 InputMask.displayName = 'InputMask'
 
-export type CurrencyInputProps = InputProps
-
-const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
+const CurrencyInput = React.forwardRef<HTMLInputElement, InputProps>(
   ({ onChange, ...props }, ref) => {
     return (
       <Input
@@ -63,7 +61,7 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
 )
 CurrencyInput.displayName = 'CurrencyInput'
 
-const DocumentInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
+const DocumentInput = React.forwardRef<HTMLInputElement, InputProps>(
   ({ onChange, ...props }, ref) => {
     return (
       <Input
@@ -93,7 +91,7 @@ const DocumentInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
 )
 DocumentInput.displayName = 'DocumentInput'
 
-const PhoneInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
+const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
   ({ onChange, ...props }, ref) => {
     return (
       <Input

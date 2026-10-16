@@ -15,13 +15,21 @@ export default defineConfig({
       'src/**/*.test.tsx',
     ],
     coverage: {
+      provider: 'v8',
       reporter: ['text', 'lcov'],
       reportsDirectory: './coverage',
+      all: true,
+      include: ['src/**/*.{ts,tsx}'],
       exclude: [
         '**/.next/**', // 👈 Exclui TUDO dentro de .next/
         'src/components/ui/**', // 👈 Exclui apenas a pasta 'ui' dentro de components
         'src/const.ts',
-        'src/app/api/*',
+        // Rotas de API sem teste (glue de framework); as de sigpae e sonarqube
+        // são cobertas por testes e entram no relatório.
+        'src/app/api/auth/**',
+        'src/app/api/azure-devops/**',
+        'src/app/api/jenkins/**',
+        'src/app/api/zabbix/**',
         'src/lib/auth/__tests__/*',
          "src/__mocks__/**",
         '*/types/*',

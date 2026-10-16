@@ -1,21 +1,12 @@
 class Monitoramento_Auto_Servico_Localizadores {
 
+  botao_ascom = 'span[data-testid="sidebar-button-ascom"]'
 
-    botao_ascom() {
-        return 'span[data-testid="sidebar-button-ascom"]';
-    }
+  botao_sistema = '/html/body/div/main/div[2]/div/div/div/button'
 
-    botao_sistema() {
-        return '/html/body/div/main/div[2]/div/div/div/button';
-    }
+  opcao_sistema = 'span[data-slot="select-value"]'
 
-    opcao_sistema() {
-        return 'span[data-slot="select-value"]';
-    }
-
-    status_sistema() {
-        return '/html/body/div[1]/main/div[3]/div/div[1]/div[2]/div/div/div[3]';
-    }
+  status_sistema = '//*[@id="onboarding-disponibilidade"]/div[2]/div/div/div[2]'
 }
 
-export default Monitoramento_Auto_Servico_Localizadores;
+export default Monitoramento_Auto_Servico_Localizadores

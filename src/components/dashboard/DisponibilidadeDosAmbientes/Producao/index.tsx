@@ -7,12 +7,14 @@ type ProducaoProps = {
     readonly projectName: string;
     readonly title?: string;
     readonly className?: string;
+    readonly unmonitoredLabel?: string;
 };
 
 export default function Producao({
     title = "Produção",
     className,
     projectName,
+    unmonitoredLabel,
 }: ProducaoProps) {
     const query = useZabbixStatus({
         endpoint: "/api/zabbix/status/producao",
@@ -26,6 +28,7 @@ export default function Producao({
             className={className}
             projectName={projectName}
             query={query}
+            unmonitoredLabel={unmonitoredLabel}
         />
     );
 }

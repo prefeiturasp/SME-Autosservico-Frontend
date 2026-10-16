@@ -1,59 +1,423 @@
 "use client";
+import ActiveUsersCard from "@/components/dashboard/ActiveUsersCard";
+import AverageSessionCard from "@/components/dashboard/AverageSessionCard";
+import AzureDevOpsBacklog from "@/components/dashboard/AzureDevOpsBacklog";
 import CardWrapperInfoAmbientes from "@/components/dashboard/CardWrapperInfoAmbientes";
+import DatabaseStatusCard from "@/components/dashboard/DatabaseStatusCard";
+import DeviceDistributionCard from "@/components/dashboard/DeviceDistributionCard";
 import Producao from "@/components/dashboard/DisponibilidadeDosAmbientes/Producao";
-
+import ActiveUsersMetricCard from "@/components/dashboard/Metricas/ActiveUsersMetricCard";
+import AgendamentosRolesSection from "@/components/dashboard/Metricas/AgendamentosRolesSection";
+import AlimentacaoTerceirizadaSection from "@/components/dashboard/Metricas/AlimentacaoTerceirizadaSection";
+import BensFisicosSection from "@/components/dashboard/Metricas/BensFisicosSection";
+import CandidatosSection from "@/components/dashboard/Metricas/CandidatosSection";
+import ConvocacaoSection from "@/components/dashboard/Metricas/ConvocacaoSection";
+import DistribuicaoSection from "@/components/dashboard/Metricas/DistribuicaoSection";
+import EscolhasSection from "@/components/dashboard/Metricas/EscolhasSection";
+import FluxoDeAtendimentoSection from "@/components/dashboard/Metricas/FluxoDeAtendimentoSection";
+import GestaoSection from "@/components/dashboard/Metricas/GestaoSection";
+import IndicadoresParticipacaoLogisticaSection from "@/components/dashboard/Metricas/IndicadoresParticipacaoLogisticaSection";
+import LimpezaSection from "@/components/dashboard/Metricas/LimpezaSection";
+import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
+import OcorrenciasSection from "@/components/dashboard/Metricas/OcorrenciasSection";
+import OportunidadesRecrutamentoSection from "@/components/dashboard/Metricas/OportunidadesRecrutamentoSection";
+import OrdemInscricaoSection from "@/components/dashboard/Metricas/OrdemInscricaoSection";
+import ProdutividadeSection from "@/components/dashboard/Metricas/ProdutividadeSection";
+import ProvasSection from "@/components/dashboard/Metricas/ProvasSection";
+import RelatoriosSection from "@/components/dashboard/Metricas/RelatoriosSection";
+import SgpSection from "@/components/dashboard/Metricas/SgpSection";
+import SigEscolaSection from "@/components/dashboard/Metricas/SigEscolaSection";
+import SorteiosSection from "@/components/dashboard/Metricas/SorteiosSection";
+import UnidadesProdutivasSection from "@/components/dashboard/Metricas/UnidadesProdutivasSection";
+import UsuariosSection from "@/components/dashboard/Metricas/UsuariosSection";
+import VagasSection from "@/components/dashboard/Metricas/VagasSection";
+import PeakHoursChart from "@/components/dashboard/PeakHoursChart";
+import PeakUsageTodayCard from "@/components/dashboard/PeakUsageTodayCard";
+import Releases from "@/components/dashboard/Releases";
 import Filas from "@/components/dashboard/SaudeDosServidores/Filas";
-import JenkinsJob from "@/components/dashboard/JenkinsJob";
+import UsersByPageCard from "@/components/dashboard/UsersByPageCard";
+import UsersWithAccessCard from "@/components/dashboard/UsersWithAccessCard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAnalyticsOnboarding } from "@/hooks/useAnalyticsOnboarding";
 import useDashboardStore from "@/states/dashboard";
+import type { DashboardTab } from "@/types/analyticsPeriod";
+import { ALL_DRES_VALUE } from "@/types/dreOption";
+import { DEFAULT_PERIODO_LETIVO } from "@/types/periodoLetivoOption";
+import type { SigEscolaFiltros } from "@/types/sigEscolaFiltros";
+import { ALL_UES_VALUE } from "@/types/ueOption";
+import { useEffect, useState } from "react";
+
+// Só sistemas integrados ao banco ou com a integração em andamento; os demais
+// (com seção pronta em metricasContentBySistema, mas mock) entram aqui conforme
+// a integração de cada um for liberada.
+const SISTEMAS_COM_METRICAS = new Set([
+    "SigPAE",
+    "Intranet",
+    "SGP",
+    "SigEscola",
+    "Serap",
+    "Serap Estudantes",
+]);
+
+// Nenhum sistema tem integração com o Google Analytics ainda (os cards da aba
+// são mock); incluir o nome aqui conforme a integração de cada um for liberada.
+const SISTEMAS_COM_ANALYTICS = new Set<string>([]);
+
+type FullWidthSectionProps = {
+    readonly id?: string;
+    readonly title: string;
+    readonly tooltip: React.ReactNode;
+    readonly children: React.ReactNode;
+};
+
+function FullWidthSection({
+    id,
+    title,
+    tooltip,
+    children,
+}: FullWidthSectionProps) {
+    return (
+        <div className="grid grid-cols-4 gap-4">
+            <CardWrapperInfoAmbientes
+                id={id}
+                title={title}
+                className="col-span-4 gap-2 py-2"
+                tooltipContent={tooltip}
+            >
+                {children}
+            </CardWrapperInfoAmbientes>
+        </div>
+    );
+}
 
 export default function Dashboard() {
+    const activeItem = useDashboardStore((state) => state.activeItem);
     const activeProject = useDashboardStore((state) => state.activeProject);
-    const projectNameFrontEnd = activeProject?.zabbixQueryFrontend?.trim();
-    const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim();
-    const projectNameFilasRabbitMQ = activeProject?.zabbixQueryFilasRabbitMQ?.trim();
-    const projectName = activeProject?.nome?.trim();
+    const setActiveTab = useDashboardStore((state) => state.setActiveTab);
+    const activePeriod = useDashboardStore((state) => state.activePeriod);
+    const projectName = activeProject?.nome?.trim() ?? "";
+    const projectNameFrontEnd =
+        activeProject?.zabbixQueryFrontend?.trim() ?? "";
+    const projectNameFrontEndHomolog =
+        activeProject?.zabbixQueryFrontendHomolog?.trim() ?? "";
+    const projectNameBackEnd = activeProject?.zabbixQueryBackend?.trim() ?? "";
+    const projectNameFilasRabbitMQ =
+        activeProject?.zabbixQueryFilasRabbitMQ?.trim() ?? "";
     const jenkinsSubprojects = activeProject?.jenkinsSubprojects ?? [];
+    const [sigEscolaFiltros, setSigEscolaFiltros] = useState<SigEscolaFiltros>({
+        modo: "periodo",
+        periodo: DEFAULT_PERIODO_LETIVO,
+        dataInicio: `${new Date().getFullYear()}-01-01`,
+        dataFim: new Date().toISOString().slice(0, 10),
+        dre: ALL_DRES_VALUE,
+        ue: ALL_UES_VALUE,
+    });
+    const [activeTabValue, setActiveTabValue] = useState("operacional");
+    const { triggerAnalyticsTour } = useAnalyticsOnboarding();
+
+    const showMetricas = SISTEMAS_COM_METRICAS.has(projectName);
+    const showAnalytics = SISTEMAS_COM_ANALYTICS.has(projectName);
+
+    // Indicadores de participação (vivências) ainda usam mock e não têm
+    // fonte no banco; ocultar até definir a origem dos dados.
+    const MOSTRAR_INDICADORES_PARTICIPACAO = false;
+
+    const metricasContentBySistema: Record<string, React.ReactNode> = {
+        SigPAE: (
+            <>
+                <AlimentacaoTerceirizadaSection systemName={projectName} />
+                <LogisticaSection systemName={projectName} />
+            </>
+        ),
+        Intranet: (
+            <>
+                <SorteiosSection systemName={projectName} />
+                <OrdemInscricaoSection systemName={projectName} />
+                <OportunidadesRecrutamentoSection systemName={projectName} />
+            </>
+        ),
+        Serap: <ProvasSection systemName={projectName} />,
+        // Sem log de acessos: do Figma, só "acesso ativo" tem fonte.
+        "Serap Estudantes": (
+            <div className="grid grid-cols-3 gap-4 mb-4">
+                <ActiveUsersMetricCard systemName={projectName} />
+            </div>
+        ),
+        SGP: <SgpSection systemName={projectName} />,
+        "Rolê Agroecológico": (
+            <>
+                {MOSTRAR_INDICADORES_PARTICIPACAO && (
+                    <IndicadoresParticipacaoLogisticaSection
+                        systemName={projectName}
+                    />
+                )}
+                <UnidadesProdutivasSection systemName={projectName} />
+                <AgendamentosRolesSection systemName={projectName} />
+            </>
+        ),
+        "Bens Físicos": <BensFisicosSection systemName={projectName} />,
+        SigEscola: (
+            <SigEscolaSection
+                systemName={projectName}
+                filtros={sigEscolaFiltros}
+                onFiltrosChange={setSigEscolaFiltros}
+            />
+        ),
+        Sigla: (
+            <>
+                <ConvocacaoSection systemName={projectName} />
+                <CandidatosSection systemName={projectName} />
+                <VagasSection systemName={projectName} />
+                <EscolhasSection systemName={projectName} />
+                <GestaoSection systemName={projectName} />
+                <RelatoriosSection systemName={projectName} />
+            </>
+        ),
+        GIPE: (
+            <>
+                <OcorrenciasSection systemName={projectName} />
+                <FluxoDeAtendimentoSection systemName={projectName} />
+                <DistribuicaoSection systemName={projectName} />
+                <UsuariosSection systemName={projectName} />
+                <ProdutividadeSection systemName={projectName} />
+            </>
+        ),
+        Limpeza: <LimpezaSection systemName={projectName} />,
+    };
+
+    useEffect(() => {
+        if (!showMetricas && activeTabValue === "metricas") {
+            setActiveTabValue("operacional");
+        }
+    }, [showMetricas, activeTabValue]);
+
+    useEffect(() => {
+        if (!showAnalytics && activeTabValue === "analytics") {
+            setActiveTabValue("operacional");
+            setActiveTab("operacional");
+        }
+    }, [showAnalytics, activeTabValue, setActiveTab]);
 
     return (
-        <div className="border-b bg-background px-6 py-4">
-            <div className="flex space-x-4 mb-6">
-                <CardWrapperInfoAmbientes
-                    title="Disponibilidade do ambiente"
-                    className="max-w-sm mb-5"
-                >
-                    <Producao
-                        className="bg-[#F5F5F5] p-3"
-                        projectName={projectNameFrontEnd ?? ""}
-                    />
-                </CardWrapperInfoAmbientes>
+        <div className="bg-background px-6 py-4">
+            <Tabs
+                defaultValue="operacional"
+                value={activeTabValue}
+                onValueChange={(value) => {
+                    setActiveTabValue(value);
+                    setActiveTab(value as DashboardTab);
+                    if (value === "analytics") triggerAnalyticsTour();
+                }}
+            >
+                <TabsList className="mb-6 px-1">
+                    <TabsTrigger value="operacional">Operacional</TabsTrigger>
+                    {showMetricas && (
+                        <TabsTrigger value="metricas">Métricas</TabsTrigger>
+                    )}
+                    {showAnalytics && (
+                        <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                    )}
+                </TabsList>
 
-                <CardWrapperInfoAmbientes
-                    title="Saúde do servidor (Workloads)"
-                    className="max-w-sm mb-5"
-                >
-                    <Filas
-                        title="Fila"
-                        className="mb-5 bg-[#F5F5F5] p-3"
-                        projectName={projectNameFilasRabbitMQ ?? ""}
-                    />
-                    <Producao
-                        title="API Service"
-                        className="bg-[#F5F5F5] p-3"
-                        projectName={projectNameBackEnd ?? ""}
-                    />
-                </CardWrapperInfoAmbientes>
+                <TabsContent value="operacional">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div
+                            id="onboarding-lancamentos"
+                            className="col-span-2"
+                        >
+                            <Releases
+                                project={projectName}
+                                subprojects={jenkinsSubprojects}
+                            />
+                        </div>
+                        <UsersWithAccessCard systemName={projectName} />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <CardWrapperInfoAmbientes
+                            id="onboarding-disponibilidade"
+                            title="Disponibilidade do ambiente"
+                            tooltipContent={
+                                <>
+                                    <p className="mb-4">
+                                        Essa seção monitora se o sistema está
+                                        funcionando e acessível aos usuários.
+                                        Disponibilidade significa que o sistema
+                                        está no ar e pronto para uso, sem
+                                        interrupções.
+                                    </p>
+                                    <p>
+                                        Os ambientes podem estar Disponível,
+                                        Indisponível ou em Alerta.
+                                    </p>
+                                </>
+                            }
+                        >
+                            <Producao
+                                className="mb-5 bg-[#F5F5F5] p-3"
+                                projectName={projectNameFrontEnd}
+                                unmonitoredLabel={
+                                    projectName ? "Sem monitoramento" : undefined
+                                }
+                            />
+                            <Producao
+                                title="Homologação"
+                                className="bg-[#F5F5F5] p-3"
+                                projectName={projectNameFrontEndHomolog}
+                                unmonitoredLabel={
+                                    projectName ? "Sem monitoramento" : undefined
+                                }
+                            />
+                        </CardWrapperInfoAmbientes>
 
-                <CardWrapperInfoAmbientes
-                    title="Lançamento de Versões"
-                    className="max-w-sm mb-5 gap-2 py-2"
-                >
-                    <JenkinsJob
-                        className="bg-[#F5F5F5] p-1.5"
-                        project={projectName ?? ""}
-                        subprojects={jenkinsSubprojects}
-                    />
-                </CardWrapperInfoAmbientes>
-            </div>
+                        <CardWrapperInfoAmbientes
+                            id="onboarding-saude-servidor"
+                            title="Saúde do servidor (Workloads)"
+                            tooltipContent={
+                                <>
+                                    <p className="mb-4">
+                                        A saúde de servidores e workloads
+                                        apontam o estado de funcionamento,
+                                        desempenho e estabilidade dos recursos
+                                        computacionais que suportam aplicações e
+                                        serviços de um sistema.
+                                    </p>
+                                    <p>
+                                        O objetivo é garantir que os sistemas
+                                        estejam disponíveis, performando bem e
+                                        livres de falhas críticas.
+                                    </p>
+                                </>
+                            }
+                        >
+                            <Filas
+                                title="Fila"
+                                className="mb-5 bg-[#F5F5F5] p-3"
+                                projectName={projectNameFilasRabbitMQ}
+                                unmonitoredLabel={
+                                    projectName ? "Sem fila" : undefined
+                                }
+                            />
+                            <Producao
+                                title="API Service"
+                                className="bg-[#F5F5F5] p-3"
+                                projectName={projectNameBackEnd}
+                                unmonitoredLabel={
+                                    projectName ? "Sem API" : undefined
+                                }
+                            />
+                        </CardWrapperInfoAmbientes>
+
+                        <CardWrapperInfoAmbientes
+                            id="onboarding-banco-dados"
+                            title="Banco de dados"
+                            tooltipContent={
+                                <>
+                                    <p className="mb-4">
+                                        Essa seção acompanha a comunicação do
+                                        sistema com os bancos de dados e
+                                        informações das aplicações.
+                                    </p>
+                                    <p>
+                                        Visa garantir que o banco esteja
+                                        funcionando bem, acessível e respondendo
+                                        corretamente às consultas das
+                                        aplicações.
+                                    </p>
+                                </>
+                            }
+                        >
+                            <DatabaseStatusCard
+                                systemName={projectName}
+                                className="bg-[#F5F5F5] p-3"
+                            />
+                        </CardWrapperInfoAmbientes>
+                    </div>
+
+                    <FullWidthSection
+                        id="onboarding-bugs"
+                        title="Bugs"
+                        tooltip={
+                            <p>
+                                Ao final da página será possível visualizar o
+                                registro dos bugs e correções necessárias para o
+                                sistema, suas tratativas e andamento para
+                                resolução.
+                            </p>
+                        }
+                    >
+                        <AzureDevOpsBacklog
+                            className="p-[2px]"
+                            project={projectName}
+                        />
+                    </FullWidthSection>
+                </TabsContent>
+
+                {showMetricas && (
+                    <TabsContent value="metricas">
+                        {metricasContentBySistema[projectName]}
+                    </TabsContent>
+                )}
+
+                {showAnalytics && (
+                    <TabsContent value="analytics">
+                        <div
+                            id="onboarding-analytics-kpis"
+                            className="grid grid-cols-3 gap-4 mb-4"
+                        >
+                            <ActiveUsersCard
+                                systemName={projectName}
+                                period={activePeriod}
+                            />
+                            <AverageSessionCard
+                                systemName={projectName}
+                                period={activePeriod}
+                            />
+                            <PeakUsageTodayCard
+                                systemName={projectName}
+                                period={activePeriod}
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 gap-4 mb-4">
+                            <div
+                                id="onboarding-analytics-users-by-page"
+                                className="col-span-2"
+                            >
+                                <UsersByPageCard
+                                    systemName={projectName}
+                                    period={activePeriod}
+                                    coordenadoria={activeItem?.title}
+                                />
+                            </div>
+                            <div
+                                id="onboarding-analytics-device-distribution"
+                                className="col-span-2"
+                            >
+                                <DeviceDistributionCard
+                                    systemName={projectName}
+                                    period={activePeriod}
+                                />
+                            </div>
+                        </div>
+                        <FullWidthSection
+                            id="onboarding-analytics-peak-hours"
+                            title="Horários de pico"
+                            tooltip={
+                                <p>
+                                    Essa seção mostra os horários com maior
+                                    volume de acessos ao sistema, permitindo
+                                    identificar os picos de uso ao longo do dia.
+                                </p>
+                            }
+                        >
+                            <PeakHoursChart
+                                systemName={projectName}
+                                period={activePeriod}
+                                className="p-[2px]"
+                            />
+                        </FullWidthSection>
+                    </TabsContent>
+                )}
+            </Tabs>
         </div>
     );
 }

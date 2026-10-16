@@ -101,9 +101,9 @@ export const mockAuthorize = async (
   return {
     id: loginResponse.login,
     name: loginResponse.nome,
-    email: loginResponse.email || "",
+    email: loginResponse.email ?? "",
     rf: loginResponse.login,
-    cpf: loginResponse.cpf || "",
+    cpf: loginResponse.cpf ?? "",
     situacaoUsuario: loginResponse.situacaoUsuario!,
     situacaoGrupo: loginResponse.situacaoGrupo!,
     visoes: loginResponse.visoes || [],

@@ -3,9 +3,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import Image from "next/image";
 
 import ClosedEye from "@/assets/icons/CloseEye";
 import OpenEye from "@/assets/icons/OpenEye";
+import LogoDevops from "@/assets/images/logo_devops.svg";
+import LogoPrefeitura from "@/assets/images/logo_prefeitura.svg";
 import { AlertCircleIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -80,14 +83,25 @@ export default function LoginForm() {
             <BackgroundForm />
             <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
                 <div className="w-full max-w-md">
+                    <div className="flex justify-center mb-[60px]">
+                        <Image
+                            src={LogoDevops}
+                            alt="Logo AutoServiço"
+                            className="w-[199.3474px] h-[34.1841px]"
+                            loading="lazy"
+                            fetchPriority="low"
+                            width={199}
+                            height={34}
+                        />
+                    </div>
                     <div className="bg-white rounded-sm shadow-2xl p-8 backdrop-blur-sm bg-opacity-95">
                         <div className="mb-8 text-left">
-                            <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                            <h1 className="text-xl font-medium text-blue-900 mb-2">
                                 Boas vindas ao Autosserviço!
                             </h1>
                             <p className="text-gray-600 text-sm">
-                                Confira as informações da saúde do seu sistema e
-                                tenha mais autonomia em suas atividades diárias.
+                                Confira as informações técnicas e dados de seu
+                                sistema.
                             </p>
                         </div>
                         <div className="mb-8">
@@ -99,10 +113,10 @@ export default function LoginForm() {
                                     <AlertCircleIcon />
                                     {errorMessage !==
                                         PERFIL_NOT_PERMISSION_ERROR_MESSAGE && (
-                                        <AlertTitle className="font-bold text-[#111827]">
-                                            Vamos tentar de novo?
-                                        </AlertTitle>
-                                    )}
+                                            <AlertTitle className="font-bold text-[#111827]">
+                                                Vamos tentar de novo?
+                                            </AlertTitle>
+                                        )}
                                     <AlertDescription>
                                         <p className="text-[#6b7280] !leading-4 -mt-1">
                                             {errorMessage}
@@ -184,16 +198,6 @@ export default function LoginForm() {
                                     </button>
                                 </div>
 
-                                {/* Link esqueceu senha */}
-                                <div className="text-right">
-                                    <button
-                                        type="button"
-                                        className="text-sm text-gray-900 hover:text-blue-600 transition-colors"
-                                    >
-                                        Esqueceu sua senha?
-                                    </button>
-                                </div>
-
                                 <div>
                                     <Button
                                         type="submit"
@@ -208,6 +212,17 @@ export default function LoginForm() {
                                 </div>
                             </form>
                         </Form>
+                    </div>
+                    <div className="flex justify-center mt-[53px]">
+                        <Image
+                            src={LogoPrefeitura}
+                            alt="Logo Prefeitura de São Paulo"
+                            className="w-[208px] h-[80px]"
+                            loading="lazy"
+                            fetchPriority="low"
+                            width={208}
+                            height={80}
+                        />
                     </div>
                 </div>
             </div>

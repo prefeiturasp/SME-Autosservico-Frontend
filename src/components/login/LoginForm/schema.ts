@@ -10,7 +10,7 @@ const formSchema = z.object({
     rf: z
         .string()
         .min(1, RF_ERROR_MESSAGE)
-        .max(8, RF_FORMAT_ERROR_MESSAGE),
+        .max(11, RF_FORMAT_ERROR_MESSAGE),
     password: z
         .string()
         .min(1, PASSWORD_ERROR_MESSAGE)

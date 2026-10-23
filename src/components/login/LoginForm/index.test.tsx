@@ -1,6 +1,7 @@
 /* @vitest-environment jsdom */
 // src/components/login/LoginForm/index.test.tsx
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import LoginForm from "./index";
 import { vi, beforeEach, describe, it, test, expect } from "vitest";
 
@@ -64,9 +65,9 @@ describe("LoginForm", () => {
     mockIsPending = false;
   });
 
-  it("renderiza os campos de RF e senha", async () => {
+  it("renderiza os campos de login e senha", async () => {
     render(<LoginForm />);
-    expect(await screen.findByPlaceholderText("Digite o seu RF...")).toBeInTheDocument();
+    expect(await screen.findByPlaceholderText("Digite o seu RF ou CPF...")).toBeInTheDocument();
     expect(await screen.findByPlaceholderText("Digite a sua senha...")).toBeInTheDocument();
     expect(await screen.findByRole("button", { name: /entrar/i })).toBeInTheDocument();
   });
@@ -78,7 +79,7 @@ describe("LoginForm", () => {
 
     render(<LoginForm />);
 
-    fireEvent.input(screen.getByLabelText(/Registro Funcional/i), { target: { value: "12345678" } });
+    fireEvent.input(screen.getByLabelText(/^RF$/), { target: { value: "12345678" } });
     fireEvent.input(screen.getByPlaceholderText("Digite a sua senha..."), { target: { value: "senhaerrada" } });
 
     const btn = screen.getByRole("button", { name: /entrar/i });
@@ -97,7 +98,7 @@ describe("LoginForm", () => {
 
     render(<LoginForm />);
 
-    fireEvent.input(screen.getByPlaceholderText("Digite o seu RF..."), { target: { value: "12345678" } });
+    fireEvent.input(screen.getByPlaceholderText("Digite o seu RF ou CPF..."), { target: { value: "12345678" } });
     fireEvent.input(screen.getByPlaceholderText("Digite a sua senha..."), { target: { value: "admin123" } });
 
     const btn = screen.getByRole("button", { name: /entrar/i });
@@ -128,7 +129,7 @@ describe("LoginForm", () => {
     render(<LoginForm />);
 
     const btn = await screen.findByRole("button", { name: /entrar/i });
-    const inputRf = screen.getByPlaceholderText("Digite o seu RF...");
+    const inputRf = screen.getByPlaceholderText("Digite o seu RF ou CPF...");
     const inputPassword = screen.getByPlaceholderText("Digite a sua senha...");
 
     // Inicialmente desabilitado
@@ -156,7 +157,7 @@ describe("LoginForm", () => {
 
     render(<LoginForm />);
 
-    fireEvent.input(screen.getByPlaceholderText("Digite o seu RF..."), { target: { value: "12345678" } });
+    fireEvent.input(screen.getByPlaceholderText("Digite o seu RF ou CPF..."), { target: { value: "12345678" } });
     fireEvent.input(screen.getByPlaceholderText("Digite a sua senha..."), { target: { value: "senha" } });
 
     const btn = screen.getByRole("button", { name: /entrar/i });
@@ -177,7 +178,7 @@ describe("LoginForm", () => {
 
     render(<LoginForm />);
 
-    const rfInput = screen.getByPlaceholderText("Digite o seu RF...");
+    const rfInput = screen.getByPlaceholderText("Digite o seu RF ou CPF...");
     const pwInput = screen.getByPlaceholderText("Digite a sua senha...");
 
     fireEvent.input(rfInput, { target: { value: "12345678" } });
@@ -198,13 +199,45 @@ describe("LoginForm", () => {
     });
   });
 
+  it("mostra o rótulo RF e troca para CPF quando passa de 8 dígitos", async () => {
+    const user = userEvent.setup();
+    render(<LoginForm />);
+    const input = screen.getByPlaceholderText("Digite o seu RF ou CPF...");
+
+    expect(screen.getByText("RF")).toBeInTheDocument();
+
+    await user.type(input, "12345678");
+    expect(screen.getByText("RF")).toBeInTheDocument();
+
+    await user.type(input, "9");
+    expect(screen.getByText("CPF")).toBeInTheDocument();
+    expect(screen.queryByText("RF")).not.toBeInTheDocument();
+
+    await user.type(input, "{Backspace}");
+    expect(screen.getByText("RF")).toBeInTheDocument();
+  });
+
+  it("aceita CPF com 11 dígitos no campo de login", async () => {
+    render(<LoginForm />);
+
+    fireEvent.input(screen.getByPlaceholderText("Digite o seu RF ou CPF..."), { target: { value: "12345678901" } });
+    fireEvent.input(screen.getByPlaceholderText("Digite a sua senha..."), { target: { value: "senha123" } });
+
+    const btn = screen.getByRole("button", { name: /entrar/i });
+    await waitFor(() => expect(btn).not.toBeDisabled());
+    fireEvent.click(btn);
+
+    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalled());
+    expect(mockOnSubmit.mock.calls[0][0].rf).toBe("12345678901");
+  });
+
   // ✅ NOVO: botão permanece desabilitado quando isPending=true mesmo com formulário válido
   it("mantém 'Entrar' desabilitado enquanto isPending=true", async () => {
     mockIsPending = true;
 
     render(<LoginForm />);
 
-    fireEvent.input(screen.getByPlaceholderText("Digite o seu RF..."), { target: { value: "12345678" } });
+    fireEvent.input(screen.getByPlaceholderText("Digite o seu RF ou CPF..."), { target: { value: "12345678" } });
     fireEvent.input(screen.getByPlaceholderText("Digite a sua senha..."), { target: { value: "senha123" } });
 
     const btn = screen.getByRole("button", { name: /entrar/i });

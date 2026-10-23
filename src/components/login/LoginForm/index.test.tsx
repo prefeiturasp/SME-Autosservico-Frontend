@@ -1,6 +1,7 @@
 /* @vitest-environment jsdom */
 // src/components/login/LoginForm/index.test.tsx
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import LoginForm from "./index";
 import { vi, beforeEach, describe, it, test, expect } from "vitest";
 
@@ -64,7 +65,7 @@ describe("LoginForm", () => {
     mockIsPending = false;
   });
 
-  it("renderiza os campos de RF ou CPF e senha", async () => {
+  it("renderiza os campos de login e senha", async () => {
     render(<LoginForm />);
     expect(await screen.findByPlaceholderText("Digite o seu RF ou CPF...")).toBeInTheDocument();
     expect(await screen.findByPlaceholderText("Digite a sua senha...")).toBeInTheDocument();
@@ -78,7 +79,7 @@ describe("LoginForm", () => {
 
     render(<LoginForm />);
 
-    fireEvent.input(screen.getByLabelText(/RF ou CPF/i), { target: { value: "12345678" } });
+    fireEvent.input(screen.getByLabelText(/^RF$/), { target: { value: "12345678" } });
     fireEvent.input(screen.getByPlaceholderText("Digite a sua senha..."), { target: { value: "senhaerrada" } });
 
     const btn = screen.getByRole("button", { name: /entrar/i });
@@ -196,6 +197,24 @@ describe("LoginForm", () => {
     await waitFor(() => {
       expect(screen.queryByText(/invalid credentials/i)).not.toBeInTheDocument();
     });
+  });
+
+  it("mostra o rótulo RF e troca para CPF quando passa de 8 dígitos", async () => {
+    const user = userEvent.setup();
+    render(<LoginForm />);
+    const input = screen.getByPlaceholderText("Digite o seu RF ou CPF...");
+
+    expect(screen.getByText("RF")).toBeInTheDocument();
+
+    await user.type(input, "12345678");
+    expect(screen.getByText("RF")).toBeInTheDocument();
+
+    await user.type(input, "9");
+    expect(screen.getByText("CPF")).toBeInTheDocument();
+    expect(screen.queryByText("RF")).not.toBeInTheDocument();
+
+    await user.type(input, "{Backspace}");
+    expect(screen.getByText("RF")).toBeInTheDocument();
   });
 
   it("aceita CPF com 11 dígitos no campo de login", async () => {

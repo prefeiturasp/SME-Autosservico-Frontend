@@ -137,7 +137,8 @@ export default function LoginForm() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="required font-semibold">
-                                                RF ou CPF
+                                                {/* RF tem até 8 dígitos; passou disso, é CPF */}
+                                                {rf.length > 8 ? "CPF" : "RF"}
                                             </FormLabel>
                                             <FormControl>
                                                 <InputMask

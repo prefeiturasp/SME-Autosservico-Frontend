@@ -7,10 +7,10 @@ Funcionalidade: Validações do formulário de login
     Então devo visualizar o formulário de login
     E o botão de entrar deve estar desabilitado
 
-  Cenário: Limitar o Registro Funcional a oito dígitos
+  Cenário: Limitar o login (RF ou CPF) a onze dígitos
     Dado que eu acesso o sistema
-    Quando informo o RF "123456789" no formulário de login
-    Então o campo de RF deve conter "12345678"
+    Quando informo o RF "123456789012" no formulário de login
+    Então o campo de RF deve conter "12345678901"
 
   Cenário: Alternar a visibilidade da senha sem alterar seu valor
     Dado que eu acesso o sistema

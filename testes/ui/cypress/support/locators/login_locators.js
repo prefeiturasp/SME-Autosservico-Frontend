@@ -1,7 +1,7 @@
 class Login_Auto_Servico_Localizadores {
 
   campo_usuario() {
-    return 'input[placeholder="Digite o seu RF..."]'
+    return 'input[placeholder="Digite o seu RF ou CPF..."]'
   }
 
   campo_senha() {

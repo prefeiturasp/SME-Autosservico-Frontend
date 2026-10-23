@@ -137,15 +137,16 @@ export default function LoginForm() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="required font-semibold">
-                                                Registro Funcional (RF)
+                                                {/* RF tem até 8 dígitos; passou disso, é CPF */}
+                                                {rf.length > 8 ? "CPF" : "RF"}
                                             </FormLabel>
                                             <FormControl>
                                                 <InputMask
                                                     {...field}
                                                     inputMode="numeric"
-                                                    placeholder="Digite o seu RF..."
+                                                    placeholder="Digite o seu RF ou CPF..."
                                                     maskProps={{
-                                                        mask: "99999999",
+                                                        mask: "99999999999",
                                                     }}
                                                 />
                                             </FormControl>

@@ -1,5 +1,5 @@
 import type { StatsCardResponse } from "@/types/metricas";
-import { useGipeMetricasQuery } from "./_helpers/gipeMetricas";
+import { semValorNulo, useGipeMetricasQuery } from "./_helpers/gipeMetricas";
 
 type Options = {
   systemName: string;
@@ -14,7 +14,7 @@ export function usePrazosMovimentacoes({ systemName }: Options) {
       mediaMovimentacoesPorOcorrencia,
     } = data.ocorrencias.prazosMovimentacoes;
     return {
-      items: [
+      items: semValorNulo([
         {
           label: "Ocorrências dentro do prazo",
           value: dentroDoPrazo,
@@ -26,7 +26,7 @@ export function usePrazosMovimentacoes({ systemName }: Options) {
           variant: "danger",
         },
         {
-          label: "Ocorrências dentro sem movimentações há mais de 7 dias",
+          label: "Ocorrências sem movimentações há mais de 7 dias",
           value: semMovimentacao7Dias,
           variant: "warning",
         },
@@ -35,7 +35,7 @@ export function usePrazosMovimentacoes({ systemName }: Options) {
           value: mediaMovimentacoesPorOcorrencia,
           variant: "neutral",
         },
-      ],
+      ]),
     };
   });
 }

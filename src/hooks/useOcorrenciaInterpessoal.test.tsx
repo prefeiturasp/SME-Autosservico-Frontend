@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useOcorrenciaInterpessoal } from "./useOcorrenciaInterpessoal";
+import { mockFetchGipe } from "./_helpers/gipeMetricas.fixture";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -17,6 +18,7 @@ const createWrapper = () => {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  mockFetchGipe();
 });
 
 describe("useOcorrenciaInterpessoal", () => {

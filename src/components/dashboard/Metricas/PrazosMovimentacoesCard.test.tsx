@@ -87,7 +87,7 @@ describe("<PrazosMovimentacoesCard />", () => {
           { label: "Ocorrências dentro do prazo", value: 903, variant: "neutral" },
           { label: "Ocorrências fora do prazo", value: 98, variant: "danger" },
           {
-            label: "Ocorrências dentro sem movimentações há mais de 7 dias",
+            label: "Ocorrências sem movimentações há mais de 7 dias",
             value: 47,
             variant: "warning",
           },

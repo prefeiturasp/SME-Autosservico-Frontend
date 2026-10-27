@@ -3,6 +3,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { usePrazosMovimentacoes } from "./usePrazosMovimentacoes";
+import {
+  GIPE_METRICAS_FIXTURE,
+  mockFetchGipe,
+} from "./_helpers/gipeMetricas.fixture";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -17,6 +21,7 @@ const createWrapper = () => {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  mockFetchGipe();
 });
 
 describe("usePrazosMovimentacoes", () => {
@@ -44,7 +49,7 @@ describe("usePrazosMovimentacoes", () => {
       { label: "Ocorrências dentro do prazo", value: 903, variant: "neutral" },
       { label: "Ocorrências fora do prazo", value: 98, variant: "danger" },
       {
-        label: "Ocorrências dentro sem movimentações há mais de 7 dias",
+        label: "Ocorrências sem movimentações há mais de 7 dias",
         value: 47,
         variant: "warning",
       },
@@ -53,6 +58,34 @@ describe("usePrazosMovimentacoes", () => {
         value: 3.8,
         variant: "neutral",
       },
+    ]);
+  });
+});
+
+describe("usePrazosMovimentacoes com dados reais incompletos", () => {
+  it("tira do card os prazos sem fonte (o GIPE não tem SLA)", async () => {
+    mockFetchGipe({
+      ...GIPE_METRICAS_FIXTURE,
+      ocorrencias: {
+        ...GIPE_METRICAS_FIXTURE.ocorrencias,
+        prazosMovimentacoes: {
+          dentroDoPrazo: null,
+          foraDoPrazo: null,
+          semMovimentacao7Dias: 387,
+          mediaMovimentacoesPorOcorrencia: 1.9,
+        },
+      },
+    });
+    const { result } = renderHook(
+      () => usePrazosMovimentacoes({ systemName: "GIPE" }),
+      { wrapper: createWrapper() },
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(result.current.data?.items.map((i) => [i.label, i.value])).toEqual([
+      ["Ocorrências sem movimentações há mais de 7 dias", 387],
+      ["Média de movimentações por ocorrência", 1.9],
     ]);
   });
 });

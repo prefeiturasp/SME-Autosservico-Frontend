@@ -1,5 +1,5 @@
 import type { StatsCardResponse } from "@/types/metricas";
-import { useGipeMetricasQuery } from "./_helpers/gipeMetricas";
+import { semValorNulo, useGipeMetricasQuery } from "./_helpers/gipeMetricas";
 
 type Options = {
   systemName: string;
@@ -9,7 +9,7 @@ export function useTempoDeResposta({ systemName }: Options) {
   return useGipeMetricasQuery(systemName, (data): StatsCardResponse => {
     const tempoResposta = data.ocorrencias.tempoResposta;
     return {
-      items: [
+      items: semValorNulo([
         {
           label: "Tempo médio de resolução",
           value: tempoResposta.tempoMedioResolucaoDias,
@@ -26,7 +26,7 @@ export function useTempoDeResposta({ systemName }: Options) {
           trend: tempoResposta.tendenciaPrimeiraTratativa,
           trendLabel: tempoResposta.tendenciaPrimeiraTratativaLabel,
         },
-      ],
+      ]),
     };
   });
 }

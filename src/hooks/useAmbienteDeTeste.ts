@@ -19,6 +19,6 @@ const semAssinatura = () => () => {};
 export const useAmbienteDeTeste = () =>
   useSyncExternalStore(
     semAssinatura,
-    () => ehAmbienteDeTeste(window.location.hostname),
+    () => ehAmbienteDeTeste(globalThis.location.hostname),
     () => false,
   );

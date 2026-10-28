@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAmbienteDeTeste } from "@/hooks/useAmbienteDeTeste";
 import { anoCorrente, PRIMEIRO_ANO_GIPE, useGipeFiltros } from "@/states/gipe";
 import AcessoAtivoGipeCard from "./AcessoAtivoGipeCard";
 import TotalAcessosHojeGipeCard from "./TotalAcessosHojeGipeCard";
@@ -26,11 +27,13 @@ const anosDisponiveis = () =>
 /**
  * Topo da aba Métricas do GIPE: o filtro de ano letivo (discovery do GIPE,
  * §7) e os três KPIs de usuário do mockup. O ano vai para o store e todos
- * os hooks do GIPE passam a consultar aquele ano.
+ * os hooks do GIPE passam a consultar aquele ano. Os KPIs de usuário só
+ * aparecem em test (qa-) e homolog (hom-); em produção ficam ocultos.
  */
 export default function GipeResumoSection({ systemName }: Props) {
   const anoLetivo = useGipeFiltros((state) => state.anoLetivo);
   const setAnoLetivo = useGipeFiltros((state) => state.setAnoLetivo);
+  const ambienteDeTeste = useAmbienteDeTeste();
 
   return (
     <div className="mb-8 space-y-4">
@@ -58,11 +61,13 @@ export default function GipeResumoSection({ systemName }: Props) {
           ocorrências sem movimentação há 7 dias
         </span>
       </div>
-      <div className="grid grid-cols-3 gap-4">
-        <AcessoAtivoGipeCard systemName={systemName} />
-        <UsuariosUnicosGipeCard systemName={systemName} />
-        <TotalAcessosHojeGipeCard systemName={systemName} />
-      </div>
+      {ambienteDeTeste && (
+        <div className="grid grid-cols-3 gap-4">
+          <AcessoAtivoGipeCard systemName={systemName} />
+          <UsuariosUnicosGipeCard systemName={systemName} />
+          <TotalAcessosHojeGipeCard systemName={systemName} />
+        </div>
+      )}
     </div>
   );
 }

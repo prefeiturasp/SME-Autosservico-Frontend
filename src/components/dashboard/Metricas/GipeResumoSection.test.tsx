@@ -35,6 +35,11 @@ vi.mock("@/components/ui/select", () => ({
   ),
 }));
 
+let mockAmbienteDeTeste = true;
+vi.mock("@/hooks/useAmbienteDeTeste", () => ({
+  useAmbienteDeTeste: () => mockAmbienteDeTeste,
+}));
+
 vi.mock("./AcessoAtivoGipeCard", () => ({
   __esModule: true,
   default: ({ systemName }: { systemName?: string }) => (
@@ -64,6 +69,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(new Date("2027-03-10T12:00:00-03:00"));
   useGipeFiltros.setState({ anoLetivo: 2027 });
+  mockAmbienteDeTeste = true;
 });
 
 afterEach(() => {
@@ -91,7 +97,7 @@ describe("<GipeResumoSection />", () => {
     expect(useGipeFiltros.getState().anoLetivo).toBe(2025);
   });
 
-  it("mostra os três KPIs do GIPE e o aviso do recorte do ano", () => {
+  it("mostra os três KPIs do GIPE e o aviso do recorte do ano em test e homolog", () => {
     render(<GipeResumoSection systemName="GIPE" />);
 
     expect(
@@ -106,5 +112,13 @@ describe("<GipeResumoSection />", () => {
         "O ano filtra ocorrências e produtividade, exceto anexos enviados e ocorrências sem movimentação há 7 dias",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("esconde os três KPIs de usuário em produção, mas mantém o filtro de ano", () => {
+    mockAmbienteDeTeste = false;
+    render(<GipeResumoSection systemName="GIPE" />);
+
+    expect(screen.queryAllByTestId("kpi-card")).toHaveLength(0);
+    expect(screen.getByTestId("ano-letivo-select")).toBeInTheDocument();
   });
 });

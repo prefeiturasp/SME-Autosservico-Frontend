@@ -83,7 +83,8 @@ When('clico no item {string} do sidebar', (item) => {
     COPED: SIDEBAR.MENU.COPED,
     COPLAN: SIDEBAR.MENU.COPLAN,
     COTIC: SIDEBAR.MENU.COTIC,
-    COGEP: SIDEBAR.MENU.COGEP
+    COGEP: SIDEBAR.MENU.COGEP,
+    GIPE: SIDEBAR.MENU.GIPE
   }
 
   const locator = mapa[item]
@@ -106,7 +107,8 @@ Then('o item {string} deve estar ativo no sidebar', (item) => {
     COPED: SIDEBAR.MENU.COPED,
     COPLAN: SIDEBAR.MENU.COPLAN,
     COTIC: SIDEBAR.MENU.COTIC,
-    COGEP: SIDEBAR.MENU.COGEP
+    COGEP: SIDEBAR.MENU.COGEP,
+    GIPE: SIDEBAR.MENU.GIPE
   }
 
   const locator = mapa[item]

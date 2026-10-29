@@ -10,5 +10,6 @@ export const SIDEBAR = {
     COPLAN: '[data-testid="sidebar-button-coplan"]',
     COTIC: '[data-testid="sidebar-button-cotic"]',
     COGEP: '[data-testid="sidebar-button-cogep"]',
+    GIPE: '[data-testid="sidebar-button-gipe"]',
   }
 }

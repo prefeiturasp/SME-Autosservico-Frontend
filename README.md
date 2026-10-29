@@ -26,6 +26,7 @@ As PRs seguem fluxo com revisores definidos no arquivo `.github/CODEOWNERS`.
 - [TypeScript](https://www.typescriptlang.org/docs/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 - [Vitest](https://vitest.dev/guide/)
+- [Cypress](https://www.cypress.io/)
 
 ## 🚀 Executando o projeto com Docker
 

@@ -16,6 +16,7 @@ import DistribuicaoSection from "@/components/dashboard/Metricas/DistribuicaoSec
 import EscolhasSection from "@/components/dashboard/Metricas/EscolhasSection";
 import FluxoDeAtendimentoSection from "@/components/dashboard/Metricas/FluxoDeAtendimentoSection";
 import GestaoSection from "@/components/dashboard/Metricas/GestaoSection";
+import GipeResumoSection from "@/components/dashboard/Metricas/GipeResumoSection";
 import IndicadoresParticipacaoLogisticaSection from "@/components/dashboard/Metricas/IndicadoresParticipacaoLogisticaSection";
 import LimpezaSection from "@/components/dashboard/Metricas/LimpezaSection";
 import LogisticaSection from "@/components/dashboard/Metricas/LogisticaSection";
@@ -57,6 +58,7 @@ const SISTEMAS_COM_METRICAS = new Set([
     "SigEscola",
     "Serap",
     "Serap Estudantes",
+    "GIPE",
 ]);
 
 // Nenhum sistema tem integração com o Google Analytics ainda (os cards da aba
@@ -175,6 +177,7 @@ export default function Dashboard() {
         ),
         GIPE: (
             <>
+                <GipeResumoSection systemName={projectName} />
                 <OcorrenciasSection systemName={projectName} />
                 <FluxoDeAtendimentoSection systemName={projectName} />
                 <DistribuicaoSection systemName={projectName} />

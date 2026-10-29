@@ -30,3 +30,14 @@ Funcionalidade: Sidebar - SME AutoServiço
   Cenário: Ativar item ASCOM no sidebar
     Quando clico no item "ASCOM" do sidebar
     Então o item "ASCOM" deve estar ativo no sidebar
+
+  Cenário: Acessar a tela de métricas do GIPE
+    Quando clico no item "GIPE" do sidebar
+    Então o item "GIPE" deve estar ativo no sidebar
+    E o cabeçalho do dashboard deve exibir "Gabinete Integrado de Proteção Escolar [GIPE]"
+    Quando acesso a aba "Métricas" do dashboard
+    Então a aba "Métricas" deve estar ativa
+    E devo visualizar o seletor "Sistema"
+    E o sistema "GIPE" deve estar selecionado
+    E devo visualizar a instrução "Selecione um sistema para visualizar as informações"
+    E devo visualizar os indicadores de acesso

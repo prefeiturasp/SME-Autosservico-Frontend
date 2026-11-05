@@ -368,6 +368,13 @@ vi.mock("@/components/dashboard/Metricas/TotalAcessosHojeGipeCard", () => ({
     ),
 }));
 
+vi.mock("@/components/dashboard/Metricas/GipeResumoSection", () => ({
+    __esModule: true,
+    default: ({ systemName }: { systemName?: string }) => (
+        <div data-testid="gipe-resumo-section">{systemName ?? ""}</div>
+    ),
+}));
+
 vi.mock("@/components/dashboard/Metricas/OcorrenciasSection", () => ({
     __esModule: true,
     default: ({ systemName }: { systemName?: string }) => (
@@ -600,7 +607,6 @@ describe("Dashboard page", () => {
         "Rolê Agroecológico",
         "Bens Físicos",
         "Sigla",
-        "GIPE",
         "Limpeza",
     ])("não exibe a aba Métricas para %s, ainda sem integração", (nome) => {
         mockStoreState = {
@@ -957,6 +963,28 @@ describe("Dashboard page", () => {
         );
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com o resumo e as seções do GIPE quando o projeto ativo é o GIPE", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: { ...mockStoreState.activeProject, nome: "GIPE" },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        for (const secao of [
+            "gipe-resumo-section",
+            "ocorrencias-section",
+            "fluxo-de-atendimento-section",
+            "distribuicao-section",
+            "usuarios-section",
+            "produtividade-section",
+        ]) {
+            expect(screen.getByTestId(secao)).toHaveTextContent("GIPE");
+        }
     });
 
     test("exibe a aba Métricas com a seção do SigEscola quando o projeto ativo é o SigEscola", () => {

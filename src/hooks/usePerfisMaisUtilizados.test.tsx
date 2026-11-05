@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { usePerfisMaisUtilizados } from "./usePerfisMaisUtilizados";
+import { mockFetchGipe } from "./_helpers/gipeMetricas.fixture";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -17,6 +18,7 @@ const createWrapper = () => {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  mockFetchGipe();
 });
 
 describe("usePerfisMaisUtilizados", () => {
@@ -41,7 +43,7 @@ describe("usePerfisMaisUtilizados", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(result.current.data).toEqual([
-      { label: "Diretor", value: 681 },
+      { label: "Diretor de Escola", value: 681 },
       { label: "GIPE admin", value: 598 },
       { label: "Ponto focal admin", value: 467 },
       { label: "GIPE", value: 342 },

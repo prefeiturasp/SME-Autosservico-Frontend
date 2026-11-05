@@ -62,6 +62,18 @@ Then('devo visualizar a instrução {string}', (instrucao) => {
   localizarTitulo(instrucao)
 })
 
+Then('o cabeçalho do dashboard deve exibir {string}', (titulo) => {
+  cy.get('#onboarding-page-title', { timeout: 20000 })
+    .should('be.visible')
+    .and('have.text', titulo)
+})
+
+Then('o sistema {string} deve estar selecionado', (sistema) => {
+  cy.get('#onboarding-select-sistema', { timeout: 20000 })
+    .should('be.visible')
+    .and('contain.text', sistema)
+})
+
 Then('devo visualizar os indicadores de acesso', () => {
   INDICADORES_ACESSO.forEach(localizarTitulo)
 })

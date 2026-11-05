@@ -1,6 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import { useSession } from "next-auth/react";
+import { SISTEMA_AUTOSERVICO } from "@/const";
 
 // Lê a variável de ambiente no build (Next.js substitui corretamente)
 const AUTH_VERSION = process.env.NEXT_PUBLIC_AUTH_VERSION ?? "v1";
@@ -46,7 +47,7 @@ export function useAllowedSquads() {
         const allowedSquads: string[] = [];
 
         user.perfis_por_sistema.forEach((perfilSistema) => {
-            if (perfilSistema.sistema === 1008) {
+            if (perfilSistema.sistema === SISTEMA_AUTOSERVICO) {
                 allowedSquads.push(...perfilSistema.perfis);
             }
         });

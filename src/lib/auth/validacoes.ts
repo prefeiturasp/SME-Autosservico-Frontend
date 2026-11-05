@@ -1,44 +1,28 @@
+import { SISTEMA_AUTOSERVICO, SQUADS_VALIDAS } from "@/const";
+
+const SQUADS = new Set(SQUADS_VALIDAS);
+
+const ehSquadValida = (nome: string) => SQUADS.has(nome.toUpperCase());
+
 /**
  * Valida se o usuário possui acesso ao sistema baseado nos grupos do Keycloak.
- * O usuário deve pertencer a pelo menos um grupo válido.
+ * O usuário deve pertencer a pelo menos uma squad válida.
  */
-export function temPermissaoDeAcessoV2(
-    groups: string[] = [],
-    gruposValidosEnv = process.env.NEXT_PUBLIC_SQUADS_VALIDAS
-): boolean {
-    if (!gruposValidosEnv) {
-        console.warn("Variável de ambiente NEXT_PUBLIC_SQUADS_VALIDAS não configurada.");
-        return false;
-    }
-    const gruposValidos = new Set(gruposValidosEnv.split(",").map((g) => g.trim().toUpperCase()));
-
-    return groups.some((group) => gruposValidos.has(group.toUpperCase()));
+export function temPermissaoDeAcessoV2(groups: string[] = []): boolean {
+    return (groups ?? []).some(ehSquadValida);
 }
+
 type PerfilPorSistema = {
     sistema: number;
     perfis: string[];
 };
 
 /**
- * Valida se o usuário possui acesso ao sistema e ao menos uma Squad válida.
+ * Valida se o usuário possui perfil no sistema do Autosserviço com ao menos
+ * uma squad válida.
  */
-export function temPermissaoDeAcesso(
-    perfisPorSistema: PerfilPorSistema[],
-    sistemaEnv = process.env.NEXT_PUBLIC_SISTEMA_AUTOSERVICO,
-    squadsEnv = process.env.NEXT_PUBLIC_SQUADS_VALIDAS
-): boolean {
-
-    if (!sistemaEnv || !squadsEnv) {
-        console.warn("Variáveis de ambiente de acesso não configuradas corretamente.");
-        return false;
-    }
-
-    const sistema = Number(sistemaEnv);
-    const squadsValidas = new Set(squadsEnv.split(",").map((s) => s.trim().toUpperCase()));
-
-    return perfisPorSistema?.some(
-        (item) =>
-            item.sistema === sistema &&
-            item.perfis.some((perfil) => squadsValidas.has(perfil.toUpperCase()))
+export function temPermissaoDeAcesso(perfisPorSistema: PerfilPorSistema[]): boolean {
+    return (perfisPorSistema ?? []).some(
+        (item) => item.sistema === SISTEMA_AUTOSERVICO && item.perfis.some(ehSquadValida)
     );
 }

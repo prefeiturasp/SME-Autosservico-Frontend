@@ -5,7 +5,7 @@
   "main": "cypress.config.js",
   "scripts": {
     "test": "npm run test:allure",
-    "test:ui": "cypress run --spec 'cypress/e2e/ui/**/*.cy.js' --reporter mocha-allure-reporter",
+    "test:ui": "cypress run --spec 'cypress/e2e/ui/**/*.feature' --reporter mocha-allure-reporter",
     "test:api": "cypress run --spec 'cypress/e2e/api/**/*.cy.js' --reporter mocha-allure-reporter",
     "e2e": "cypress run --reporter mocha-allure-reporter",
     "report:allure": "allure generate allure-results --clean -o allure-report && allure open allure-report",

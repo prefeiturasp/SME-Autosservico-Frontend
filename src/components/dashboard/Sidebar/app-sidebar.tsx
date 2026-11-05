@@ -77,13 +77,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </div>
                 </SidebarContent>
                 <SidebarFooter>
-                    <ProfileLink className="justify-start px-4" />
-                    <SignOutButton
-                        variant="link"
-                        className="[&_svg]:size-7 text-white no-underline hover:no-underline justify-start px-4"
-                    >
-                        <LogoutIcon /> <span>Sair</span>
-                    </SignOutButton>
+                    <div className="flex flex-row items-center justify-between">
+                        <ProfileLink className="px-4" />
+                        <SignOutButton
+                            variant="link"
+                            className="[&_svg]:size-7 text-white no-underline hover:no-underline px-4"
+                        >
+                            <LogoutIcon /> <span>Sair</span>
+                        </SignOutButton>
+                    </div>
                     <p className="text-center text-[10px] text-white/60 pb-1">
                         Licença AGPL V3
                     </p>
@@ -108,10 +110,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {allowedItems.map((item) => (
-                                <SidebarMenuItem
-                                    key={item.title}
-                                    className="my-1"
-                                >
+                                <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton
                                         asChild
                                         isActive={
@@ -145,18 +144,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
-                <ProfileLink
-                    className={open ? "justify-start px-4" : "justify-center"}
-                    showLabel={open}
-                />
-                <SignOutButton
-                    variant="link"
-                    className={`${
-                        open ? "justify-start px-4" : "justify-center"
-                    } [&_svg]:size-7 text-white no-underline hover:no-underline`}
+                {/* Aberto, Perfil e Sair dividem uma linha para sobrar espaço às coordenadorias. */}
+                <div
+                    className={`flex ${
+                        open
+                            ? "flex-row items-center justify-between"
+                            : "flex-col items-center gap-2"
+                    }`}
                 >
-                    <LogoutIcon /> {open && <span>Sair</span>}
-                </SignOutButton>
+                    <ProfileLink
+                        className={open ? "px-4" : "justify-center"}
+                        showLabel={open}
+                    />
+                    <SignOutButton
+                        variant="link"
+                        className={`${
+                            open ? "px-4" : "justify-center"
+                        } [&_svg]:size-7 text-white no-underline hover:no-underline`}
+                    >
+                        <LogoutIcon /> {open && <span>Sair</span>}
+                    </SignOutButton>
+                </div>
                 {open && (
                     <p className="text-center text-[10px] text-white/60 pb-1">
                         Licença AGPL V3

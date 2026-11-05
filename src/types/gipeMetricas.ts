@@ -1,5 +1,5 @@
 import type { MetricTrend } from "@/types/metric";
-import type { AnalistaTableRow, ProfileDistributionItem, TableRow } from "@/types/metricas";
+import type { AnalistaTableRow, TableRow } from "@/types/metricas";
 
 export type GipeMetricasKpi = {
     valor: number;
@@ -21,18 +21,21 @@ export type GipeMetricasResponse = {
             finalizadas: number;
         };
         tempoResposta: {
-            tempoMedioResolucaoDias: number;
-            tendenciaResolucao: MetricTrend;
-            tendenciaResolucaoLabel: string;
-            tempoMedioPrimeiraTratativaDias: number;
-            tendenciaPrimeiraTratativa: MetricTrend;
-            tendenciaPrimeiraTratativaLabel: string;
+            // Nulos quando não há ocorrência finalizada; tendência ausente
+            // quando não há base de comparação nos últimos 60 dias.
+            tempoMedioResolucaoDias: number | null;
+            tendenciaResolucao?: MetricTrend;
+            tendenciaResolucaoLabel?: string;
+            tempoMedioPrimeiraTratativaDias: number | null;
+            tendenciaPrimeiraTratativa?: MetricTrend;
+            tendenciaPrimeiraTratativaLabel?: string;
         };
         prazosMovimentacoes: {
-            dentroDoPrazo: number;
-            foraDoPrazo: number;
+            // Dentro/fora do prazo: sem SLA no GIPE, o Backend manda null.
+            dentroDoPrazo: number | null;
+            foraDoPrazo: number | null;
             semMovimentacao7Dias: number;
-            mediaMovimentacoesPorOcorrencia: number;
+            mediaMovimentacoesPorOcorrencia: number | null;
         };
         porDre: TableRow[];
         porUnidadeEducacional: TableRow[];
@@ -49,7 +52,8 @@ export type GipeMetricasResponse = {
     };
     usuarios: {
         cadastrados: number;
-        porTipoDePerfil: ProfileDistributionItem[];
+        // A cor de cada perfil é decisão de UI: o hook resolve.
+        porTipoDePerfil: { label: string; percentage: number }[];
         perfisMaisUtilizados: TableRow[];
         porDre: TableRow[];
         porUnidadeEducacional: TableRow[];

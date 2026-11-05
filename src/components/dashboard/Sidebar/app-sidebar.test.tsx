@@ -149,6 +149,24 @@ describe("<AppSidebar />", () => {
         expect(screen.getByText("Sair")).toBeInTheDocument();
     });
 
+    it("não acrescenta margem vertical nos itens do menu", () => {
+        renderWithSidebarProvider(<AppSidebar />);
+
+        const itens = screen
+            .getAllByRole("listitem")
+            .filter((item) => item.dataset.sidebar === "menu-item");
+        expect(itens.length).toBeGreaterThan(0);
+        itens.forEach((item) => expect(item).not.toHaveClass("my-1"));
+    });
+
+    it("mostra Perfil e Sair lado a lado, na mesma linha", () => {
+        renderWithSidebarProvider(<AppSidebar />);
+
+        const acoes = screen.getByTestId("btn-perfil").parentElement;
+        expect(screen.getByTestId("btn-logout").parentElement).toBe(acoes);
+        expect(acoes).toHaveClass("flex-row");
+    });
+
     it("libera COPED e COPLAN para quem tem outra coordenadoria no perfil", () => {
         vi.mocked(useSession).mockReturnValueOnce({
             data: {
@@ -175,6 +193,9 @@ describe("<AppSidebar />", () => {
 
         expect(screen.queryByText("COPED")).not.toBeInTheDocument();
         expect(mockSetActiveItem).not.toHaveBeenCalled();
+        const acoes = screen.getByTestId("btn-perfil").parentElement;
+        expect(screen.getByTestId("btn-logout").parentElement).toBe(acoes);
+        expect(acoes).toHaveClass("flex-row");
     });
 
     it("deve chamar setActiveItem ao clicar em um item permitido", () => {

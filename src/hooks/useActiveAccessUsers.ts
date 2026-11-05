@@ -11,6 +11,7 @@ const ROTAS_REAIS: Record<string, string> = {
   SGP: "/api/sgp/usuarios/acesso-ativo",
   "Serap Estudantes": "/api/serap/usuarios/acesso-ativo",
   SigEscola: "/api/sigescola/usuarios/acesso-ativo",
+  GIPE: "/api/gipe/usuarios/acesso-ativo",
 };
 
 const MOCK_RESPONSE: ActiveAccessUsersResponse = {

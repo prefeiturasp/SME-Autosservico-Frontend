@@ -28,10 +28,10 @@ export function usePeriodosSgp({ systemName }: Options) {
 
 export function usePeriodoSgp(systemName: string) {
     const { data: opcoes = [] } = usePeriodosSgp({ systemName });
-    const [selecionado, setPeriodo] = useState<string>();
+    const [selecionado, setSelecionado] = useState<string>();
     return {
         periodo: selecionado ?? periodoPadraoSgp(opcoes),
-        setPeriodo,
+        setPeriodo: setSelecionado,
         opcoes,
     };
 }

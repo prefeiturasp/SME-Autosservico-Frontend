@@ -78,9 +78,9 @@ export function periodoPadraoSgp(
   opcoes: ReadonlyArray<PeriodoSgpOption>,
   hoje = new Date(),
 ): string {
-  const ultimo = opcoes
-    .filter((opcao) => opcao.segmento === "fundamental_medio")
-    .at(-1);
+  const ultimo = opcoes.findLast(
+    (opcao) => opcao.segmento === "fundamental_medio",
+  );
   if (ultimo) return ultimo.value;
   return codificarPeriodoSgp({
     ...periodoCorrente(hoje),

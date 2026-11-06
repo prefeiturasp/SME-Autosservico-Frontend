@@ -16,6 +16,8 @@ type Props = {
   readonly onRetry?: () => void;
   readonly errorMessage?: string;
   readonly value?: string;
+  readonly valueDetail?: string;
+  readonly valueClassName?: string;
   readonly trend?: MetricTrend;
   readonly trendLabel?: string;
   readonly comparison?: string;
@@ -31,6 +33,8 @@ export default function MetricCard({
   onRetry,
   errorMessage = "Não foi possível carregar os dados.",
   value,
+  valueDetail,
+  valueClassName,
   trend,
   trendLabel,
   comparison,
@@ -72,7 +76,12 @@ export default function MetricCard({
 
     return (
       <>
-        <div className="text-2xl font-bold text-[#3B82F6]">{value}</div>
+        <div className={cn("text-2xl font-bold text-[#3B82F6]", valueClassName)}>
+          {value}
+          {valueDetail && (
+            <span className="ml-1 text-sm font-medium">{valueDetail}</span>
+          )}
+        </div>
         <div className="mt-4 flex items-center gap-3">
           {badge ?? (trend && trendLabel && <TrendBadge trend={trend} label={trendLabel} />)}
           {comparison && (

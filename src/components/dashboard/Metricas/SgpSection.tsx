@@ -1,6 +1,8 @@
 import FrequenciasLancadasCard from "./FrequenciasLancadasCard";
 import SondagensRealizadasCard from "./SondagensRealizadasCard";
 import ConselhoDeClasseCard from "./ConselhoDeClasseCard";
+import ControleAcessosKpis from "./ControleAcessosKpis";
+import AcompanhamentoAcessosCard from "./AcompanhamentoAcessosCard";
 import FechamentoSgpSection from "./FechamentoSgpSection";
 import MetricasCollapsibleSection from "./MetricasCollapsibleSection";
 
@@ -11,6 +13,10 @@ type Props = {
 export default function SgpSection({ systemName }: Props) {
   return (
     <div className="mb-8">
+      <MetricasCollapsibleSection title="Controle de Acessos">
+        <ControleAcessosKpis systemName={systemName} />
+        <AcompanhamentoAcessosCard systemName={systemName} />
+      </MetricasCollapsibleSection>
       <MetricasCollapsibleSection title="Fechamento">
         <FechamentoSgpSection systemName={systemName} />
         <ConselhoDeClasseCard systemName={systemName} />

@@ -1,5 +1,4 @@
 import React from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { StatItem } from "@/types/metricas";
@@ -21,36 +20,27 @@ vi.mock("@/components/ui/button", () => ({
   ),
 }));
 
-vi.mock("@/components/ui/select", () => ({
-  Select: ({
-    children,
-    value,
-    onValueChange,
-  }: Readonly<{
-    children: React.ReactNode;
-    value: string;
-    onValueChange: (value: string) => void;
-  }>) => (
-    <select
-      data-testid="select-native"
-      value={value}
-      onChange={(event) => onValueChange(event.target.value)}
-    >
-      {children}
-    </select>
-  ),
-  SelectTrigger: () => null,
-  SelectValue: () => null,
-  SelectContent: ({ children }: Readonly<{ children: React.ReactNode }>) => (
-    <>{children}</>
-  ),
-  SelectItem: ({
-    value,
-    children,
-  }: Readonly<{ value: string; children: React.ReactNode }>) => (
-    <option value={value}>{children}</option>
-  ),
-}));
+vi.mock("@/components/ui/select", async () => {
+  const { selectNativo } = await import("@/__mocks__/selectNativo");
+  return selectNativo;
+});
+
+vi.mock("@/hooks/usePeriodosSgp", async () => {
+  const { useState } = await import("react");
+  return {
+    usePeriodoSgp: () => {
+      const [periodo, setPeriodo] = useState("fundamental_medio:2026:0:4");
+      return {
+        periodo,
+        setPeriodo,
+        opcoes: [
+          { value: "fundamental_medio:2026:0:4", label: "4º Bimestre de 2026", segmento: "fundamental_medio" },
+          { value: "eja:2026:2:1", label: "EJA - 1º Bim. do 2º Sem. 2026", segmento: "eja" },
+        ],
+      };
+    },
+  };
+});
 
 type MockQueryResult = {
   data?: StatItem[];
@@ -60,18 +50,12 @@ type MockQueryResult = {
   refetch: () => void;
 };
 
-let mockQueryResult: MockQueryResult = {
-  data: undefined,
-  isLoading: false,
-  isFetching: false,
-  isError: false,
-  refetch: vi.fn(),
-};
-let lastBimestreArg: string | undefined;
+let mockQueryResult: MockQueryResult;
+let ultimoPeriodo: string | undefined;
 
 vi.mock("@/hooks/useConselhoDeClasse", () => ({
-  useConselhoDeClasse: ({ bimestre }: { bimestre: string }) => {
-    lastBimestreArg = bimestre;
+  useConselhoDeClasse: ({ periodo }: { periodo: string }) => {
+    ultimoPeriodo = periodo;
     return mockQueryResult;
   },
 }));
@@ -81,7 +65,7 @@ import ConselhoDeClasseCard from "./ConselhoDeClasseCard";
 describe("<ConselhoDeClasseCard />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    lastBimestreArg = undefined;
+    ultimoPeriodo = undefined;
     mockQueryResult = {
       data: undefined,
       isLoading: false,
@@ -96,11 +80,10 @@ describe("<ConselhoDeClasseCard />", () => {
     expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
   });
 
-  it("renderiza o título e usa '2026-2' como bimestre inicial", () => {
+  it("usa o período padrão do seletor", () => {
     render(<ConselhoDeClasseCard systemName="SGP" />);
     expect(screen.getByText("Conselho de classe")).toBeInTheDocument();
-    expect(lastBimestreArg).toBe("2026-2");
-    expect(screen.getByTestId("select-native")).toHaveValue("2026-2");
+    expect(ultimoPeriodo).toBe("fundamental_medio:2026:0:4");
   });
 
   it("loading mostra skeletons", () => {
@@ -122,27 +105,28 @@ describe("<ConselhoDeClasseCard />", () => {
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 
-  it("sucesso renderiza os 3 indicadores", () => {
+  it("sucesso renderiza esperados e situações", () => {
     mockQueryResult = {
       ...mockQueryResult,
       data: [
-        { label: "Não iniciados", value: 204, variant: "muted" },
-        { label: "Em andamento", value: 387, variant: "neutral" },
-        { label: "Processado com sucesso", value: 1889, variant: "success" },
+        { label: "Esperados para o período", value: 2480, variant: "neutral", percentage: 91.77 },
+        { label: "Não iniciados", value: 204, variant: "muted", percentage: 8.23 },
+        { label: "Em andamento", value: 387, variant: "neutral", percentage: 15.6 },
+        { label: "Processado com sucesso", value: 1889, variant: "success", percentage: 76.17 },
       ],
     };
     render(<ConselhoDeClasseCard systemName="SGP" />);
 
-    expect(screen.getByText("204")).toBeInTheDocument();
-    expect(screen.getByText("387")).toBeInTheDocument();
+    expect(screen.getByText("2.480")).toBeInTheDocument();
     expect(screen.getByText("1.889")).toBeInTheDocument();
+    expect(screen.getByText("91,77%")).toBeInTheDocument();
   });
 
-  it("troca o bimestre ao selecionar outra opção", async () => {
+  it("troca para um período da EJA", async () => {
     render(<ConselhoDeClasseCard systemName="SGP" />);
 
-    await userEvent.selectOptions(screen.getByTestId("select-native"), "2026-1");
+    await userEvent.selectOptions(screen.getByTestId("select-native"), "eja:2026:2:1");
 
-    expect(lastBimestreArg).toBe("2026-1");
+    expect(ultimoPeriodo).toBe("eja:2026:2:1");
   });
 });

@@ -1,8 +1,7 @@
 import React from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { StatItem } from "@/types/metricas";
+import type { AcompanhamentoFechamentoResponse, PeriodoSgpOption } from "@/types/sgpMetricas";
 
 vi.mock("@/components/ui/skeleton", () => ({
   Skeleton: (props: Readonly<React.HTMLAttributes<HTMLDivElement>>) => (
@@ -10,78 +9,51 @@ vi.mock("@/components/ui/skeleton", () => ({
   ),
 }));
 
-vi.mock("@/components/ui/button", () => ({
-  Button: ({
-    children,
-    ...rest
-  }: Readonly<React.ButtonHTMLAttributes<HTMLButtonElement>>) => (
-    <button data-testid="retry-button" {...rest}>
-      {children}
-    </button>
-  ),
-}));
-
-vi.mock("@/components/ui/select", () => ({
-  Select: ({
-    children,
-    value,
-    onValueChange,
-  }: Readonly<{
-    children: React.ReactNode;
-    value: string;
-    onValueChange: (value: string) => void;
-  }>) => (
-    <select
-      data-testid="select-native"
-      value={value}
-      onChange={(event) => onValueChange(event.target.value)}
-    >
-      {children}
-    </select>
-  ),
-  SelectTrigger: () => null,
-  SelectValue: () => null,
-  SelectContent: ({ children }: Readonly<{ children: React.ReactNode }>) => (
-    <>{children}</>
-  ),
-  SelectItem: ({
-    value,
-    children,
-  }: Readonly<{ value: string; children: React.ReactNode }>) => (
-    <option value={value}>{children}</option>
-  ),
-}));
+vi.mock("@/components/ui/select", async () => {
+  const { selectNativo } = await import("@/__mocks__/selectNativo");
+  return selectNativo;
+});
 
 type MockQueryResult = {
-  data?: StatItem[];
+  data?: AcompanhamentoFechamentoResponse;
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;
   refetch: () => void;
 };
 
-let mockQueryResult: MockQueryResult = {
-  data: undefined,
-  isLoading: false,
-  isFetching: false,
-  isError: false,
-  refetch: vi.fn(),
-};
-let lastBimestreArg: string | undefined;
+let mockQueryResult: MockQueryResult;
+let ultimoPeriodo: string | undefined;
 
 vi.mock("@/hooks/useAcompanhamentoFechamento", () => ({
-  useAcompanhamentoFechamento: ({ bimestre }: { bimestre: string }) => {
-    lastBimestreArg = bimestre;
+  useAcompanhamentoFechamento: ({ periodo }: { periodo: string }) => {
+    ultimoPeriodo = periodo;
     return mockQueryResult;
   },
 }));
 
 import AcompanhamentoFechamentoCard from "./AcompanhamentoFechamentoCard";
 
+const OPCOES: PeriodoSgpOption[] = [
+  { value: "fundamental_medio:2026:0:4", label: "4º Bimestre de 2026", segmento: "fundamental_medio" },
+  { value: "eja:2026:2:1", label: "EJA - 1º Bim. do 2º Sem. 2026", segmento: "eja" },
+];
+
+const renderCard = (props: Partial<React.ComponentProps<typeof AcompanhamentoFechamentoCard>> = {}) =>
+  render(
+    <AcompanhamentoFechamentoCard
+      systemName="SGP"
+      periodo="fundamental_medio:2026:0:4"
+      opcoes={OPCOES}
+      onPeriodoChange={vi.fn()}
+      {...props}
+    />,
+  );
+
 describe("<AcompanhamentoFechamentoCard />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    lastBimestreArg = undefined;
+    ultimoPeriodo = undefined;
     mockQueryResult = {
       data: undefined,
       isLoading: false,
@@ -92,59 +64,56 @@ describe("<AcompanhamentoFechamentoCard />", () => {
   });
 
   it("sem systemName mostra placeholder", () => {
-    render(<AcompanhamentoFechamentoCard />);
+    renderCard({ systemName: undefined });
     expect(screen.getByText("Selecione um projeto")).toBeInTheDocument();
   });
 
-  it("renderiza o título e usa '2026-2' como bimestre inicial", () => {
-    render(<AcompanhamentoFechamentoCard systemName="SGP" />);
+  it("consulta o período recebido e mostra as opções do seletor", () => {
+    renderCard();
     expect(screen.getByText("Acompanhamento de fechamento")).toBeInTheDocument();
-    expect(lastBimestreArg).toBe("2026-2");
-    expect(screen.getByTestId("select-native")).toHaveValue("2026-2");
+    expect(ultimoPeriodo).toBe("fundamental_medio:2026:0:4");
+    expect(screen.getByTestId("select-native")).toHaveValue("fundamental_medio:2026:0:4");
+    expect(screen.getByRole("option", { name: "EJA - 1º Bim. do 2º Sem. 2026" })).toBeInTheDocument();
   });
 
   it("loading mostra skeletons", () => {
     mockQueryResult = { ...mockQueryResult, isLoading: true };
-    render(<AcompanhamentoFechamentoCard systemName="SGP" />);
+    renderCard();
     expect(screen.getAllByTestId("skeleton").length).toBeGreaterThanOrEqual(1);
   });
 
-  it("erro mostra mensagem e botão de retry", async () => {
-    const refetch = vi.fn();
-    mockQueryResult = { ...mockQueryResult, isError: true, refetch };
-    render(<AcompanhamentoFechamentoCard systemName="SGP" />);
-
+  it("erro mostra a mensagem do card", () => {
+    mockQueryResult = { ...mockQueryResult, isError: true };
+    renderCard();
     expect(
       screen.getByText("Não foi possível carregar o acompanhamento de fechamento."),
     ).toBeInTheDocument();
-
-    await userEvent.click(screen.getByTestId("retry-button"));
-    expect(refetch).toHaveBeenCalledTimes(1);
   });
 
-  it("sucesso renderiza os 4 indicadores", () => {
+  it("sucesso renderiza esperado e situações com percentual", () => {
     mockQueryResult = {
       ...mockQueryResult,
-      data: [
-        { label: "Não iniciados", value: 8398, variant: "muted" },
-        { label: "Processado com sucesso", value: 7530, variant: "success" },
-        { label: "Processado com pendências", value: 6853, variant: "warning" },
-        { label: "Processado com erro", value: 12398, variant: "danger" },
-      ],
+      data: {
+        itens: [
+          { label: "Esperado para o período", value: 35179, variant: "neutral", percentage: 76.13 },
+          { label: "Não iniciados", value: 8398, variant: "muted", percentage: 23.87 },
+        ],
+        porDre: [],
+      },
     };
-    render(<AcompanhamentoFechamentoCard systemName="SGP" />);
+    renderCard();
 
-    expect(screen.getByText("8.398")).toBeInTheDocument();
-    expect(screen.getByText("7.530")).toBeInTheDocument();
-    expect(screen.getByText("6.853")).toBeInTheDocument();
-    expect(screen.getByText("12.398")).toBeInTheDocument();
+    expect(screen.getByText("35.179")).toBeInTheDocument();
+    expect(screen.getByText("76,13%")).toBeInTheDocument();
+    expect(screen.getByText("23,87%")).toBeInTheDocument();
   });
 
-  it("troca o bimestre ao selecionar outra opção", async () => {
-    render(<AcompanhamentoFechamentoCard systemName="SGP" />);
+  it("avisa a seção ao trocar o período", async () => {
+    const onPeriodoChange = vi.fn();
+    renderCard({ onPeriodoChange });
 
-    await userEvent.selectOptions(screen.getByTestId("select-native"), "2026-1");
+    await userEvent.selectOptions(screen.getByTestId("select-native"), "eja:2026:2:1");
 
-    expect(lastBimestreArg).toBe("2026-1");
+    expect(onPeriodoChange).toHaveBeenCalledWith("eja:2026:2:1");
   });
 });

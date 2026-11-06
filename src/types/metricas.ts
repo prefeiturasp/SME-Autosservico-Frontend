@@ -56,6 +56,7 @@ export type StatItem = {
     format?: "number" | "currency" | "days";
     trend?: MetricTrend;
     trendLabel?: string;
+    percentage?: number;
 };
 
 export type StatsCardResponse = {

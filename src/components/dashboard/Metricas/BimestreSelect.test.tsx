@@ -37,16 +37,15 @@ vi.mock("@/components/ui/select", () => ({
 import BimestreSelect from "./BimestreSelect";
 
 describe("<BimestreSelect />", () => {
-  it("renderiza todas as opções de bimestre", () => {
+  it("lista os bimestres do mais recente para o mais antigo", () => {
     render(<BimestreSelect value="2026-2" onChange={vi.fn()} />);
 
-    expect(
-      screen.getByRole("option", { name: "2º Bimestre de 2026" })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("option", { name: "1º Bimestre de 2026" })
-    ).toBeInTheDocument();
-    expect(screen.getAllByRole("option")).toHaveLength(4);
+    expect(screen.getAllByRole("option").map((o) => o.textContent)).toEqual([
+      "2º Bimestre de 2026",
+      "1º Bimestre de 2026",
+      "4º Bimestre de 2025",
+      "3º Bimestre de 2025",
+    ]);
   });
 
   it("mostra o valor selecionado", () => {

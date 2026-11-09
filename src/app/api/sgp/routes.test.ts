@@ -8,20 +8,38 @@ vi.mock("@/actions/_helpers/sgpMetricas", () => ({
   fetchAcompanhamentoFechamento: vi.fn(),
   fetchConselhoDeClasse: vi.fn(),
   fetchUsuariosAcessoAtivo: vi.fn(),
+  fetchPeriodosSgp: vi.fn(),
   resolverPeriodo: (sp: URLSearchParams) => ({
     anoLetivo: Number(sp.get("ano_letivo")) || 2026,
     bimestre: Number(sp.get("bimestre")) || 2,
   }),
+  resolverFiltrosSgp: (sp: URLSearchParams) => ({
+    anoLetivo: Number(sp.get("ano_letivo")) || 2026,
+    bimestre: Number(sp.get("bimestre")) || 2,
+    segmento: "fundamental_medio",
+    semestre: null,
+  }),
+}));
+vi.mock("@/actions/_helpers/sgpControleAcessos", () => ({
+  fetchControleAcessos: vi.fn(),
+  fetchSerieAcessos: vi.fn(),
+  resolverGranularidade: () => "hora",
 }));
 
 import { auth } from "@/lib/auth";
-import * as helpers from "@/actions/_helpers/sgpMetricas";
+import * as sgpHelpers from "@/actions/_helpers/sgpMetricas";
+import * as acessosHelpers from "@/actions/_helpers/sgpControleAcessos";
 
 import { GET as frequencias } from "./frequencias/route";
 import { GET as sondagens } from "./sondagens/route";
 import { GET as fechamento } from "./acompanhamento-fechamento/route";
 import { GET as conselho } from "./conselho-de-classe/route";
 import { GET as acessoAtivo } from "./usuarios/acesso-ativo/route";
+import { GET as periodos } from "./periodos/route";
+import { GET as controleAcessos } from "./controle-acessos/route";
+import { GET as serieAcessos } from "./controle-acessos/serie/route";
+
+const helpers = { ...sgpHelpers, ...acessosHelpers };
 
 const mockedAuth = vi.mocked(auth);
 const sessao = { user: { id: "1" } } as never;
@@ -31,7 +49,10 @@ type Fetcher =
   | "fetchSondagens"
   | "fetchAcompanhamentoFechamento"
   | "fetchConselhoDeClasse"
-  | "fetchUsuariosAcessoAtivo";
+  | "fetchUsuariosAcessoAtivo"
+  | "fetchPeriodosSgp"
+  | "fetchControleAcessos"
+  | "fetchSerieAcessos";
 
 const rotas: ReadonlyArray<{
   nome: string;
@@ -54,6 +75,17 @@ const rotas: ReadonlyArray<{
     nome: "usuarios/acesso-ativo",
     GET: acessoAtivo,
     fetcher: "fetchUsuariosAcessoAtivo",
+  },
+  { nome: "periodos", GET: periodos, fetcher: "fetchPeriodosSgp" },
+  {
+    nome: "controle-acessos",
+    GET: controleAcessos,
+    fetcher: "fetchControleAcessos",
+  },
+  {
+    nome: "controle-acessos/serie",
+    GET: serieAcessos,
+    fetcher: "fetchSerieAcessos",
   },
 ];
 

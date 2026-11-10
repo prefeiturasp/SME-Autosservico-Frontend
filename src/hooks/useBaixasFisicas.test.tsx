@@ -3,6 +3,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useBaixasFisicas } from "./useBaixasFisicas";
+import {
+  BENS_FISICOS_METRICAS_FIXTURE,
+  mockFetchBensFisicos,
+} from "./_helpers/bensFisicosMetricas.fixture";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -17,6 +21,7 @@ const createWrapper = () => {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  mockFetchBensFisicos();
 });
 
 describe("useBaixasFisicas", () => {
@@ -30,7 +35,7 @@ describe("useBaixasFisicas", () => {
     expect(result.current.data).toBeUndefined();
   });
 
-  it("retorna os itens mockados de baixas físicas", async () => {
+  it("retorna os itens de baixas físicas vindos do BFF", async () => {
     const wrapper = createWrapper();
     const { result } = renderHook(
       () => useBaixasFisicas({ systemName: "Bens Físicos" }),
@@ -39,9 +44,6 @@ describe("useBaixasFisicas", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data?.items).toEqual([
-      { label: "Aprovadas", value: 540, variant: "success" },
-      { label: "Aguardando aprovação", value: 128, variant: "warning" },
-    ]);
+    expect(result.current.data).toEqual(BENS_FISICOS_METRICAS_FIXTURE.baixasFisicas);
   });
 });

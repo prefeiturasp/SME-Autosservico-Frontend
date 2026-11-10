@@ -59,6 +59,7 @@ const SISTEMAS_COM_METRICAS = new Set([
     "Serap",
     "Serap Estudantes",
     "GIPE",
+    "Bens Físicos",
 ]);
 
 // Nenhum sistema tem integração com o Google Analytics ainda (os cards da aba

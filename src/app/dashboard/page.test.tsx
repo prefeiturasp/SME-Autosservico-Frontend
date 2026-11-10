@@ -605,7 +605,6 @@ describe("Dashboard page", () => {
 
     test.each([
         "Rolê Agroecológico",
-        "Bens Físicos",
         "Sigla",
         "Limpeza",
     ])("não exibe a aba Métricas para %s, ainda sem integração", (nome) => {
@@ -963,6 +962,24 @@ describe("Dashboard page", () => {
         );
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com a seção do Bens Físicos quando o projeto ativo é o Bens Físicos", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: {
+                ...mockStoreState.activeProject,
+                nome: "Bens Físicos",
+            },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("bens-fisicos-section")).toHaveTextContent(
+            "Bens Físicos",
+        );
     });
 
     test("exibe a aba Métricas com o resumo e as seções do GIPE quando o projeto ativo é o GIPE", () => {

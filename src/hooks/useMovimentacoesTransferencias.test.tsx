@@ -3,6 +3,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMovimentacoesTransferencias } from "./useMovimentacoesTransferencias";
+import {
+  BENS_FISICOS_METRICAS_FIXTURE,
+  mockFetchBensFisicos,
+} from "./_helpers/bensFisicosMetricas.fixture";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -17,6 +21,7 @@ const createWrapper = () => {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  mockFetchBensFisicos();
 });
 
 describe("useMovimentacoesTransferencias", () => {
@@ -31,7 +36,7 @@ describe("useMovimentacoesTransferencias", () => {
     expect(result.current.data).toBeUndefined();
   });
 
-  it("retorna os itens mockados de movimentações e transferências", async () => {
+  it("retorna os itens de movimentações e transferências vindos do BFF", async () => {
     const wrapper = createWrapper();
     const { result } = renderHook(
       () => useMovimentacoesTransferencias({ systemName: "Bens Físicos" }),
@@ -40,10 +45,6 @@ describe("useMovimentacoesTransferencias", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data?.items).toEqual([
-      { label: "Movimentações realizadas", value: 3150, variant: "neutral" },
-      { label: "Movimentações pendentes", value: 214, variant: "warning" },
-      { label: "Transferências realizadas", value: 892, variant: "neutral" },
-    ]);
+    expect(result.current.data).toEqual(BENS_FISICOS_METRICAS_FIXTURE.movimentacoes);
   });
 });

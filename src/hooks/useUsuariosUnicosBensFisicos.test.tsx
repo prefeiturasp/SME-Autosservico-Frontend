@@ -3,6 +3,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useUsuariosUnicosBensFisicos } from "./useUsuariosUnicosBensFisicos";
+import {
+  BENS_FISICOS_METRICAS_FIXTURE,
+  mockFetchBensFisicos,
+} from "./_helpers/bensFisicosMetricas.fixture";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -17,6 +21,7 @@ const createWrapper = () => {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  mockFetchBensFisicos();
 });
 
 describe("useUsuariosUnicosBensFisicos", () => {
@@ -31,7 +36,7 @@ describe("useUsuariosUnicosBensFisicos", () => {
     expect(result.current.data).toBeUndefined();
   });
 
-  it("retorna os usuários únicos por dia mockados do Bens Físicos", async () => {
+  it("retorna os usuários únicos por dia do Bens Físicos vindos do BFF", async () => {
     const wrapper = createWrapper();
     const { result } = renderHook(
       () => useUsuariosUnicosBensFisicos({ systemName: "Bens Físicos" }),
@@ -40,10 +45,6 @@ describe("useUsuariosUnicosBensFisicos", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toEqual({
-      uniqueCount: 1560,
-      trend: "above",
-      trendLabel: "8% acima da média dos últimos 30 dias",
-    });
+    expect(result.current.data).toEqual(BENS_FISICOS_METRICAS_FIXTURE.usuariosUnicos);
   });
 });

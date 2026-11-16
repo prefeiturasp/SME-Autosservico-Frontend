@@ -550,7 +550,7 @@ describe("Dashboard page", () => {
         );
     });
 
-    test.each(["Novo SGP", "SigPAE", "Intranet", "GIPE"])(
+    test.each(["Novo SGP", "GIPE"])(
         "não exibe a aba Analytics nem os cards dela para %s",
         (nome) => {
             mockStoreState = {
@@ -569,6 +569,34 @@ describe("Dashboard page", () => {
             expect(
                 screen.queryByTestId("peak-hours-chart"),
             ).not.toBeInTheDocument();
+        },
+    );
+
+    test.each(["SGP", "SigPAE", "SigEscola", "Intranet"])(
+        "renderiza os cards da aba Analytics para %s",
+        (nome) => {
+            mockStoreState = {
+                ...mockStoreState,
+                activeItem: { title: "COPED" },
+                activeProject: { ...mockStoreState.activeProject, nome },
+            };
+
+            render(withClient(<Dashboard />));
+
+            fireEvent.click(screen.getByRole("tab", { name: "Analytics" }));
+
+            for (const testId of [
+                "active-users-card",
+                "average-session-card",
+                "peak-usage-today-card",
+                "device-distribution-card",
+                "peak-hours-chart",
+            ]) {
+                expect(screen.getByTestId(testId)).toHaveTextContent(nome);
+            }
+            expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
+                `${nome}::COPED`,
+            );
         },
     );
 

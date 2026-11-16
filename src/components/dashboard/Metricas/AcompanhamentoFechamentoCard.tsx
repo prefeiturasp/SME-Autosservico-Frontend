@@ -1,22 +1,28 @@
 "use client";
 
-import { useState } from "react";
 import { useAcompanhamentoFechamento } from "@/hooks/useAcompanhamentoFechamento";
-import { DEFAULT_BIMESTRE } from "@/types/bimestreOption";
+import type { PeriodoSgpOption } from "@/types/sgpMetricas";
 import StatsCard from "./StatsCard";
-import BimestreSelect from "./BimestreSelect";
+import PeriodoSgpSelect from "./PeriodoSgpSelect";
 
 type Props = {
   readonly systemName?: string;
+  readonly periodo: string;
+  readonly opcoes: ReadonlyArray<PeriodoSgpOption>;
+  readonly onPeriodoChange: (next: string) => void;
   readonly className?: string;
 };
 
-export default function AcompanhamentoFechamentoCard({ systemName, className }: Props) {
-  const [bimestre, setBimestre] = useState<string>(DEFAULT_BIMESTRE);
-  const { data, isLoading, isFetching, isError, refetch } = useAcompanhamentoFechamento({
-    systemName: systemName ?? "",
-    bimestre,
-  });
+// O período vem da seção porque os gráficos por DRE usam o mesmo filtro.
+export default function AcompanhamentoFechamentoCard({
+  systemName,
+  periodo,
+  opcoes,
+  onPeriodoChange,
+  className,
+}: Props) {
+  const { data, isLoading, isFetching, isError, refetch } =
+    useAcompanhamentoFechamento({ systemName: systemName ?? "", periodo });
 
   return (
     <StatsCard
@@ -26,8 +32,14 @@ export default function AcompanhamentoFechamentoCard({ systemName, className }: 
       isError={isError}
       onRetry={() => refetch()}
       errorMessage="Não foi possível carregar o acompanhamento de fechamento."
-      items={data}
-      action={<BimestreSelect value={bimestre} onChange={setBimestre} />}
+      items={data?.itens}
+      action={
+        <PeriodoSgpSelect
+          value={periodo}
+          onChange={onPeriodoChange}
+          options={opcoes}
+        />
+      }
       className={className}
     />
   );

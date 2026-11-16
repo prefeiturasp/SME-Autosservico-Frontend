@@ -1,11 +1,11 @@
-import type { StatItem } from "@/types/metricas";
+import type { AcompanhamentoFechamentoResponse } from "@/types/sgpMetricas";
 import {
-  useSgpBimestreQuery,
-  type SgpBimestreOptions,
-} from "./_helpers/sgpBimestreQuery";
+  useSgpPeriodoQuery,
+  type SgpPeriodoOptions,
+} from "./_helpers/sgpPeriodoQuery";
 
-export function useAcompanhamentoFechamento(options: SgpBimestreOptions) {
-  return useSgpBimestreQuery<StatItem[]>(
+export function useAcompanhamentoFechamento(options: SgpPeriodoOptions) {
+  return useSgpPeriodoQuery<AcompanhamentoFechamentoResponse>(
     "acompanhamento-fechamento",
     "/api/sgp/acompanhamento-fechamento",
     options,

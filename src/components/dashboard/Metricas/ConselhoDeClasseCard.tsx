@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useConselhoDeClasse } from "@/hooks/useConselhoDeClasse";
-import { DEFAULT_BIMESTRE } from "@/types/bimestreOption";
+import { usePeriodoSgp } from "@/hooks/usePeriodosSgp";
 import StatsCard from "./StatsCard";
-import BimestreSelect from "./BimestreSelect";
+import PeriodoSgpSelect from "./PeriodoSgpSelect";
 
 type Props = {
   readonly systemName?: string;
@@ -12,10 +11,10 @@ type Props = {
 };
 
 export default function ConselhoDeClasseCard({ systemName, className }: Props) {
-  const [bimestre, setBimestre] = useState<string>(DEFAULT_BIMESTRE);
+  const { periodo, setPeriodo, opcoes } = usePeriodoSgp(systemName ?? "");
   const { data, isLoading, isFetching, isError, refetch } = useConselhoDeClasse({
     systemName: systemName ?? "",
-    bimestre,
+    periodo,
   });
 
   return (
@@ -27,7 +26,9 @@ export default function ConselhoDeClasseCard({ systemName, className }: Props) {
       onRetry={() => refetch()}
       errorMessage="Não foi possível carregar o conselho de classe."
       items={data}
-      action={<BimestreSelect value={bimestre} onChange={setBimestre} />}
+      action={
+        <PeriodoSgpSelect value={periodo} onChange={setPeriodo} options={opcoes} />
+      }
       className={className}
     />
   );

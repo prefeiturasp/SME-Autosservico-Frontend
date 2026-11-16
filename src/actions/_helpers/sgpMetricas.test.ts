@@ -10,7 +10,9 @@ import {
   fetchAcompanhamentoFechamento,
   fetchConselhoDeClasse,
   fetchUsuariosAcessoAtivo,
+  fetchPeriodosSgp,
   resolverPeriodo,
+  resolverFiltrosSgp,
   periodoCorrente,
 } from "./sgpMetricas";
 
@@ -29,7 +31,7 @@ describe("fetchFrequencias", () => {
     const res = await fetchFrequencias(2026, 2);
 
     expect(mockBffGet).toHaveBeenCalledWith(
-      "/api/v1/sgp/metricas/?ano_letivo=2026&bimestre=2",
+      "/api/v1/sgp/metricas/?ano_letivo=2026&bimestre=2&segmento=fundamental_medio",
     );
     expect(res).toEqual({
       items: [
@@ -77,53 +79,139 @@ describe("fetchSondagens", () => {
   });
 });
 
+const FUND_MEDIO = {
+  anoLetivo: 2026,
+  bimestre: 2,
+  segmento: "fundamental_medio",
+  semestre: null,
+} as const;
+const EJA = { anoLetivo: 2026, bimestre: 1, segmento: "eja", semestre: 2 } as const;
+
 describe("fetchAcompanhamentoFechamento", () => {
-  it("mapeia as 4 situações de fechamento", async () => {
+  it("mapeia esperado, situações com percentual e a quebra por DRE", async () => {
     mockBffGet.mockResolvedValue({
       fechamento: {
+        esperado: 35179,
         nao_iniciados: 8398,
-        processado_sucesso: 7530,
-        processado_pendencias: 6853,
-        processado_erro: 12398,
+        processado_sucesso: 12398,
+        processado_pendencias: 7530,
+        processado_erro: 6853,
+        por_dre: [
+          {
+            dre: "BT",
+            previsto: 3156,
+            nao_iniciados: 1736,
+            processado_sucesso: 980,
+            processado_pendencias: 240,
+            processado_erro: 200,
+          },
+        ],
       },
     });
 
-    const res = await fetchAcompanhamentoFechamento(2026, 2);
+    const res = await fetchAcompanhamentoFechamento(EJA);
 
-    expect(res).toEqual([
-      { label: "Não iniciados", value: 8398, variant: "muted" },
-      { label: "Processado com sucesso", value: 7530, variant: "success" },
-      { label: "Processado com pendências", value: 6853, variant: "warning" },
-      { label: "Processado com erro", value: 12398, variant: "danger" },
+    expect(mockBffGet).toHaveBeenCalledWith(
+      "/api/v1/sgp/metricas/?ano_letivo=2026&bimestre=1&segmento=eja&semestre=2",
+    );
+    expect(res.itens).toEqual([
+      { label: "Esperado para o período", value: 35179, variant: "neutral", percentage: 76.13 },
+      { label: "Não iniciados", value: 8398, variant: "muted", percentage: 23.87 },
+      { label: "Processado com sucesso", value: 12398, variant: "success", percentage: 35.24 },
+      { label: "Processado com pendências", value: 7530, variant: "warning", percentage: 21.4 },
+      { label: "Processado com erro", value: 6853, variant: "danger", percentage: 19.48 },
+    ]);
+    expect(res.porDre).toEqual([
+      {
+        dre: "BT",
+        previsto: 3156,
+        naoIniciados: 1736,
+        processadoSucesso: 980,
+        processadoPendencias: 240,
+        processadoErro: 200,
+      },
     ]);
   });
 
-  it("usa 0 para situações null", async () => {
+  it("usa 0 (e 0%) quando o bloco vem null", async () => {
     mockBffGet.mockResolvedValue({ fechamento: null });
 
-    const res = await fetchAcompanhamentoFechamento(2026, 2);
+    const res = await fetchAcompanhamentoFechamento(FUND_MEDIO);
 
-    expect(res.every((i) => i.value === 0)).toBe(true);
+    expect(mockBffGet).toHaveBeenCalledWith(
+      "/api/v1/sgp/metricas/?ano_letivo=2026&bimestre=2&segmento=fundamental_medio",
+    );
+    expect(res.itens.every((i) => i.value === 0 && i.percentage === 0)).toBe(true);
+    expect(res.porDre).toEqual([]);
   });
 });
 
 describe("fetchConselhoDeClasse", () => {
-  it("mapeia as 3 situações do conselho", async () => {
+  it("mapeia esperado e as 3 situações com percentual", async () => {
     mockBffGet.mockResolvedValue({
       conselho_classe: {
+        esperado: 2480,
         nao_iniciados: 204,
         em_andamento: 387,
         processado_sucesso: 1889,
       },
     });
 
-    const res = await fetchConselhoDeClasse(2026, 2);
+    const res = await fetchConselhoDeClasse(FUND_MEDIO);
 
     expect(res).toEqual([
-      { label: "Não iniciados", value: 204, variant: "muted" },
-      { label: "Em andamento", value: 387, variant: "neutral" },
-      { label: "Processado com sucesso", value: 1889, variant: "success" },
+      { label: "Esperados para o período", value: 2480, variant: "neutral", percentage: 91.77 },
+      { label: "Não iniciados", value: 204, variant: "muted", percentage: 8.23 },
+      { label: "Em andamento", value: 387, variant: "neutral", percentage: 15.6 },
+      { label: "Processado com sucesso", value: 1889, variant: "success", percentage: 76.17 },
     ]);
+  });
+});
+
+describe("fetchPeriodosSgp", () => {
+  it("monta as opções do seletor com valor e rótulo", async () => {
+    mockBffGet.mockResolvedValue({
+      periodos: [
+        { ano_letivo: 2026, segmento: "fundamental_medio", semestre: null, bimestre: 4, inicio: "2026-10-05", fim: "2026-12-18" },
+        { ano_letivo: 2026, segmento: "eja", semestre: 2, bimestre: 1, inicio: "2026-07-27", fim: "2026-09-30" },
+      ],
+    });
+
+    const res = await fetchPeriodosSgp();
+
+    expect(mockBffGet).toHaveBeenCalledWith("/api/v1/sgp/periodos/");
+    expect(res).toEqual([
+      { value: "fundamental_medio:2026:0:4", label: "4º Bimestre de 2026", segmento: "fundamental_medio" },
+      { value: "eja:2026:2:1", label: "EJA - 1º Bim. do 2º Sem. 2026", segmento: "eja" },
+    ]);
+  });
+
+  it("devolve lista vazia com o cache do BFF frio", async () => {
+    mockBffGet.mockResolvedValue({ periodos: null });
+
+    expect(await fetchPeriodosSgp()).toEqual([]);
+  });
+});
+
+describe("resolverFiltrosSgp", () => {
+  const filtros = (query: string) =>
+    resolverFiltrosSgp(new URLSearchParams(query));
+
+  it("lê a EJA com semestre e bimestre válidos", () => {
+    expect(filtros("ano_letivo=2026&bimestre=1&segmento=eja&semestre=2")).toEqual(EJA);
+  });
+
+  it("ignora o semestre fora da EJA", () => {
+    expect(filtros("ano_letivo=2026&bimestre=2&semestre=1")).toEqual(FUND_MEDIO);
+  });
+
+  it.each([
+    "ano_letivo=2026&bimestre=2&segmento=eja",
+    "ano_letivo=2026&bimestre=3&segmento=eja&semestre=1",
+    "ano_letivo=2026&bimestre=2&segmento=infantil",
+  ])("EJA inválida cai em Fundamental/Médio (%s)", (query) => {
+    expect(filtros(query).segmento).toBe("fundamental_medio");
+    expect(filtros(query).semestre).toBeNull();
   });
 });
 

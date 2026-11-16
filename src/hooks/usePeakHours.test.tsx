@@ -1,59 +1,65 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, waitFor } from "@testing-library/react";
 import React from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+vi.mock("@/lib/analytics", () => ({ fetchAnalytics: vi.fn() }));
+
+import { fetchAnalytics } from "@/lib/analytics";
 import { usePeakHours } from "./usePeakHours";
 
+const mockedFetch = vi.mocked(fetchAnalytics);
+
 const createWrapper = () => {
-    const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
-        const client = new QueryClient({
-            defaultOptions: {
-                queries: { retry: false, gcTime: Infinity },
-            },
-        });
-        return (
-            <QueryClientProvider client={client}>
-                {children}
-            </QueryClientProvider>
-        );
-    };
-    Wrapper.displayName = "QueryClientTestWrapper";
-    return Wrapper;
+  const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false, gcTime: Infinity },
+      },
+    });
+    return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  };
+  Wrapper.displayName = "QueryClientTestWrapper";
+  return Wrapper;
 };
 
 beforeEach(() => {
-    vi.restoreAllMocks();
+  mockedFetch.mockReset();
 });
 
 describe("usePeakHours", () => {
-    it("não dispara fetch quando systemName é vazio", async () => {
-        const wrapper = createWrapper();
-
-        const { result } = renderHook(() => usePeakHours({ systemName: "" }), {
-            wrapper,
-        });
-
-        await waitFor(() => expect(result.current.isFetching).toBe(false));
-        expect(result.current.data).toBeUndefined();
+  it("não dispara fetch quando systemName é vazio", async () => {
+    const { result } = renderHook(() => usePeakHours({ systemName: "" }), {
+      wrapper: createWrapper(),
     });
 
-    it("retorna dados mock e propaga o systemName", async () => {
-        const wrapper = createWrapper();
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(result.current.data).toBeUndefined();
+    expect(mockedFetch).not.toHaveBeenCalled();
+  });
 
-        const { result } = renderHook(
-            () => usePeakHours({ systemName: "SigPAE" }),
-            { wrapper },
-        );
+  it("busca o indicador do sistema e período informados", async () => {
+    const resposta = { system: "SGP", peakHour: "11h", data: [] };
+    mockedFetch.mockResolvedValueOnce(resposta);
 
-        await waitFor(() => expect(result.current.isSuccess).toBe(true), {
-            timeout: 2000,
-        });
+    const { result } = renderHook(
+      () => usePeakHours({ systemName: "SGP", period: "7-dias" }),
+      { wrapper: createWrapper() },
+    );
 
-        expect(result.current.data).toMatchObject({
-            system: "SigPAE",
-            peakHour: expect.any(String),
-            data: expect.any(Array),
-        });
-        expect(result.current.data?.data.length).toBe(24);
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(resposta);
+    expect(mockedFetch).toHaveBeenCalledWith("peak-hours", "SGP", "7-dias");
+  });
+
+  it("usa o período padrão e expõe o erro da consulta", async () => {
+    mockedFetch.mockRejectedValueOnce(new Error("falha"));
+
+    const { result } = renderHook(() => usePeakHours({ systemName: "SGP" }), {
+      wrapper: createWrapper(),
     });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(mockedFetch).toHaveBeenCalledWith("peak-hours", "SGP", "hoje");
+  });
 });

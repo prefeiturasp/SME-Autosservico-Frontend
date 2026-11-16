@@ -62,9 +62,13 @@ const SISTEMAS_COM_METRICAS = new Set([
     "Bens Físicos",
 ]);
 
-// Nenhum sistema tem integração com o Google Analytics ainda (os cards da aba
-// são mock); incluir o nome aqui conforme a integração de cada um for liberada.
-const SISTEMAS_COM_ANALYTICS = new Set<string>([]);
+// Sistemas com property do Google Analytics configurada (GA_<SISTEMA>_*).
+const SISTEMAS_COM_ANALYTICS = new Set<string>([
+    "SGP",
+    "SigPAE",
+    "SigEscola",
+    "Intranet",
+]);
 
 type FullWidthSectionProps = {
     readonly id?: string;

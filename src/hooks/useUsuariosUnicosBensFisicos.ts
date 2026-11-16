@@ -1,24 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
 import type { UniqueUsersPerDayResponse } from "@/types/metricas";
+import { useBensFisicosMetricasQuery } from "./_helpers/bensFisicosMetricas";
 
 type Options = {
   systemName: string;
 };
 
-const MOCK_RESPONSE: UniqueUsersPerDayResponse = {
-  uniqueCount: 1560,
-  trend: "above",
-  trendLabel: "8% acima da média dos últimos 30 dias",
-};
-
 export function useUsuariosUnicosBensFisicos({ systemName }: Options) {
-  return useQuery<UniqueUsersPerDayResponse>({
-    queryKey: ["usuarios-unicos-bens-fisicos", systemName],
-    enabled: !!systemName,
-    refetchOnWindowFocus: false,
-    queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return MOCK_RESPONSE;
-    },
-  });
+  return useBensFisicosMetricasQuery(
+    systemName,
+    (data): UniqueUsersPerDayResponse => data.usuariosUnicos,
+  );
 }

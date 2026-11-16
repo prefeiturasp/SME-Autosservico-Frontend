@@ -124,13 +124,12 @@ export async function getAverageSession(
   systemName: string,
   period: AnalyticsPeriod,
 ): Promise<AverageSessionResponse> {
-  const anteriores = janelasAnteriores(period);
   const rows = await runReport(systemName, {
     dateRanges: [
       janela(period, 0),
       {
-        startDate: anteriores[anteriores.length - 1].startDate,
-        endDate: anteriores[0].endDate,
+        startDate: janela(period, JANELAS_ANTERIORES).startDate,
+        endDate: janela(period, 1).endDate,
         name: "referencia",
       },
     ],

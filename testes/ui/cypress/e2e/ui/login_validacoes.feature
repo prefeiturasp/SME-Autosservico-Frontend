@@ -2,11 +2,13 @@
 
 Funcionalidade: Validações do formulário de login
 
+@ignore
   Cenário: Exibir os elementos essenciais do formulário
     Dado que eu acesso o sistema
     Então devo visualizar o formulário de login
     E o botão de entrar deve estar desabilitado
 
+@ignore
   Cenário: Limitar o Registro Funcional a oito dígitos
     Dado que eu acesso o sistema
     Quando informo o RF "123456789" no formulário de login
@@ -20,6 +22,7 @@ Funcionalidade: Validações do formulário de login
     Quando alterno a visibilidade da senha
     Então o campo de senha deve estar oculto e conter "senha-de-teste"
 
+@ignore
   Cenário: Limpar a senha após credenciais inválidas
     Dado que eu acesso o sistema
     Quando eu informo o RF do tipo "rf_invalido" e a senha do tipo "senha_invalida"

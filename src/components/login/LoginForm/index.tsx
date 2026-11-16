@@ -143,9 +143,16 @@ export default function LoginForm() {
                                                 <InputMask
                                                     {...field}
                                                     inputMode="numeric"
+                                                    maxLength={8}
                                                     placeholder="Digite o seu RF..."
                                                     maskProps={{
                                                         mask: "99999999",
+                                                    }}
+                                                    onChange={(event) => {
+                                                        const nextValue = event.target.value
+                                                            .replace(/\D/g, "")
+                                                            .slice(0, 8);
+                                                        field.onChange(nextValue);
                                                     }}
                                                 />
                                             </FormControl>

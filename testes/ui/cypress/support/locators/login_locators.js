@@ -1,15 +1,15 @@
 class Login_Auto_Servico_Localizadores {
 
   campo_usuario() {
-    return 'input[placeholder="Digite o seu RF..."]'
+    return 'input[placeholder*="RF"], input[name="rf"]'
   }
 
   campo_senha() {
-    return 'input[placeholder="Digite a sua senha..."]'
+    return 'input[placeholder*="senha"], input[name="password"]'
   }
 
   botao_acessar() {
-    return 'button:contains("Entrar")'
+    return 'button[type="submit"], button:contains("Entrar")'
   }
 
   mensagem_erro() {

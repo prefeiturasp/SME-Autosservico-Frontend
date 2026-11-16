@@ -1,11 +1,11 @@
 import type { StatItem } from "@/types/metricas";
 import {
-  useSgpBimestreQuery,
-  type SgpBimestreOptions,
-} from "./_helpers/sgpBimestreQuery";
+  useSgpPeriodoQuery,
+  type SgpPeriodoOptions,
+} from "./_helpers/sgpPeriodoQuery";
 
-export function useConselhoDeClasse(options: SgpBimestreOptions) {
-  return useSgpBimestreQuery<StatItem[]>(
+export function useConselhoDeClasse(options: SgpPeriodoOptions) {
+  return useSgpPeriodoQuery<StatItem[]>(
     "conselho-de-classe",
     "/api/sgp/conselho-de-classe",
     options,

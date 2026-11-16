@@ -550,7 +550,7 @@ describe("Dashboard page", () => {
         );
     });
 
-    test.each(["Novo SGP", "SigPAE", "Intranet", "GIPE"])(
+    test.each(["Novo SGP", "GIPE"])(
         "não exibe a aba Analytics nem os cards dela para %s",
         (nome) => {
             mockStoreState = {
@@ -569,6 +569,34 @@ describe("Dashboard page", () => {
             expect(
                 screen.queryByTestId("peak-hours-chart"),
             ).not.toBeInTheDocument();
+        },
+    );
+
+    test.each(["SGP", "SigPAE", "SigEscola", "Intranet"])(
+        "renderiza os cards da aba Analytics para %s",
+        (nome) => {
+            mockStoreState = {
+                ...mockStoreState,
+                activeItem: { title: "COPED" },
+                activeProject: { ...mockStoreState.activeProject, nome },
+            };
+
+            render(withClient(<Dashboard />));
+
+            fireEvent.click(screen.getByRole("tab", { name: "Analytics" }));
+
+            for (const testId of [
+                "active-users-card",
+                "average-session-card",
+                "peak-usage-today-card",
+                "device-distribution-card",
+                "peak-hours-chart",
+            ]) {
+                expect(screen.getByTestId(testId)).toHaveTextContent(nome);
+            }
+            expect(screen.getByTestId("users-by-page-card")).toHaveTextContent(
+                `${nome}::COPED`,
+            );
         },
     );
 
@@ -605,7 +633,6 @@ describe("Dashboard page", () => {
 
     test.each([
         "Rolê Agroecológico",
-        "Bens Físicos",
         "Sigla",
         "Limpeza",
     ])("não exibe a aba Métricas para %s, ainda sem integração", (nome) => {
@@ -963,6 +990,24 @@ describe("Dashboard page", () => {
         );
         expect(screen.queryByTestId("provas-section")).not.toBeInTheDocument();
         expect(screen.queryByTestId("sgp-section")).not.toBeInTheDocument();
+    });
+
+    test("exibe a aba Métricas com a seção do Bens Físicos quando o projeto ativo é o Bens Físicos", () => {
+        mockStoreState = {
+            ...mockStoreState,
+            activeProject: {
+                ...mockStoreState.activeProject,
+                nome: "Bens Físicos",
+            },
+        };
+
+        render(withClient(<Dashboard />));
+
+        fireEvent.click(screen.getByRole("tab", { name: "Métricas" }));
+
+        expect(screen.getByTestId("bens-fisicos-section")).toHaveTextContent(
+            "Bens Físicos",
+        );
     });
 
     test("exibe a aba Métricas com o resumo e as seções do GIPE quando o projeto ativo é o GIPE", () => {

@@ -70,6 +70,32 @@ describe("<StatItemBox />", () => {
     expect(screen.queryByLabelText(/Tendência/)).not.toBeInTheDocument();
   });
 
+  it("com percentage, mostra a barra e o percentual (barra limitada a 100%)", () => {
+    render(
+      <StatItemBox
+        item={{
+          label: "Esperado para o período",
+          value: 35179,
+          variant: "neutral",
+          percentage: 76.13,
+        }}
+      />,
+    );
+
+    expect(screen.getByText("76,13%")).toBeInTheDocument();
+    expect(screen.getByTestId("stat-item-progress")).toHaveStyle({ width: "76.13%" });
+  });
+
+  it("sem percentage, não renderiza a barra", () => {
+    render(
+      <StatItemBox
+        item={{ label: "UPs cadastradas", value: 4890, variant: "warning" }}
+      />,
+    );
+
+    expect(screen.queryByTestId("stat-item-progress")).not.toBeInTheDocument();
+  });
+
   it("aceita className extra pra customizar a caixa em contextos específicos", () => {
     render(
       <StatItemBox

@@ -3,6 +3,10 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAcessoAtivoBensFisicos } from "./useAcessoAtivoBensFisicos";
+import {
+  BENS_FISICOS_METRICAS_FIXTURE,
+  mockFetchBensFisicos,
+} from "./_helpers/bensFisicosMetricas.fixture";
 
 const createWrapper = () => {
   const Wrapper = ({ children }: { readonly children: React.ReactNode }) => {
@@ -17,6 +21,7 @@ const createWrapper = () => {
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  mockFetchBensFisicos();
 });
 
 describe("useAcessoAtivoBensFisicos", () => {
@@ -31,7 +36,7 @@ describe("useAcessoAtivoBensFisicos", () => {
     expect(result.current.data).toBeUndefined();
   });
 
-  it("retorna o acesso ativo mockado do Bens Físicos", async () => {
+  it("retorna o acesso ativo do Bens Físicos vindo do BFF", async () => {
     const wrapper = createWrapper();
     const { result } = renderHook(
       () => useAcessoAtivoBensFisicos({ systemName: "Bens Físicos" }),
@@ -40,10 +45,6 @@ describe("useAcessoAtivoBensFisicos", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toEqual({
-      activeCount: 4645,
-      trend: "on-average",
-      trendLabel: "Média dos últimos 30 dias",
-    });
+    expect(result.current.data).toEqual(BENS_FISICOS_METRICAS_FIXTURE.acessoAtivo);
   });
 });

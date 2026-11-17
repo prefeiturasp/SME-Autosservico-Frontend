@@ -16,13 +16,6 @@ vi.mock("./UsuariosUnicosBensFisicosCard", () => ({
   ),
 }));
 
-vi.mock("./UesAptasPrestarContasCard", () => ({
-  __esModule: true,
-  default: ({ systemName }: { systemName?: string }) => (
-    <div data-testid="ues-aptas-prestar-contas-card">{systemName ?? ""}</div>
-  ),
-}));
-
 vi.mock("./CadastroDeBensCard", () => ({
   __esModule: true,
   default: ({ systemName }: { systemName?: string }) => (
@@ -47,7 +40,7 @@ vi.mock("./MovimentacoesTransferenciasCard", () => ({
 import BensFisicosSection from "./BensFisicosSection";
 
 describe("<BensFisicosSection />", () => {
-  it("renderiza os 6 cards propagando systemName", () => {
+  it("renderiza os 5 cards propagando systemName", () => {
     render(<BensFisicosSection systemName="Bens Físicos" />);
 
     expect(
@@ -55,9 +48,6 @@ describe("<BensFisicosSection />", () => {
     ).toHaveTextContent("Bens Físicos");
     expect(
       screen.getByTestId("usuarios-unicos-bens-fisicos-card"),
-    ).toHaveTextContent("Bens Físicos");
-    expect(
-      screen.getByTestId("ues-aptas-prestar-contas-card"),
     ).toHaveTextContent("Bens Físicos");
     expect(screen.getByTestId("cadastro-de-bens-card")).toHaveTextContent(
       "Bens Físicos",
@@ -68,5 +58,14 @@ describe("<BensFisicosSection />", () => {
     expect(
       screen.getByTestId("movimentacoes-transferencias-card"),
     ).toHaveTextContent("Bens Físicos");
+  });
+
+  it("não exibe o card de UEs aptas a prestar contas", () => {
+    render(<BensFisicosSection systemName="Bens Físicos" />);
+
+    expect(
+      screen.queryByText("UEs aptas a prestar contas pelo sistema"),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByTestId(/-card$/)).toHaveLength(5);
   });
 });

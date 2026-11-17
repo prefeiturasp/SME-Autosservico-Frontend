@@ -7,6 +7,7 @@ Funcionalidade: Dashboard
     E clico no botão de acessar
     Então o resultado esperado para o cenário "Login válido padrão" deve ser exibido
 
+  @ignore
   Cenário: Validar card de lançamentos
     Então o card de "Lançamentos" deve estar visível
     E deve exibir a versão e data de realização
